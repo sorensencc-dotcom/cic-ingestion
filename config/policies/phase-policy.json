@@ -1,0 +1,49 @@
+{
+  "version": "1.0.0",
+  "phase": "1.1.1",
+  "description": "Memory pipeline phase execution policy",
+  "effective_date": "2026-06-22",
+  "policies": {
+    "phase_23_memory": {
+      "enabled": true,
+      "max_items_per_batch": 1000,
+      "batch_timeout_ms": 5000,
+      "retry_policy": {
+        "enabled": true,
+        "max_attempts": 3,
+        "backoff_type": "exponential",
+        "backoff_seed": 12345
+      }
+    },
+    "phase_24_governance": {
+      "enabled": true,
+      "council_voting_enabled": true,
+      "rail_precedence": [
+        "security",
+        "compliance",
+        "performance",
+        "feature"
+      ],
+      "decay_enabled": true,
+      "decay_days": 30
+    },
+    "phase_25_knowledge_graph": {
+      "enabled": true,
+      "max_vertices": 100000,
+      "max_edges": 500000,
+      "indexing_enabled": true
+    },
+    "determinism": {
+      "enabled": true,
+      "clock_type": "monotonic",
+      "seed": 42,
+      "allow_math_random": false,
+      "promise_timeout_ms": 30000
+    },
+    "audit": {
+      "enabled": true,
+      "log_path": "/app/data/phase-audit.log",
+      "retention_days": 90
+    }
+  }
+}

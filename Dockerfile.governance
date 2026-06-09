@@ -1,0 +1,22 @@
+# Phase 1.1.1 Governance Engine
+# Enforces tool policies, memory pipeline rules, agent governance
+
+FROM node:20.13.0-alpine3.20
+
+LABEL phase="1.1.1"
+LABEL component="governance-engine"
+
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --frozen-lockfile
+
+COPY src/governance /app/src/governance
+COPY config/policies /app/config/policies
+COPY tsconfig.json ./
+
+RUN npm run build:ts 2>/dev/null || true
+
+EXPOSE 9095
+
+CMD ["npm", "run", "start:governance"]

@@ -1,0 +1,51 @@
+{
+  "version": "1.0.0",
+  "phase": "1.1.1",
+  "description": "Tool execution policy for Wayland adapters",
+  "effective_date": "2026-06-22",
+  "policies": {
+    "tool_execution": {
+      "enabled": true,
+      "allowlist": [
+        "read_file",
+        "write_file",
+        "execute_script",
+        "list_directory",
+        "query_database"
+      ],
+      "blocklist": [
+        "delete_file",
+        "drop_database",
+        "force_push",
+        "unsafe_shell_exec"
+      ],
+      "rate_limits": {
+        "read_file": {
+          "max_per_minute": 100,
+          "max_concurrent": 10
+        },
+        "write_file": {
+          "max_per_minute": 20,
+          "max_concurrent": 5
+        },
+        "execute_script": {
+          "max_per_minute": 10,
+          "max_concurrent": 2
+        }
+      },
+      "timeout_ms": 30000,
+      "retry_policy": {
+        "enabled": true,
+        "max_attempts": 3,
+        "backoff_ms": 100
+      }
+    },
+    "audit_trail": {
+      "enabled": true,
+      "log_level": "info",
+      "destinations": [
+        "/app/data/audit.log"
+      ]
+    }
+  }
+}
