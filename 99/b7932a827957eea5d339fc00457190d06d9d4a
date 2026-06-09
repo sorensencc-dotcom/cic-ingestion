@@ -1,0 +1,21 @@
+CAVEMAN_SETUP_COMPLETE.md
+  s_7ed1cba9a0c9a6::t_e2bce5f15966fb 72,75-99
+CAVEMAN.md
+  s_7ed1cba9a0c9a6::t_910ec90e19beee 173-182,188
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "99b7932a827957eea5d339fc00457190d06d9d4a",
+  "prompts": {},
+  "sessions": {
+    "s_7ed1cba9a0c9a6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "38d2de9c-9932-4eec-bdea-d848fcebdba0",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
