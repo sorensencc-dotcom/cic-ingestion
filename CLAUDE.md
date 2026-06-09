@@ -49,3 +49,44 @@ docker run -it --rm -v $(pwd):/app cic-ingestion:latest
 
 ## When Asking for Builds
 **Always specify:** "Use TheFoundry Docker build" or just say "build with Docker" and I'll use the command above.
+
+---
+
+## CIC Local Ops Pack (Phase 0.9)
+
+**Complete zero-cost Docker deployment infrastructure** — ready to use immediately.
+
+### Quick Access
+```bash
+make help              # View all targets
+make build            # Build with TheFoundry
+make compose-up       # Start CIC + MemoryStore
+make all-up          # Full stack (CIC + logging + monitoring)
+make all-down        # Stop everything
+```
+
+### What's Included
+- **Makefile:** 25+ targets for all Docker + Foundry operations
+- **Docker Compose:** Multi-service stack (CIC + MemoryStore)
+- **Logging Stack:** Loki + Promtail + Grafana (http://localhost:3000)
+- **Monitoring Stack:** Prometheus + Grafana (http://localhost:3001)
+- **k3d Kubernetes:** Multi-node local cluster (optional)
+- **Local Registry:** Push/pull images locally (localhost:5000)
+- **Observability:** Pre-built dashboards, comprehensive logging
+
+### Key Files
+- `Makefile` — Command center
+- `docker-compose.yml` — Main stack
+- `docker-compose.logging.yml` — Log aggregation
+- `docker-compose.monitoring.yml` — Metrics
+- `k3d/` — Kubernetes manifests
+- `scripts/` — k3d + registry setup
+- `config/` — Loki, Prometheus, Grafana configs
+- `dashboards/` — Sample Grafana dashboard
+- `DOCKER_LOCAL_OPS_GUIDE.md` — Complete guide (500+ lines)
+
+### Read This First
+→ **DOCKER_LOCAL_OPS_GUIDE.md** — Full documentation
+
+### Status
+✅ **Production-ready** — All artifacts complete and tested
