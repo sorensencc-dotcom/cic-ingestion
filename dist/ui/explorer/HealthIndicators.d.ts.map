@@ -1,0 +1,1 @@
+{"version":3,"file":"HealthIndicators.d.ts","sourceRoot":"","sources":["../../../src/ui/explorer/HealthIndicators.tsx"],"names":[],"mappings":"AAAA;;;GAGG;AAEH,OAAO,KAAK,MAAM,OAAO,CAAC;AAC1B,OAAO,EAAE,YAAY,EAAE,MAAM,yBAAyB,CAAC;AAEvD,UAAU,qBAAqB;IAC7B,OAAO,EAAE,YAAY,EAAE,CAAC;IACxB,SAAS,EAAE,OAAO,CAAC;CACpB;AAED,eAAO,MAAM,gBAAgB,EAAE,KAAK,CAAC,EAAE,CAAC,qBAAqB,CA+H5D,CAAC"}

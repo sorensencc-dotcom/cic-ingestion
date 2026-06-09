@@ -1,0 +1,64 @@
+version: "3.9"
+
+# Logging Stack: Loki + Promtail + Grafana
+# Zero-cost, local-only logging pipeline for CIC/WIL
+#
+# Usage:
+#   docker compose -f docker-compose.logging.yml up
+#
+# Access:
+#   Grafana: http://localhost:3000 (admin/admin)
+#   Loki:    http://localhost:3100
+
+services:
+  loki:
+    image: grafana/loki:latest
+    container_name: loki
+    ports:
+      - "3100:3100"
+    environment:
+      - LOKI_CONFIG=/etc/loki/local-config.yaml
+    volumes:
+      - ./data/loki:/loki
+      - ./config/loki-config.yaml:/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "-q", "http://localhost:3100/loki/api/v1/status/buildinfo" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  promtail:
+    image: grafana/promtail:latest
+    container_name: promtail
+    environment:
+      - HOSTNAME=cic-wil
+    volumes:
+      - ./config/promtail-config.yaml:/etc/promtail/config.yaml
+      - /var/lib/docker/containers:/var/lib/docker/containers:ro
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: -config.file=/etc/promtail/config.yaml
+    depends_on:
+      loki:
+        condition: service_healthy
+
+  grafana-logs:
+    image: grafana/grafana:latest
+    container_name: grafana-logs
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+      - GF_SECURITY_ADMIN_USER=admin
+      - GF_INSTALL_PLUGINS=grafana-piechart-panel
+    volumes:
+      - ./data/grafana-logs:/var/lib/grafana
+      - ./config/grafana-datasources-logs.yaml:/etc/grafana/provisioning/datasources/datasources.yaml
+      - ./config/grafana-dashboards-logs.yaml:/etc/grafana/provisioning/dashboards/dashboards.yaml
+      - ./dashboards:/var/lib/grafana/dashboards
+    depends_on:
+      - loki
+
+volumes:
+  loki:
+  grafana-logs:

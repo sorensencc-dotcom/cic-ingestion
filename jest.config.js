@@ -2,11 +2,11 @@
  * Jest Configuration for CIC Ingestion (Autonomy Bridges)
  */
 
-module.exports = {
+export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
   roots: ['<rootDir>/src'],
-  testMatch: ['**/__tests__/**/*.test.ts'],
+  testMatch: ['**/*.test.ts', '**/__tests__/**/*.test.ts'],
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx', 'json', 'node'],
   collectCoverageFrom: [
     'src/**/*.ts',
@@ -22,13 +22,23 @@ module.exports = {
       statements: 75,
     },
   },
-  setupFiles: ['<rootDir>/jest.setup.js'],
-  globals: {
-    'ts-jest': {
-      tsconfig: {
-        esModuleInterop: true,
-        allowSyntheticDefaultImports: true,
+  setupFilesAfterEnv: ['<rootDir>/jest.setup.js'],
+  extensionsToTreatAsEsm: ['.ts'],
+  moduleNameMapper: {
+    '^(\\.{1,2}/.*)\\.js$': '$1',
+  },
+  transform: {
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        useESM: true,
+        tsconfig: {
+          esModuleInterop: true,
+          allowSyntheticDefaultImports: true,
+          module: 'esnext',
+          moduleResolution: 'node',
+        },
       },
-    },
+    ],
   },
 };
