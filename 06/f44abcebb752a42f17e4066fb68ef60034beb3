@@ -1,0 +1,19 @@
+.claude/settings.json
+  s_f0293c7391f962::t_8c18196bc6e670 4,11-19,28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "06f44abcebb752a42f17e4066fb68ef60034beb3",
+  "prompts": {},
+  "sessions": {
+    "s_f0293c7391f962": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d5df32a8-d2ad-4224-a1ad-ba12e0d3976b",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
