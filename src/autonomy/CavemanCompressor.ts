@@ -151,3 +151,57 @@ export function logCompressionStats(stats: CompressionStats): void {
     `[Caveman] Compression: ${stats.originalLength} → ${stats.compressedLength} bytes (${stats.reductionPercent}% reduction)`
   );
 }
+
+/**
+ * Unified compress() method returning {data, stats}
+ * Used by higher-level integrations (Wayland, Phase25To26, etc)
+ */
+export class CavemanCompressor {
+  compress<T extends Record<string, any> | any[]>(
+    data: T,
+    fieldsToCompress?: (keyof any)[]
+  ): { data: T; stats: { bytesIn: number; bytesOut: number; bytesSaved: number; ratio: number; arraysProcessed: number; objectsProcessed: number; recompressionBlocked: boolean } } {
+    const originalJson = JSON.stringify(data);
+    const bytesIn = originalJson.length;
+
+    const compressed = compressJsonResponse(data, fieldsToCompress);
+    const compressedJson = JSON.stringify(compressed);
+    const bytesOut = compressedJson.length;
+
+    const bytesSaved = Math.max(0, bytesIn - bytesOut);
+    const ratio = bytesIn > 0 ? bytesOut / bytesIn : 1;
+
+    // Count processed arrays/objects
+    let arraysProcessed = 0;
+    let objectsProcessed = 0;
+
+    function countStructures(obj: any) {
+      if (Array.isArray(obj)) {
+        arraysProcessed++;
+        for (const item of obj) {
+          countStructures(item);
+        }
+      } else if (typeof obj === 'object' && obj !== null) {
+        objectsProcessed++;
+        for (const key in obj) {
+          countStructures(obj[key]);
+        }
+      }
+    }
+
+    countStructures(data);
+
+    return {
+      data: compressed,
+      stats: {
+        bytesIn,
+        bytesOut,
+        bytesSaved,
+        ratio: Math.max(0, ratio),
+        arraysProcessed,
+        objectsProcessed,
+        recompressionBlocked: false,
+      },
+    };
+  }
+}

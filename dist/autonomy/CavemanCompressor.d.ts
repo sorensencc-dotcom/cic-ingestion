@@ -31,5 +31,23 @@ export declare function compressAutonomyOutput(signals: any, proposals: any): {
  * Logger for compression stats (useful for monitoring token savings)
  */
 export declare function logCompressionStats(stats: CompressionStats): void;
+/**
+ * Unified compress() method returning {data, stats}
+ * Used by higher-level integrations (Wayland, Phase25To26, etc)
+ */
+export declare class CavemanCompressor {
+    compress<T extends Record<string, any> | any[]>(data: T, fieldsToCompress?: (keyof any)[]): {
+        data: T;
+        stats: {
+            bytesIn: number;
+            bytesOut: number;
+            bytesSaved: number;
+            ratio: number;
+            arraysProcessed: number;
+            objectsProcessed: number;
+            recompressionBlocked: boolean;
+        };
+    };
+}
 export {};
 //# sourceMappingURL=CavemanCompressor.d.ts.map
