@@ -1,0 +1,21 @@
+CLAUDE.md
+  s_f0293c7391f962::t_b8dfb412a0ac0f 52-92
+ARTIFACTS_DELIVERED.md
+  s_f0293c7391f962::t_0a7b9e9bc556ad 1-365
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "a0fea239e709d6bb7a99a925b16a740bd6a8d5e0",
+  "prompts": {},
+  "sessions": {
+    "s_f0293c7391f962": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d5df32a8-d2ad-4224-a1ad-ba12e0d3976b",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
