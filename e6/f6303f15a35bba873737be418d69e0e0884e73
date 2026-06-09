@@ -1,0 +1,29 @@
+PHASE_1_0_TO_2_0_MIGRATION.md
+  s_f0293c7391f962::t_e3757dd7d57ad8 1-340
+PHASE_1_1_ROADMAP.md
+  s_f0293c7391f962::t_68a9fb2afec242 1-279
+PHASE_2_0_EVOLUTION_ENGINE.md
+  s_f0293c7391f962::t_5f510f331e88e7 1-486
+CAVEMAN_V2_0_SPEC.md
+  s_f0293c7391f962::t_5b6737f20e28cb 1-598
+PHASE_2_0_ARCHITECTURE.md
+  s_f0293c7391f962::t_41d408cc5acbc3 1-519
+DOCUMENTATION_INDEX.md
+  s_f0293c7391f962::t_77bd96f5bfe08f 1-244
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "e6f6303f15a35bba873737be418d69e0e0884e73",
+  "prompts": {},
+  "sessions": {
+    "s_f0293c7391f962": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d5df32a8-d2ad-4224-a1ad-ba12e0d3976b",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
