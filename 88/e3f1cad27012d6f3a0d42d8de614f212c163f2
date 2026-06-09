@@ -1,0 +1,25 @@
+Dockerfile.governance
+  s_e825802bb75054::t_35579934f03aec 1-2,18-19
+  s_e825802bb75054::t_109e52c0a81026 4
+docker-compose.yml
+  s_e825802bb75054::t_c0d98a65b7ac2a 94
+thefoundry/images/node-build/Dockerfile
+  s_e825802bb75054::t_2fcc15794de9b2 5
+  s_e825802bb75054::t_62bebf53ad2e05 11,13-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "88e3f1cad27012d6f3a0d42d8de614f212c163f2",
+  "prompts": {},
+  "sessions": {
+    "s_e825802bb75054": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "225c08d0-1998-4813-ac9c-c69a53227936",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
