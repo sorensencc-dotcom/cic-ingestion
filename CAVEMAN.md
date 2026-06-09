@@ -170,12 +170,22 @@ const { signals, proposals, stats } = compressAutonomyOutput(
 this.aprBridge.ingestSignals(signals);
 ```
 
+## Implementation Notes
+
+**Array Handling**: `compressJsonResponse()` handles both objects and arrays. Arrays preserve structure.
+
+**Re-compression Guard**: Text already compressed (heuristic: <2% articles, <50 words) skipped automatically.
+
+**Article Preservation**: Articles kept before numbers/acronyms ("the 2FA", "a 512-bit").
+
+**Negative Compression**: Stats capped at 0% (never shows negative reduction).
+
 ## Best Practices
 
 1. **Compress descriptions, not data** — Keep IDs, numbers, and structured data intact
 2. **Compress at API boundaries** — Apply compression when sending data externally
 3. **Monitor stats** — Use `logCompressionStats()` to track savings
-4. **Chain compressions carefully** — Don't double-compress; compress once at generation
+4. **Skip re-compression** — Module detects already-compressed text automatically
 5. **Preserve accuracy** — Caveman removes fluff, not information
 
 ## Next Steps

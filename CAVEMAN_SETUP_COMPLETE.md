@@ -69,30 +69,34 @@ npm install  # 362 packages, 0 vulnerabilities
 
 ## Test Results
 
+**CavemanCompressor Test Suite**: 13 tests, 13 passing
+
 ```
-🪨 CAVEMAN COMPRESSION TEST
-============================================================
+✓ cavemanCompress (5 tests)
+  - removes verbose patterns
+  - preserves articles before numbers
+  - skips re-compression of already compressed text
+  - handles empty strings
+  - cleans multiple spaces
 
-📝 Test 1: Basic Text Compression
-  Before: 320 chars
-  After:  278 chars
-  Reduction: 13%
+✓ compressJsonResponse (4 tests)
+  - compresses specified fields in objects
+  - compresses array elements
+  - ignores non-string fields
+  - handles undefined fieldsToCompress
 
-📦 Test 2: JSON Response Compression
-  Before: 425 bytes
-  After:  379 bytes
-  Reduction: 11%
-
-🤖 Test 3: Full Autonomy Output
-  ✓ Compression logic verified
-  ✓ Stats tracking working
-
-🌐 Test 4: Real-World API Response
-  ✓ Token estimation accurate
-  ✓ Metadata preserved
-
-✓ All tests passed!
+✓ compressAutonomyOutput (4 tests)
+  - compresses signals and proposals
+  - returns valid compression stats
+  - preserves data integrity
+  - handles empty arrays
 ```
+
+**Functional Tests Passed** (test-caveman.mjs):
+- Basic text: 13% reduction
+- JSON fields: 11% reduction
+- Full autonomy output: verified
+- API response: token estimation accurate
 
 ---
 
