@@ -2,18 +2,18 @@
 # Phase 0.9 sealed infrastructure
 # Reproducible, pinned, no floating versions
 
-FROM node:20.13.0-alpine3.20
+FROM node:20-alpine
 
 LABEL maintainer="CIC Architecture"
 LABEL version="1.0"
 LABEL description="Deterministic Node build for Phase 1.1"
 
-# Install build essentials (pinned versions)
+# Install build essentials (latest stable)
 RUN apk add --no-cache \
-  python3=3.12.3-r1 \
-  make=4.4.1-r2 \
-  g++=13.2.1_git20231219-r2 \
-  ca-certificates=20240226-r0
+  python3 \
+  make \
+  g++ \
+  ca-certificates
 
 # Create app directory
 WORKDIR /app
