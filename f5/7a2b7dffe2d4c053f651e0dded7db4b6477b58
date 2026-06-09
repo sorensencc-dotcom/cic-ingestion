@@ -1,0 +1,31 @@
+src/caveman/WaylandCavemanIntegration.ts
+  s_7ed1cba9a0c9a6::t_8ad5419b887d73 7
+  s_7ed1cba9a0c9a6::t_b5ca4fa45fd366 1-6,8-167
+src/caveman/Phase25To26CavemanAdapter.ts
+  s_7ed1cba9a0c9a6::t_0b7f3227483476 6
+  s_7ed1cba9a0c9a6::t_6a85a9b033be14 1-5,7-138
+src/caveman/index.ts
+  s_7ed1cba9a0c9a6::t_0ee34d07321263 1-32
+src/caveman/CavemanStats.ts
+  s_7ed1cba9a0c9a6::t_af4fc6d2fdca9a 1-89
+src/autonomy/CavemanCompressor.ts
+  s_7ed1cba9a0c9a6::t_f0ce22883cfabc 154-207
+src/caveman/CavemanBudget.ts
+  s_7ed1cba9a0c9a6::t_e35b011b8b1ead 1-157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "f57a2b7dffe2d4c053f651e0dded7db4b6477b58",
+  "prompts": {},
+  "sessions": {
+    "s_7ed1cba9a0c9a6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "38d2de9c-9932-4eec-bdea-d848fcebdba0",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
