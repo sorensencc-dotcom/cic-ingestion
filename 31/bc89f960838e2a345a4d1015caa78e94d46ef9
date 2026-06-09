@@ -1,0 +1,19 @@
+PHASE_1_1_READY.md
+  s_e825802bb75054::t_0f776ece883ce3 1-214
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "31bc89f960838e2a345a4d1015caa78e94d46ef9",
+  "prompts": {},
+  "sessions": {
+    "s_e825802bb75054": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "225c08d0-1998-4813-ac9c-c69a53227936",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
