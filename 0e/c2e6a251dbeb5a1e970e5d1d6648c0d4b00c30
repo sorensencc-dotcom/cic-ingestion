@@ -1,0 +1,47 @@
+config/policies/agent-policy.json
+  s_e825802bb75054::t_cadb697b8fc86c 1-46
+Dockerfile.governance
+  s_e825802bb75054::t_7df8c78526f57a 1-22
+scripts/init-db.sql
+  s_e825802bb75054::t_71f4fe7a2a7b8f 1-105
+Makefile
+  s_e825802bb75054::t_edf16a56dc80c2 188-306
+  s_e825802bb75054::t_db53cfb1e8fc48 1
+  s_e825802bb75054::t_a8b2c327c231ee 36-44
+config/policies/phase-policy.json
+  s_e825802bb75054::t_02444c8f9c0925 1-49
+config/policies/caveman-policy.json
+  s_e825802bb75054::t_5209c6f0da1106 1-52
+config/loki-config.yml
+  s_e825802bb75054::t_e18bc84624d524 1-45
+config/grafana-datasources.yml
+  s_e825802bb75054::t_e353571ab65595 1-22
+PHASE_1_1_DOCKER_SETUP.md
+  s_e825802bb75054::t_585f223f7a75df 1-471
+config/promtail-config.yml
+  s_e825802bb75054::t_35542c7207731e 1-47
+config/policies/tool-policy.json
+  s_e825802bb75054::t_e37c07b7c70046 1-51
+config/prometheus.yml
+  s_e825802bb75054::t_035d10f56d028e 1-36
+thefoundry/images/node-build/Dockerfile
+  s_e825802bb75054::t_a78388f9fccfbe 1-34
+docker-compose.yml
+  s_e825802bb75054::t_34696bbddc927e 1-160
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "0ec2e6a251dbeb5a1e970e5d1d6648c0d4b00c30",
+  "prompts": {},
+  "sessions": {
+    "s_e825802bb75054": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "225c08d0-1998-4813-ac9c-c69a53227936",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
