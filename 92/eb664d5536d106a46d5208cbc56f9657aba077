@@ -1,0 +1,39 @@
+README.md
+  s_ce718f5fe4feae::t_3254ba38c041b1 1-378
+docker-compose.yml
+  s_ce718f5fe4feae::t_8563c9c57add8d 88-106,108-120
+  s_ce718f5fe4feae::t_12c596686565c5 107
+src/orchestrator/wayland-endpoint.ts
+  s_ce718f5fe4feae::t_89e746b2545f07 146
+WAYLAND_ORCHESTRATOR_INTEGRATION.md
+  s_ce718f5fe4feae::t_0307b2badd0d40 1-307
+src/wayland/wayland-security-policy.ts
+  s_ce718f5fe4feae::t_0b0437a29b048c 1-6
+  s_ce718f5fe4feae::t_7e7f06db0efc57 7-10
+src/orchestrator/index.ts
+  s_ce718f5fe4feae::t_3009d5ed6a52f7 28
+  s_ce718f5fe4feae::t_8bcc37fcb613eb 6
+src/wayland/wayland-adapter-registry.ts
+  s_ce718f5fe4feae::t_e001f89a75acc9 1-6
+  s_ce718f5fe4feae::t_c5bf3a279d82bb 7-10
+package.json
+  s_ce718f5fe4feae::t_fadb769963f86f 10
+src/wayland/workflow-integration.ts
+  s_ce718f5fe4feae::t_69886940f37057 5-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "92eb664d5536d106a46d5208cbc56f9657aba077",
+  "prompts": {},
+  "sessions": {
+    "s_ce718f5fe4feae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b1842fa3-64b8-48c1-a196-9ea19917a829",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
