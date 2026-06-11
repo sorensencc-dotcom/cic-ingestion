@@ -1,0 +1,21 @@
+WAYLAND_ORCHESTRATOR_INTEGRATION.md
+  s_ce718f5fe4feae::t_846cc530ec7f23 281-297
+IMPLEMENTATION_SUMMARY.md
+  s_ce718f5fe4feae::t_cb5ec88585b020 68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "6d093c6c347e2a2ed27ae1509a90dc70a32ee8bf",
+  "prompts": {},
+  "sessions": {
+    "s_ce718f5fe4feae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b1842fa3-64b8-48c1-a196-9ea19917a829",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
