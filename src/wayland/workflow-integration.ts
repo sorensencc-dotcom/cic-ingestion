@@ -67,7 +67,7 @@ export async function callOrchestratorDirect(
     metadata: metadata || {},
   };
 
-  let response: Response;
+  let response: globalThis.Response;
   try {
     response = await fetch('http://localhost:7001/reason', {
       method: 'POST',
@@ -90,7 +90,8 @@ export async function callOrchestratorDirect(
 }
 
 // Example: Async workflow trigger (fire-and-forget)
-// NOTE: Uses setImmediate (in-memory queue). Not persistent—job lost on process exit.
+// NOTE: Promise resolves when queued (sync), not when workflow finishes (async).
+// Uses setImmediate (in-memory queue). Not persistent—job lost on process exit.
 // For production, use persistent queue (Bull, RabbitMQ, etc.)
 export function triggerWorkflowAsync(
   logger: any,
@@ -101,11 +102,12 @@ export function triggerWorkflowAsync(
     setImmediate(async () => {
       try {
         await runDailyIngestReasoning(logger);
-        resolve(`Workflow ${workflowId} completed`);
+        logger.info('async-workflow.complete', { workflowId });
       } catch (err: any) {
         logger.error('async-workflow.error', { workflowId, error: err.message });
-        resolve(`Workflow ${workflowId} failed: ${err.message}`);
       }
     });
+    // Resolve immediately (workflow runs in background)
+    resolve(`Workflow ${workflowId} queued`);
   });
 }

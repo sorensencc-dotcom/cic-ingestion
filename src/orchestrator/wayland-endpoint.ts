@@ -4,6 +4,12 @@
 
 import type { Request, Response } from 'express';
 
+export interface Logger {
+  info(event: string, data?: any): void;
+  warn(event: string, data?: any): void;
+  error(event: string, data?: any): void;
+}
+
 export interface ReasoningRequest {
   action: string;
   timestamp: string;
@@ -20,9 +26,9 @@ export interface ReasoningResponse {
 }
 
 export class WaylandOrchestratorEndpoint {
-  private logger: any;
+  private logger: Logger;
 
-  constructor(logger: any) {
+  constructor(logger: Logger) {
     this.logger = logger;
   }
 
@@ -140,7 +146,16 @@ export class WaylandOrchestratorEndpoint {
 
   register(app: any) {
     app.post('/reason', (req: Request, res: Response) => {
-      this.handleReasoning(req, res);
+      this.handleReasoning(req, res).catch((err: any) => {
+        this.logger.error('wayland.handler.unhandled', { error: err.message });
+        res.status(500).json({
+          status: 'error',
+          requestId: `wayland-error-${Date.now()}`,
+          action: req.body?.action || 'unknown',
+          error: 'Internal server error',
+          processingTimeMs: 0,
+        });
+      });
     });
 
     app.get('/reason/health', (_req: Request, res: Response) => {

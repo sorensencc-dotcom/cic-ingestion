@@ -67,6 +67,10 @@ export class WorkflowRunner {
             throw new Error(`Adapter not found: ${step.adapter}`);
           }
 
+          if (typeof adapter.execute !== 'function') {
+            throw new Error(`Adapter ${step.adapter} missing execute method`);
+          }
+
           const result = await adapter.execute(step.payload, ctx);
           ctx.stepResults.set(step.id, result);
 

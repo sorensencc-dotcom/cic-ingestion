@@ -46,7 +46,7 @@ app.use((req, res) => {
 });
 
 // Error handler
-app.use((err: any, req: express.Request, res: express.Response) => {
+app.use((err: Error, req: express.Request, res: express.Response) => {
   logger.error('unhandled.error', {
     path: req.path,
     method: req.method,
@@ -61,7 +61,7 @@ app.use((err: any, req: express.Request, res: express.Response) => {
 });
 
 // Start server
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   logger.info('orchestrator.start', {
     port: PORT,
     nodeEnv: process.env.NODE_ENV,
@@ -72,10 +72,16 @@ app.listen(PORT, () => {
 // Graceful shutdown
 process.on('SIGTERM', () => {
   logger.info('orchestrator.shutdown');
-  process.exit(0);
+  server.close(() => {
+    logger.info('orchestrator.closed');
+    process.exit(0);
+  });
 });
 
 process.on('SIGINT', () => {
   logger.info('orchestrator.interrupt');
-  process.exit(0);
+  server.close(() => {
+    logger.info('orchestrator.closed');
+    process.exit(0);
+  });
 });
