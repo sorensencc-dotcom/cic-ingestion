@@ -1,0 +1,28 @@
+src/wayland/workflow-integration.ts
+  s_ce718f5fe4feae::t_571bfd549f92d8 93-94,105,110-111
+  s_ce718f5fe4feae::t_94cb5b2a6d1e58 70
+src/orchestrator/wayland-endpoint.ts
+  s_ce718f5fe4feae::t_5a0381530862a6 7-12
+  s_ce718f5fe4feae::t_e731f23df8c5de 29,31
+  s_ce718f5fe4feae::t_79ede848b93762 149-158
+src/orchestrator/index.ts
+  s_ce718f5fe4feae::t_91a978c645e29c 49,64,75-78,83-86
+src/wayland/workflow.ts
+  s_ce718f5fe4feae::t_64772318766426 70-73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "65b7bc2e8d372b5f531dbdeab46979c39ce384cf",
+  "prompts": {},
+  "sessions": {
+    "s_ce718f5fe4feae": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b1842fa3-64b8-48c1-a196-9ea19917a829",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
