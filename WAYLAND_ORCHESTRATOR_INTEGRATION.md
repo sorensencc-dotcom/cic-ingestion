@@ -278,6 +278,23 @@ npm test
 
 ---
 
+## Code Quality & Security Hardening (2026-06-11)
+
+**Fixes applied to rewrite-mcp implementations:**
+
+1. **wayland-adapter-registry.ts HTTP adapter:**
+   - ✅ Timeout cleanup guaranteed via try/finally (prevents timeout leak on network errors)
+   - ✅ Payload validation before any side effects
+
+2. **wayland-security-policy.ts:**
+   - ✅ Path boundary checking fixed: `/work` no longer matches `/workspace` (security)
+   - ✅ HTTP method check optimized: Set.has() instead of includes() (O(1) lookup)
+   - ✅ Empty allowedCommands handled explicitly: deny-all semantics documented
+
+**Impact:** No behavioral changes; improves robustness, security, and performance. Commit: `52fa5f3`
+
+---
+
 ## Files
 
 ### Created

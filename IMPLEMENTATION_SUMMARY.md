@@ -65,6 +65,7 @@ WorkflowDef (JSON/TS) → WorkflowRunner → Adapters (HTTP, shell, file, model)
 
 - `92eb664` — Initial implementation + docs
 - `65b7bc2` — Code review fixes (types, error handling, validation)
+- `52fa5f3` — Security hardening (timeout cleanup, path boundary checks, method check optimization)
 
 ### Next Phase
 
