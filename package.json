@@ -7,6 +7,7 @@
   "scripts": {
     "build": "tsc",
     "start": "node dist/autonomy/AutonomyAPIServer.js",
+    "start:dev": "tsc 2>/dev/null || true; node dist/orchestrator/index.js",
     "dev": "tsc && node dist/autonomy/AutonomyAPIServer.js",
     "test": "jest",
     "test:watch": "jest --watch",

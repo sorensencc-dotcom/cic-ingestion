@@ -85,6 +85,39 @@ services:
     depends_on:
       - memory-store
 
+  # ===== Phase 1.2: Orchestrator (Wayland Integration) =====
+  orchestrator:
+    build:
+      context: .
+      dockerfile: thefoundry/images/node-build/Dockerfile
+    container_name: orchestrator
+    restart: unless-stopped
+    environment:
+      NODE_ENV: development
+      ORCHESTRATOR_PORT: 7001
+      MEMORY_STORE_HOST: memory-store
+      MEMORY_STORE_PORT: 5432
+      MEMORY_STORE_DB: cic
+      MEMORY_STORE_USER: cic
+      MEMORY_STORE_PASSWORD: cic-local
+      INGESTION_SERVICE_URL: http://cic-wil:8080
+    ports:
+      - "7001:7001"
+    volumes:
+      - ./src:/app/src:ro
+      - ./data:/app/data
+    networks:
+      - cic-network
+    depends_on:
+      - memory-store
+      - cic-wil
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:7001/reason/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
   # ===== Phase 1.1.3: Observability Stack =====
   prometheus:
     image: prom/prometheus:v2.54.0
