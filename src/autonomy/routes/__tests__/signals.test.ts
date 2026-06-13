@@ -391,7 +391,7 @@ describe('Signals Routes', () => {
 
       expect(mockService.querySignalsWithTotal).toHaveBeenCalledWith(
         expect.objectContaining({
-          type: undefined,
+          type: [],
         })
       );
     });

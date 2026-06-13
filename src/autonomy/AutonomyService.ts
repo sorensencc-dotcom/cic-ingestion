@@ -100,17 +100,12 @@ export class AutonomyService {
     endDate: Date
   ): Promise<AutonomySignal[]> {
     try {
-      // Fetch events and metrics with individual error handling
-      // If any fetch fails, use empty array as fallback
-      const [events, driftMetrics, healthMetrics] = await Promise.allSettled([
+      // Fetch events and metrics from MemoryQueryAPI
+      const [events, driftMetrics, healthMetrics] = await Promise.all([
         this.fetchEvents(startDate, endDate),
         this.fetchDriftMetrics(),
         this.fetchHealthMetrics(),
-      ]).then((results) =>
-        results.map((r) =>
-          r.status === 'fulfilled' ? r.value : (console.warn('Fetch failed, using fallback'), [])
-        )
-      );
+      ]);
 
       // Build detection context
       const context: SignalDetectionContext = {
