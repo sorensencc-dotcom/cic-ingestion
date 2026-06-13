@@ -1,0 +1,46 @@
+src/autonomy/routes/signals.ts
+  s_9c5ea7eeb98f11::t_5ffff5bb0a9446 183,186
+  s_9c5ea7eeb98f11::t_47568cf980b881 150,160
+  s_e91e1961abab82::t_9296fca4308e0d 254
+  s_9c5ea7eeb98f11::t_a4a9b98eff8cd7 231,240
+  s_9c5ea7eeb98f11::t_f4c478a88b8edf 57,69
+src/autonomy/__tests__/AutonomyService.test.ts
+  s_e91e1961abab82::t_1b776e84911f92 216
+  s_e91e1961abab82::t_694c76bede56b7 20-28,30-31
+  s_e91e1961abab82::t_38945f24e4093b 1-19,29,32-215,217-299,301-386
+  s_e91e1961abab82::t_49093804d359cc 300
+src/autonomy/__tests__/BridgeOrchestrator.test.ts
+  s_e91e1961abab82::t_9630f05ea2a086 1-304,306-377
+  s_e91e1961abab82::t_f0810fe20c8ce0 305
+src/autonomy/routes/proposals.ts
+  s_e91e1961abab82::t_47de8fa861a72c 143
+src/autonomy/routes/__tests__/proposals.test.ts
+  s_e91e1961abab82::t_6d02f6b84e5e30 1-482
+src/autonomy/routes/__tests__/signals.test.ts
+  s_e91e1961abab82::t_504efe04fffc50 1-129,131-417
+  s_e91e1961abab82::t_5611e43d80850a 130
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "0cffa63b93f0c4467f8b037a03d05c8e7d937f69",
+  "prompts": {},
+  "sessions": {
+    "s_9c5ea7eeb98f11": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9997bef8-7c13-499a-a4c1-eb89a8839ea7",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_e91e1961abab82": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "827b6e81-0dce-4c50-b5b2-ead5a93e500a",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
