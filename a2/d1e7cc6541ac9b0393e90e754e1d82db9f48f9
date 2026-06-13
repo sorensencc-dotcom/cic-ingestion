@@ -1,0 +1,38 @@
+src/autonomy/routes/signals.ts
+  s_9c5ea7eeb98f11::t_d533e0af336f1c 9
+  s_9c5ea7eeb98f11::t_c82a29b1cf63ef 144-149,151-152,156
+  s_9c5ea7eeb98f11::t_6efb379775c1ae 13,23,51-56,58-59,65
+src/autonomy/AutonomyService.ts
+  s_9c5ea7eeb98f11::t_7f513195feb970 103-105,109-113
+  s_e91e1961abab82::t_b7e1bb6616f9c2 7,10
+src/autonomy/CavemanCompressor.ts
+  s_9c5ea7eeb98f11::t_ce7a422ba01728 181,183,202-220,252-256
+src/autonomy/routes/proposals.ts
+  s_9c5ea7eeb98f11::t_99b970c0528dc0 11
+  s_9c5ea7eeb98f11::t_021146bd882b5d 15
+  s_9c5ea7eeb98f11::t_3bb3e204b1d2d0 82-88,90-91,95
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "a2d1e7cc6541ac9b0393e90e754e1d82db9f48f9",
+  "prompts": {},
+  "sessions": {
+    "s_9c5ea7eeb98f11": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9997bef8-7c13-499a-a4c1-eb89a8839ea7",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_e91e1961abab82": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "827b6e81-0dce-4c50-b5b2-ead5a93e500a",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
