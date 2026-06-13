@@ -6,9 +6,11 @@
 
 import { Router, Request, Response } from 'express';
 import { AutonomyService, SignalQuery } from '../AutonomyService';
+import { CavemanCompressor } from '../CavemanCompressor';
 
 export function createSignalsRouter(service: AutonomyService): Router {
   const router = Router();
+  const caveman = new CavemanCompressor();
 
   /**
    * POST /autonomy/signals
@@ -18,7 +20,7 @@ export function createSignalsRouter(service: AutonomyService): Router {
    *   startDate (ISO 8601) - default: 7 days ago
    *   endDate (ISO 8601) - default: now
    *
-   * Response: { signals: AutonomySignal[], count: number, detectedAt: ISO8601 }
+   * Response: { signals: AutonomySignal[], count: number, detectedAt: ISO8601, CAVEMAN_STATS? }
    */
   router.post('/signals', async (req: Request, res: Response) => {
     try {
@@ -46,14 +48,21 @@ export function createSignalsRouter(service: AutonomyService): Router {
       // Detect signals
       const signals = await service.detectSignals(start, end);
 
+      // Apply Caveman compression
+      const { data: compressedSignals, stats } = caveman.compress(signals, [
+        'description',
+        'rationale',
+      ]);
+
       res.json({
-        signals,
-        count: signals.length,
+        signals: compressedSignals,
+        count: compressedSignals.length,
         window: {
           startDate: start.toISOString(),
           endDate: end.toISOString(),
         },
         detectedAt: new Date().toISOString(),
+        CAVEMAN_STATS: stats,
       });
     } catch (err) {
       console.error('POST /autonomy/signals error:', err);
@@ -132,12 +141,19 @@ export function createSignalsRouter(service: AutonomyService): Router {
       // Query signals with total count (single pass)
       const { results: signals, total } = service.querySignalsWithTotal(query);
 
+      // Apply Caveman compression
+      const { data: compressedSignals, stats } = caveman.compress(signals, [
+        'description',
+        'rationale',
+      ]);
+
       res.json({
-        signals,
-        count: signals.length,
+        signals: compressedSignals,
+        count: compressedSignals.length,
         total,
         query,
         queriedAt: new Date().toISOString(),
+        CAVEMAN_STATS: stats,
       });
     } catch (err) {
       console.error('GET /autonomy/signals error:', err);

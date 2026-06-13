@@ -8,9 +8,11 @@
 import { Router, Request, Response } from 'express';
 import { AutonomyService, ProposalQuery } from '../AutonomyService';
 import { scoreProposalPriority } from '../models/RoadmapProposal';
+import { CavemanCompressor } from '../CavemanCompressor';
 
 export function createProposalsRouter(service: AutonomyService): Router {
   const router = Router();
+  const caveman = new CavemanCompressor();
 
   /**
    * GET /autonomy/proposals
@@ -77,12 +79,20 @@ export function createProposalsRouter(service: AutonomyService): Router {
         priority: scoreProposalPriority(p),
       }));
 
+      // Apply Caveman compression
+      const { data: compressedProposals, stats } = caveman.compress(proposalsWithPriority, [
+        'description',
+        'reasoning',
+        'impact',
+      ]);
+
       res.json({
-        proposals: proposalsWithPriority,
-        count: proposals.length,
+        proposals: compressedProposals,
+        count: compressedProposals.length,
         total,
         query,
         queriedAt: new Date().toISOString(),
+        CAVEMAN_STATS: stats,
       });
     } catch (err) {
       console.error('GET /autonomy/proposals error:', err);

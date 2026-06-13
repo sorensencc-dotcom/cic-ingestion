@@ -4,10 +4,10 @@
  */
 
 import { TimelineEvent, DriftMetric, HealthMetric } from '../ui/models/TimelineEvent';
-import { AutonomySignal, isSignalValid } from './models/AutonomySignal';
+import { AutonomySignal } from './models/AutonomySignal';
 import { RoadmapProposal } from './models/RoadmapProposal';
 import { SignalDetectionEngine, SignalDetectionContext } from './SignalDetection';
-import { RoadmapProposalEngine, RoadmapContext, PhaseInfo } from './RoadmapProposalEngine';
+import { RoadmapProposalEngine, RoadmapContext } from './RoadmapProposalEngine';
 
 export interface AutonomyServiceConfig {
   memoryQueryApiUrl: string;
@@ -100,12 +100,17 @@ export class AutonomyService {
     endDate: Date
   ): Promise<AutonomySignal[]> {
     try {
-      // Fetch events and metrics from MemoryQueryAPI
-      const [events, driftMetrics, healthMetrics] = await Promise.all([
+      // Fetch events and metrics with individual error handling
+      // If any fetch fails, use empty array as fallback
+      const [events, driftMetrics, healthMetrics] = await Promise.allSettled([
         this.fetchEvents(startDate, endDate),
         this.fetchDriftMetrics(),
         this.fetchHealthMetrics(),
-      ]);
+      ]).then((results) =>
+        results.map((r) =>
+          r.status === 'fulfilled' ? r.value : (console.warn('Fetch failed, using fallback'), [])
+        )
+      );
 
       // Build detection context
       const context: SignalDetectionContext = {

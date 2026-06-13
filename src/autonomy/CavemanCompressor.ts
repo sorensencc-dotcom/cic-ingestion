@@ -178,8 +178,9 @@ export class CavemanCompressor {
     fieldsToCompress?: (keyof any)[]
   ): { data: T; stats: { bytesIn: number; bytesOut: number; bytesSaved: number; ratio: number; arraysProcessed: number; objectsProcessed: number; recompressionBlocked: boolean; error?: string } } {
     let bytesIn = 0;
+    let originalJson = '';
     try {
-      const originalJson = JSON.stringify(data);
+      originalJson = JSON.stringify(data);
       bytesIn = originalJson.length;
     } catch (err) {
       console.error('CavemanCompressor.compress: JSON.stringify input failed:', err);
@@ -198,7 +199,25 @@ export class CavemanCompressor {
       };
     }
 
-    const compressed = compressJsonResponse(data, fieldsToCompress);
+    let compressed: T;
+    try {
+      compressed = compressJsonResponse(data, fieldsToCompress);
+    } catch (err) {
+      console.error('CavemanCompressor.compress: compressJsonResponse failed:', err);
+      return {
+        data,
+        stats: {
+          bytesIn,
+          bytesOut: bytesIn,
+          bytesSaved: 0,
+          ratio: 1,
+          arraysProcessed: 0,
+          objectsProcessed: 0,
+          recompressionBlocked: false,
+          error: 'compression_failed',
+        },
+      };
+    }
 
     let bytesOut = 0;
     try {
@@ -230,7 +249,11 @@ export class CavemanCompressor {
       }
     }
 
-    countStructures(data);
+    try {
+      countStructures(data);
+    } catch (err) {
+      console.error('CavemanCompressor.compress: countStructures failed:', err);
+    }
 
     return {
       data: compressed,
