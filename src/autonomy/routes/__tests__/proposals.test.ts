@@ -82,7 +82,7 @@ describe('Proposals Routes', () => {
         total: 0,
       });
 
-      const res = await request(app)
+      await request(app)
         .get('/autonomy/proposals')
         .query({ status: 'pending,invalid,approved' })
         .expect(200);
@@ -440,7 +440,7 @@ describe('Proposals Routes', () => {
         total: 0,
       });
 
-      const res = await request(app)
+      await request(app)
         .get('/autonomy/proposals')
         .query({ status: 'pending,invalid,approved' })
         .expect(200);

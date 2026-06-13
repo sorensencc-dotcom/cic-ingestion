@@ -29,16 +29,20 @@ export function createProposalsRouter(service: AutonomyService): Router {
   router.get('/proposals', (req: Request, res: Response) => {
     try {
       // Parse and sanitize query parameters
+      const statusValues = req.query.status
+        ? (req.query.status as string)
+            .split(',')
+            .map((s) => s.trim())
+            .filter(
+              (s) =>
+                s.length > 0 &&
+                ['pending', 'approved', 'rejected', 'executed'].includes(s)
+            )
+        : [];
+
       const query: ProposalQuery = {
-        status: req.query.status
-          ? (req.query.status as string)
-              .split(',')
-              .map((s) => s.trim())
-              .filter(
-                (s) =>
-                  s.length > 0 &&
-                  ['pending', 'approved', 'rejected', 'executed'].includes(s)
-              )
+        status: statusValues.length > 0
+          ? (statusValues as ('pending' | 'approved' | 'rejected' | 'executed')[])
           : undefined,
         minPriority: req.query.minPriority
           ? parseFloat((req.query.minPriority as string).trim())
@@ -86,7 +90,7 @@ export function createProposalsRouter(service: AutonomyService): Router {
         'impact',
       ]);
 
-      res.json({
+      return res.json({
         proposals: compressedProposals,
         count: compressedProposals.length,
         total,
@@ -96,7 +100,7 @@ export function createProposalsRouter(service: AutonomyService): Router {
       });
     } catch (err) {
       console.error('GET /autonomy/proposals error:', err);
-      res.status(500).json({
+      return res.status(500).json({
         error: err instanceof Error ? err.message : 'Unknown error',
       });
     }
@@ -119,13 +123,13 @@ export function createProposalsRouter(service: AutonomyService): Router {
         });
       }
 
-      res.json({
+      return res.json({
         proposal,
         priority: scoreProposalPriority(proposal),
       });
     } catch (err) {
       console.error(`GET /autonomy/proposals/${req.params.id} error:`, err);
-      res.status(500).json({
+      return res.status(500).json({
         error: err instanceof Error ? err.message : 'Unknown error',
       });
     }
@@ -140,7 +144,7 @@ export function createProposalsRouter(service: AutonomyService): Router {
    *
    * Response: { proposals: RoadmapProposal[], count: number, generatedAt: ISO8601 }
    */
-  router.post('/proposals', async (req: Request, res: Response): Promise<void> => {
+  router.post('/proposals', async (req: Request, res: Response) => {
     try {
       const { signalIds } = req.body;
 
@@ -167,14 +171,14 @@ export function createProposalsRouter(service: AutonomyService): Router {
         priority: scoreProposalPriority(p),
       }));
 
-      res.status(201).json({
+      return res.status(201).json({
         proposals: proposalsWithPriority,
         count: proposals.length,
         generatedAt: new Date().toISOString(),
       });
     } catch (err) {
       console.error('POST /autonomy/proposals error:', err);
-      res.status(500).json({
+      return res.status(500).json({
         error: err instanceof Error ? err.message : 'Unknown error',
       });
     }
@@ -218,7 +222,7 @@ export function createProposalsRouter(service: AutonomyService): Router {
         });
       }
 
-      res.json({
+      return res.json({
         proposal: {
           ...updated,
           priority: scoreProposalPriority(updated),
@@ -227,7 +231,7 @@ export function createProposalsRouter(service: AutonomyService): Router {
       });
     } catch (err) {
       console.error(`PUT /autonomy/proposals/${req.params.id} error:`, err);
-      res.status(500).json({
+      return res.status(500).json({
         error: err instanceof Error ? err.message : 'Unknown error',
       });
     }
@@ -275,13 +279,13 @@ export function createProposalsRouter(service: AutonomyService): Router {
         confidence: proposal.confidence,
       };
 
-      res.json({
+      return res.json({
         result: simulationResult,
         simulatedAt: new Date().toISOString(),
       });
     } catch (err) {
       console.error('POST /autonomy/proposals/simulate error:', err);
-      res.status(500).json({
+      return res.status(500).json({
         error: err instanceof Error ? err.message : 'Unknown error',
       });
     }
