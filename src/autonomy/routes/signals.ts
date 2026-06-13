@@ -54,7 +54,7 @@ export function createSignalsRouter(service: AutonomyService): Router {
         'rationale',
       ]);
 
-      res.json({
+      return res.json({
         signals: compressedSignals,
         count: compressedSignals.length,
         window: {
@@ -66,7 +66,7 @@ export function createSignalsRouter(service: AutonomyService): Router {
       });
     } catch (err) {
       console.error('POST /autonomy/signals error:', err);
-      res.status(500).json({
+      return res.status(500).json({
         error: err instanceof Error ? err.message : 'Unknown error',
       });
     }
@@ -147,7 +147,7 @@ export function createSignalsRouter(service: AutonomyService): Router {
         'rationale',
       ]);
 
-      res.json({
+      return res.json({
         signals: compressedSignals,
         count: compressedSignals.length,
         total,
@@ -157,7 +157,7 @@ export function createSignalsRouter(service: AutonomyService): Router {
       });
     } catch (err) {
       console.error('GET /autonomy/signals error:', err);
-      res.status(500).json({
+      return res.status(500).json({
         error: err instanceof Error ? err.message : 'Unknown error',
       });
     }
@@ -180,10 +180,10 @@ export function createSignalsRouter(service: AutonomyService): Router {
         });
       }
 
-      res.json({ signal });
+      return res.json({ signal });
     } catch (err) {
       console.error(`GET /autonomy/signals/${req.params.id} error:`, err);
-      res.status(500).json({
+      return res.status(500).json({
         error: err instanceof Error ? err.message : 'Unknown error',
       });
     }
@@ -228,7 +228,7 @@ export function createSignalsRouter(service: AutonomyService): Router {
       // Group and aggregate by window
       const trends = calculateTrends(recentSignals, metric, window);
 
-      res.json({
+      return res.json({
         trends,
         metric,
         window,
@@ -237,7 +237,7 @@ export function createSignalsRouter(service: AutonomyService): Router {
       });
     } catch (err) {
       console.error(`GET /autonomy/signals/trends/${req.params.metric} error:`, err);
-      res.status(500).json({
+      return res.status(500).json({
         error: err instanceof Error ? err.message : 'Unknown error',
       });
     }
@@ -251,7 +251,7 @@ export function createSignalsRouter(service: AutonomyService): Router {
  */
 function calculateTrends(
   signals: any[],
-  metric: string,
+  _metric: string,
   window: string
 ): Array<{ timestamp: string; count: number; avgConfidence: number }> {
   const grouped: Record<string, any[]> = {};

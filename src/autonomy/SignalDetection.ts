@@ -14,7 +14,6 @@ import {
   InstabilitySignal,
   RegressionSignal,
   OpportunitySignal,
-  SignalType,
   SIGNAL_THRESHOLDS,
   classifySignalSeverity,
   isSignalValid,

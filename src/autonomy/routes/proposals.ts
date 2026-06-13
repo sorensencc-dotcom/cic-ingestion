@@ -140,7 +140,7 @@ export function createProposalsRouter(service: AutonomyService): Router {
    *
    * Response: { proposals: RoadmapProposal[], count: number, generatedAt: ISO8601 }
    */
-  router.post('/proposals', async (req: Request, res: Response) => {
+  router.post('/proposals', async (req: Request, res: Response): Promise<void> => {
     try {
       const { signalIds } = req.body;
 

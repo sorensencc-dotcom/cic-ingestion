@@ -8,7 +8,6 @@ import {
   RoadmapProposal,
   ProposalAction,
   ProposalImpact,
-  scoreProposalPriority,
   requiresGovernanceApproval,
 } from './models/RoadmapProposal';
 
