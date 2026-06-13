@@ -111,8 +111,16 @@ export function compressAutonomyOutput(
   signals: any,
   proposals: any
 ): { signals: any; proposals: any; stats: CompressionStats } {
-  const originalJson = JSON.stringify({ signals, proposals });
-  const originalLength = originalJson.length;
+  let originalLength = 0;
+  let originalJson = '';
+
+  try {
+    originalJson = JSON.stringify({ signals, proposals });
+    originalLength = originalJson.length;
+  } catch (err) {
+    console.error('compressAutonomyOutput: JSON.stringify original failed:', err);
+    originalLength = 0;
+  }
 
   const compressedSignals = compressJsonResponse(signals, ['description', 'rationale']);
   const compressedProposals = compressJsonResponse(proposals, [
@@ -121,13 +129,21 @@ export function compressAutonomyOutput(
     'impact',
   ]);
 
-  const compressedJson = JSON.stringify({
-    signals: compressedSignals,
-    proposals: compressedProposals,
-  });
-  const compressedLength = compressedJson.length;
+  let compressedLength = 0;
+  try {
+    const compressedJson = JSON.stringify({
+      signals: compressedSignals,
+      proposals: compressedProposals,
+    });
+    compressedLength = compressedJson.length;
+  } catch (err) {
+    console.error('compressAutonomyOutput: JSON.stringify compressed failed:', err);
+    compressedLength = originalLength;
+  }
 
-  const reductionPercent = ((originalLength - compressedLength) / originalLength) * 100;
+  const reductionPercent = originalLength > 0
+    ? ((originalLength - compressedLength) / originalLength) * 100
+    : 0;
 
   const stats: CompressionStats = {
     originalLength,
@@ -160,13 +176,38 @@ export class CavemanCompressor {
   compress<T extends Record<string, any> | any[]>(
     data: T,
     fieldsToCompress?: (keyof any)[]
-  ): { data: T; stats: { bytesIn: number; bytesOut: number; bytesSaved: number; ratio: number; arraysProcessed: number; objectsProcessed: number; recompressionBlocked: boolean } } {
-    const originalJson = JSON.stringify(data);
-    const bytesIn = originalJson.length;
+  ): { data: T; stats: { bytesIn: number; bytesOut: number; bytesSaved: number; ratio: number; arraysProcessed: number; objectsProcessed: number; recompressionBlocked: boolean; error?: string } } {
+    let bytesIn = 0;
+    try {
+      const originalJson = JSON.stringify(data);
+      bytesIn = originalJson.length;
+    } catch (err) {
+      console.error('CavemanCompressor.compress: JSON.stringify input failed:', err);
+      return {
+        data,
+        stats: {
+          bytesIn: 0,
+          bytesOut: 0,
+          bytesSaved: 0,
+          ratio: 1,
+          arraysProcessed: 0,
+          objectsProcessed: 0,
+          recompressionBlocked: false,
+          error: 'stringify_input_failed',
+        },
+      };
+    }
 
     const compressed = compressJsonResponse(data, fieldsToCompress);
-    const compressedJson = JSON.stringify(compressed);
-    const bytesOut = compressedJson.length;
+
+    let bytesOut = 0;
+    try {
+      const compressedJson = JSON.stringify(compressed);
+      bytesOut = compressedJson.length;
+    } catch (err) {
+      console.error('CavemanCompressor.compress: JSON.stringify compressed failed:', err);
+      bytesOut = bytesIn;
+    }
 
     const bytesSaved = Math.max(0, bytesIn - bytesOut);
     const ratio = bytesIn > 0 ? bytesOut / bytesIn : 1;

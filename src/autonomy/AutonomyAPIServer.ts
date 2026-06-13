@@ -132,9 +132,17 @@ export class AutonomyAPIServer {
   private setupErrorHandler(): void {
     this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
       console.error('Unhandled error:', err);
+      console.error('Stack:', err.stack);
+
+      // Sanitize error message to prevent path leakage
+      let sanitizedMessage = 'Internal server error';
+      if (err.message && !err.message.includes('/') && !err.message.includes('\\')) {
+        sanitizedMessage = err.message;
+      }
+
       res.status(500).json({
         error: 'Internal server error',
-        message: err.message,
+        message: sanitizedMessage,
       });
     });
   }

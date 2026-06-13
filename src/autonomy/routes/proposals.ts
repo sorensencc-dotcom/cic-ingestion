@@ -26,18 +26,23 @@ export function createProposalsRouter(service: AutonomyService): Router {
    */
   router.get('/proposals', (req: Request, res: Response) => {
     try {
-      // Parse query parameters
+      // Parse and sanitize query parameters
       const query: ProposalQuery = {
         status: req.query.status
-          ? (req.query.status as string).split(',').filter((s) =>
-              ['pending', 'approved', 'rejected', 'executed'].includes(s)
-            )
+          ? (req.query.status as string)
+              .split(',')
+              .map((s) => s.trim())
+              .filter(
+                (s) =>
+                  s.length > 0 &&
+                  ['pending', 'approved', 'rejected', 'executed'].includes(s)
+              )
           : undefined,
         minPriority: req.query.minPriority
-          ? parseFloat(req.query.minPriority as string)
+          ? parseFloat((req.query.minPriority as string).trim())
           : undefined,
-        limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 100,
-        offset: req.query.offset ? parseInt(req.query.offset as string, 10) : 0,
+        limit: req.query.limit ? parseInt((req.query.limit as string).trim(), 10) : 100,
+        offset: req.query.offset ? parseInt((req.query.offset as string).trim(), 10) : 0,
       };
 
       // Validate pagination
@@ -63,13 +68,8 @@ export function createProposalsRouter(service: AutonomyService): Router {
         });
       }
 
-      // Query proposals
-      const proposals = service.queryProposals(query);
-      const total = service.queryProposals({
-        ...query,
-        limit: undefined,
-        offset: undefined,
-      }).length;
+      // Query proposals with total count (single pass)
+      const { results: proposals, total } = service.queryProposalsWithTotal(query);
 
       // Add priority scores
       const proposalsWithPriority = proposals.map((p) => ({

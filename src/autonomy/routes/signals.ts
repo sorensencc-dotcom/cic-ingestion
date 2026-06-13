@@ -79,20 +79,31 @@ export function createSignalsRouter(service: AutonomyService): Router {
    */
   router.get('/signals', (req: Request, res: Response) => {
     try {
-      // Parse query parameters
+      // Parse and sanitize query parameters
       const query: SignalQuery = {
-        type: req.query.type ? (req.query.type as string).split(',') : undefined,
+        type: req.query.type
+          ? (req.query.type as string)
+              .split(',')
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0)
+          : undefined,
         severity: req.query.severity
-          ? (req.query.severity as string).split(',')
+          ? (req.query.severity as string)
+              .split(',')
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0)
           : undefined,
         phase: req.query.phase
-          ? (req.query.phase as string).split(',')
+          ? (req.query.phase as string)
+              .split(',')
+              .map((s) => s.trim())
+              .filter((s) => s.length > 0)
           : undefined,
         minConfidence: req.query.minConfidence
-          ? parseFloat(req.query.minConfidence as string)
+          ? parseFloat((req.query.minConfidence as string).trim())
           : undefined,
-        limit: req.query.limit ? parseInt(req.query.limit as string, 10) : 100,
-        offset: req.query.offset ? parseInt(req.query.offset as string, 10) : 0,
+        limit: req.query.limit ? parseInt((req.query.limit as string).trim(), 10) : 100,
+        offset: req.query.offset ? parseInt((req.query.offset as string).trim(), 10) : 0,
       };
 
       // Validate pagination
@@ -118,9 +129,8 @@ export function createSignalsRouter(service: AutonomyService): Router {
         });
       }
 
-      // Query signals
-      const signals = service.querySignals(query);
-      const total = service.querySignals({ ...query, limit: undefined, offset: undefined }).length;
+      // Query signals with total count (single pass)
+      const { results: signals, total } = service.querySignalsWithTotal(query);
 
       res.json({
         signals,

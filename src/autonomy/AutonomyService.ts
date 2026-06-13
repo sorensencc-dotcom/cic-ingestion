@@ -129,7 +129,12 @@ export class AutonomyService {
 
       return signals;
     } catch (err) {
-      console.error('Signal detection error:', err);
+      const errMsg = err instanceof Error ? err.message : 'Unknown error';
+      console.error(
+        `Signal detection error (window ${startDate.toISOString()} to ${endDate.toISOString()}):`,
+        errMsg
+      );
+      console.error('Stack:', err instanceof Error ? err.stack : err);
       throw err;
     }
   }
@@ -233,6 +238,95 @@ export class AutonomyService {
     const offset = query.offset || 0;
     const limit = query.limit || 100;
     return results.slice(offset, offset + limit);
+  }
+
+  /**
+   * Query signals with total count (single pass)
+   */
+  querySignalsWithTotal(query: SignalQuery): {
+    results: AutonomySignal[];
+    total: number;
+  } {
+    let results = this.store.getAllSignals();
+
+    // Filter by type
+    if (query.type && query.type.length > 0) {
+      results = results.filter((s) => query.type!.includes(s.type));
+    }
+
+    // Filter by severity
+    if (query.severity && query.severity.length > 0) {
+      results = results.filter((s) => query.severity!.includes(s.severity));
+    }
+
+    // Filter by phase
+    if (query.phase && query.phase.length > 0) {
+      results = results.filter((s) =>
+        s.affectedPhases.some((p) => query.phase!.includes(p))
+      );
+    }
+
+    // Filter by confidence
+    if (query.minConfidence !== undefined) {
+      results = results.filter((s) => s.confidence >= query.minConfidence!);
+    }
+
+    const total = results.length;
+
+    // Sort by timestamp (newest first)
+    results.sort(
+      (a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+
+    // Paginate
+    const offset = query.offset || 0;
+    const limit = query.limit || 100;
+
+    return {
+      results: results.slice(offset, offset + limit),
+      total,
+    };
+  }
+
+  /**
+   * Query proposals with total count (single pass)
+   */
+  queryProposalsWithTotal(query: ProposalQuery): {
+    results: RoadmapProposal[];
+    total: number;
+  } {
+    let results = this.store.getAllProposals();
+
+    // Filter by status
+    if (query.status && query.status.length > 0) {
+      results = results.filter((p) => query.status!.includes(p.status));
+    }
+
+    // Filter by priority
+    if (query.minPriority !== undefined) {
+      const { scoreProposalPriority } = require('./models/RoadmapProposal');
+      results = results.filter(
+        (p) => scoreProposalPriority(p) >= query.minPriority!
+      );
+    }
+
+    const total = results.length;
+
+    // Sort by timestamp (newest first)
+    results.sort(
+      (a, b) =>
+        new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+
+    // Paginate
+    const offset = query.offset || 0;
+    const limit = query.limit || 100;
+
+    return {
+      results: results.slice(offset, offset + limit),
+      total,
+    };
   }
 
   /**
