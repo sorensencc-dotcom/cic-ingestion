@@ -1,0 +1,20 @@
+src/autonomy/__tests__/learner.test.ts
+  s_4b1b33a7e0cf74::t_21e7177dc67b74 5
+  s_4b1b33a7e0cf74::t_150b861b449d5a 62,65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "dae6b67e54b6dc4d339d35da83ee3a26588a8266",
+  "prompts": {},
+  "sessions": {
+    "s_4b1b33a7e0cf74": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "864c33f1-1e6d-4997-8cf8-66cec8af1f6b",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
