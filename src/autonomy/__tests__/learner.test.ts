@@ -2,7 +2,7 @@
  * Autonomy Learner Test Suite (Phase 23.7.7)
  */
 
-import { AutonomyLearner, ProposalOutcome } from '../AutonomyLearner';
+import { AutonomyLearner } from '../AutonomyLearner';
 import { createMockProposal, createMockDriftSignal } from '../bridges/__tests__/fixtures';
 
 describe('AutonomyLearner', () => {
@@ -59,9 +59,10 @@ describe('AutonomyLearner', () => {
       );
 
       const outcomes = learner.getAllOutcomes();
+      expect(outcomes.length).toBeGreaterThan(0);
       expect(outcomes[0].reason).toBe('Mitigation worked well');
       expect(outcomes[0].feedback).toBeDefined();
-      expect(outcomes[0].feedback.confidence).toBe(proposal.confidence);
+      expect(outcomes[0].feedback?.confidence).toBe(proposal.confidence);
     });
   });
 
@@ -174,7 +175,6 @@ describe('AutonomyLearner', () => {
     it('does not adjust thresholds beyond safe bounds', async () => {
       const proposal = createMockProposal('executed');
       proposal.triggeredBy = [createMockDriftSignal('critical')];
-      const baseThresholds = learner.getCurrentThresholds();
 
       // Multiple failures should not push threshold beyond bounds
       for (let i = 0; i < 10; i++) {
