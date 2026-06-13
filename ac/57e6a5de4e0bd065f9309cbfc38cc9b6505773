@@ -1,0 +1,39 @@
+src/autonomy/routes/proposals.ts
+  s_e91e1961abab82::t_bd41e404fa41ed 174,181
+  s_e91e1961abab82::t_842f3765a78639 282,288
+  s_e91e1961abab82::t_724170f75cd017 126,132
+  s_e91e1961abab82::t_5863f24dcb2547 225,234
+  s_e91e1961abab82::t_ec0ac15f811abf 32-42,44-45
+  s_e91e1961abab82::t_056444000c4da8 147
+  s_e91e1961abab82::t_8d2faa46e8eb4b 93,103
+src/autonomy/routes/__tests__/proposals.test.ts
+  s_e91e1961abab82::t_1fb75a6d24114c 443
+  s_e91e1961abab82::t_bf587f0cb33c20 85
+src/autonomy/__tests__/autonomy-integration.test.ts
+  s_e91e1961abab82::t_b69c12c8a9cfd8 1-25,27-54,66-70,81-326,340-342,355-424,461-470,473-474,506-512
+  s_e91e1961abab82::t_b2336c4e54c817 26
+  s_e91e1961abab82::t_73b0d026a6cdfb 55-65,71-80
+  s_e91e1961abab82::t_5621b73a0b1080 327-339,343-354
+  s_e91e1961abab82::t_3624fe709adf0d 425-460
+  s_e91e1961abab82::t_ed9bd2795911d2 471-472,475-505
+src/autonomy/routes/__tests__/routes-integration.test.ts
+  s_e91e1961abab82::t_ed7016a3b9bd72 59-69,75-84,385-395,401-410
+  s_e91e1961abab82::t_acd1f5499c6676 29
+  s_e91e1961abab82::t_d8fed682440cae 1-28,30-58,70-74,85-384,396-400,411-542
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "ac57e6a5de4e0bd065f9309cbfc38cc9b6505773",
+  "prompts": {},
+  "sessions": {
+    "s_e91e1961abab82": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "827b6e81-0dce-4c50-b5b2-ead5a93e500a",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
