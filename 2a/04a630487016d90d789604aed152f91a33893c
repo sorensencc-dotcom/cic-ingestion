@@ -1,0 +1,24 @@
+src/prompt-cache/router.ts
+  s_bc7d61b0ee4497::t_c4b7a31ace9dea 17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "2a04a630487016d90d789604aed152f91a33893c",
+  "prompts": {},
+  "humans": {
+    "h_8285d1e5d54e81": {
+      "author": "Soren <sorensencc@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_bc7d61b0ee4497": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9692580d-38e5-4383-8340-759022fadf47",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
