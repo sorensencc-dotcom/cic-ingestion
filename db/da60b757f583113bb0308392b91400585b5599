@@ -1,0 +1,22 @@
+scripts/test-setup.js
+  s_bc7d61b0ee4497::t_d145ebccc8a139 1-6,14-35
+  s_bc7d61b0ee4497::t_01aee64cffe750 7-13
+package.json
+  s_bc7d61b0ee4497::t_d739468a2213f5 12-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "dbda60b757f583113bb0308392b91400585b5599",
+  "prompts": {},
+  "sessions": {
+    "s_bc7d61b0ee4497": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9692580d-38e5-4383-8340-759022fadf47",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
