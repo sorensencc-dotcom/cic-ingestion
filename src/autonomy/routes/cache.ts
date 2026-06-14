@@ -1,11 +1,13 @@
 /**
  * Cache metrics routes
- * GET /autonomy/cache/metrics — get aggregate statistics
+ * GET /autonomy/cache/metrics — get aggregate statistics (JSON)
+ * GET /autonomy/cache/metrics/prometheus — get metrics in Prometheus format
  * GET /autonomy/cache/status — get human-readable status
  */
 
 import { Router, Request, Response } from 'express';
 import { AutonomyPromptCacheAdapter } from '../AutonomyPromptCacheAdapter';
+import { CacheMetricsExporter } from '../../prompt-cache/metrics/CacheMetricsExporter';
 
 export function createCacheRouter(adapter: AutonomyPromptCacheAdapter): Router {
   const router = Router();
@@ -18,6 +20,15 @@ export function createCacheRouter(adapter: AutonomyPromptCacheAdapter): Router {
       data: stats,
       timestamp: new Date().toISOString(),
     });
+  });
+
+  // Get metrics in Prometheus format (Phase 2.3)
+  router.get('/cache/metrics/prometheus', (_req: Request, res: Response) => {
+    const stats = adapter.getCacheStatistics();
+    const prometheusText = CacheMetricsExporter.exportPrometheus(stats);
+
+    res.set('Content-Type', 'text/plain; charset=utf-8');
+    res.send(prometheusText);
   });
 
   // Get human-readable cache status

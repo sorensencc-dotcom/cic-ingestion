@@ -13,8 +13,11 @@ import { AutonomyService, AutonomyServiceConfig } from './AutonomyService';
 import { createSignalsRouter } from './routes/signals';
 import { createProposalsRouter } from './routes/proposals';
 import { createCacheRouter } from './routes/cache';
+import { createMemoryRouter } from './routes/memory';
+import { createGovernanceRouter } from '../governance/routes/governance';
 import { ObservabilityManager } from './ObservabilityManager';
 import { wireVectorLayer } from '../vector/index.js';
+import { MemoryStore } from '../../rewrite-mcp/src/memory/MemoryStore';
 
 export interface AutonomyAPIServerConfig extends AutonomyServiceConfig {
   port?: number;
@@ -106,33 +109,58 @@ export class AutonomyAPIServer {
 
     // API info
     this.app.get('/autonomy', (req: Request, res: Response) => {
+      const endpoints: any = {
+        signals: {
+          'POST /autonomy/signals': 'Detect signals from event history',
+          'GET /autonomy/signals': 'Query stored signals',
+          'GET /autonomy/signals/:id': 'Get specific signal',
+          'GET /autonomy/signals/trends/:metric': 'Get signal trends',
+        },
+        proposals: {
+          'GET /autonomy/proposals': 'Query stored proposals',
+          'GET /autonomy/proposals/:id': 'Get specific proposal',
+          'POST /autonomy/proposals': 'Generate proposals from signals',
+          'PUT /autonomy/proposals/:id': 'Update proposal status',
+          'POST /autonomy/proposals/simulate': 'Simulate proposal execution',
+        },
+        cache: {
+          'GET /autonomy/cache/metrics': 'Cache statistics (JSON)',
+          'GET /autonomy/cache/metrics/prometheus': 'Cache metrics in Prometheus text format',
+          'GET /autonomy/cache/status': 'Cache status (human-readable)',
+        },
+        observability: {
+          'GET /metrics': 'Prometheus format metrics',
+          'GET /metrics/json': 'JSON format metrics',
+        },
+      };
+
+      // (Phase 23.2) Add memory endpoints if MemoryStore is available
+      if (this.config.memoryStore) {
+        endpoints.memory = {
+          'GET /memory/events': 'Query events (by type, agent, session, time)',
+          'GET /memory/summaries': 'Get metric summaries (drift/health)',
+          'GET /memory/stats': 'Get store statistics',
+          'POST /memory/append': 'Append a single event',
+        };
+      }
+
+      // (Phase 24) Add governance endpoints
+      endpoints.governance = {
+        'POST /governance/proposals': 'Submit new proposal',
+        'POST /governance/votes': 'Vote on proposal',
+        'POST /governance/decisions/:proposalId/finalize': 'Finalize proposal decision',
+        'GET /governance/context/:proposalId': 'Get proposal context (history + signals)',
+        'POST /governance/evolution/amendments': 'Generate amendment proposals',
+        'POST /governance/evolution/constraints': 'Generate constraint updates',
+        'POST /governance/evolution/policies': 'Generate policy changes',
+        'POST /governance/evolution/full-cycle': 'Run full evolution cycle',
+      };
+
       return res.json({
         service: 'CIC Autonomy API',
         version: '1.0.0',
-        phase: '23.7',
-        endpoints: {
-          signals: {
-            'POST /autonomy/signals': 'Detect signals from event history',
-            'GET /autonomy/signals': 'Query stored signals',
-            'GET /autonomy/signals/:id': 'Get specific signal',
-            'GET /autonomy/signals/trends/:metric': 'Get signal trends',
-          },
-          proposals: {
-            'GET /autonomy/proposals': 'Query stored proposals',
-            'GET /autonomy/proposals/:id': 'Get specific proposal',
-            'POST /autonomy/proposals': 'Generate proposals from signals',
-            'PUT /autonomy/proposals/:id': 'Update proposal status',
-            'POST /autonomy/proposals/simulate': 'Simulate proposal execution',
-          },
-          cache: {
-            'GET /autonomy/cache/metrics': 'Cache statistics (JSON)',
-            'GET /autonomy/cache/status': 'Cache status (human-readable)',
-          },
-          observability: {
-            'GET /metrics': 'Prometheus format metrics',
-            'GET /metrics/json': 'JSON format metrics',
-          },
-        },
+        phase: '24.0',
+        endpoints,
       });
     });
 
@@ -144,6 +172,18 @@ export class AutonomyAPIServer {
     this.app.use('/autonomy', signalsRouter);
     this.app.use('/autonomy', proposalsRouter);
     this.app.use('/autonomy', cacheRouter);
+
+    // (Phase 23.2) Mount memory routes if MemoryStore is available
+    if (this.config.memoryStore) {
+      const memoryRouter = createMemoryRouter({
+        memoryStore: this.config.memoryStore,
+      });
+      this.app.use('/memory', memoryRouter);
+    }
+
+    // (Phase 24) Mount governance routes
+    const governanceRouter = createGovernanceRouter();
+    this.app.use('/governance', governanceRouter);
 
     // 404 handler
     this.app.use((req: Request, res: Response) => {
