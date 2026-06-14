@@ -8,6 +8,7 @@ import { AutonomySignal } from './models/AutonomySignal';
 import { RoadmapProposal } from './models/RoadmapProposal';
 import { SignalDetectionEngine, SignalDetectionContext } from './SignalDetection';
 import { RoadmapProposalEngine, RoadmapContext } from './RoadmapProposalEngine';
+import { AutonomyPromptCacheAdapter } from './AutonomyPromptCacheAdapter';
 
 export interface AutonomyServiceConfig {
   memoryQueryApiUrl: string;
@@ -83,12 +84,14 @@ export class AutonomyService {
   private signalEngine: SignalDetectionEngine;
   private proposalEngine: RoadmapProposalEngine;
   private store: AutonomyStore;
+  private cacheAdapter: AutonomyPromptCacheAdapter;
 
   constructor(config: AutonomyServiceConfig) {
     this.config = config;
     this.signalEngine = new SignalDetectionEngine();
     this.proposalEngine = new RoadmapProposalEngine();
     this.store = new AutonomyStore();
+    this.cacheAdapter = new AutonomyPromptCacheAdapter();
   }
 
   /**
@@ -330,6 +333,13 @@ export class AutonomyService {
   }
 
   /**
+   * Get cache adapter (for metrics/status endpoints)
+   */
+  getCacheAdapter(): AutonomyPromptCacheAdapter {
+    return this.cacheAdapter;
+  }
+
+  /**
    * Get signal by ID
    */
   getSignal(id: string): AutonomySignal | undefined {
@@ -364,6 +374,28 @@ export class AutonomyService {
     const proposals = await this.generateProposals(signals);
 
     return { signals, proposals };
+  }
+
+  /**
+   * Analyze archival batch with prompt caching
+   * Task types: 'findings' | 'gaps' | 'patterns'
+   */
+  async analyzeArchivalBatch(
+    docId: string,
+    batchContent: string,
+    analysisType: 'findings' | 'gaps' | 'patterns'
+  ) {
+    const taskMap = {
+      findings: 'extract_findings' as const,
+      gaps: 'identify_gaps' as const,
+      patterns: 'detect_patterns' as const,
+    };
+
+    return await this.cacheAdapter.analyzeDocumentWithCache({
+      docId,
+      docText: batchContent,
+      task: taskMap[analysisType],
+    });
   }
 
   /**

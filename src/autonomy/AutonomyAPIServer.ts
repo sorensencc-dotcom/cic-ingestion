@@ -12,6 +12,8 @@ import express, { Express, Request, Response, NextFunction } from 'express';
 import { AutonomyService, AutonomyServiceConfig } from './AutonomyService';
 import { createSignalsRouter } from './routes/signals';
 import { createProposalsRouter } from './routes/proposals';
+import { createCacheRouter } from './routes/cache';
+import { ObservabilityManager } from './ObservabilityManager';
 
 export interface AutonomyAPIServerConfig extends AutonomyServiceConfig {
   port?: number;
@@ -23,6 +25,7 @@ export class AutonomyAPIServer {
   private service: AutonomyService;
   private config: AutonomyAPIServerConfig;
   private server: any = null;
+  private observability: ObservabilityManager;
 
   constructor(config: AutonomyAPIServerConfig) {
     this.config = {
@@ -31,6 +34,7 @@ export class AutonomyAPIServer {
       ...config,
     };
 
+    this.observability = ObservabilityManager.getInstance();
     this.app = express();
     this.service = new AutonomyService(config);
 
@@ -46,14 +50,17 @@ export class AutonomyAPIServer {
     // JSON body parser
     this.app.use(express.json({ limit: '10mb' }));
 
-    // Request logging middleware
+    // Observability middleware (request/response tracking)
     this.app.use((req: Request, res: Response, next: NextFunction) => {
       const start = Date.now();
       res.on('finish', () => {
         const duration = Date.now() - start;
-        console.log(
-          `[${new Date().toISOString()}] ${req.method} ${req.path} ${res.statusCode} ${duration}ms`
-        );
+        this.observability.recordRequest(req, res, duration);
+        const logger = this.observability.getLogger();
+        logger.info('api', `${req.method} ${req.path}`, {
+          status: res.statusCode,
+          duration_ms: duration,
+        });
       });
       next();
     });
@@ -77,7 +84,7 @@ export class AutonomyAPIServer {
   private setupRoutes(): void {
     // Health check
     this.app.get('/health', (req: Request, res: Response) => {
-      res.json({
+      return res.json({
         status: 'ok',
         service: 'autonomy-api',
         uptime: process.uptime(),
@@ -85,9 +92,20 @@ export class AutonomyAPIServer {
       });
     });
 
+    // Metrics endpoint (Prometheus format)
+    this.app.get('/metrics', (req: Request, res: Response) => {
+      res.set('Content-Type', 'text/plain; charset=utf-8');
+      return res.send(this.observability.getMetricsPrometheus());
+    });
+
+    // Metrics JSON endpoint
+    this.app.get('/metrics/json', (req: Request, res: Response) => {
+      return res.json(this.observability.getMetricsJSON());
+    });
+
     // API info
     this.app.get('/autonomy', (req: Request, res: Response) => {
-      res.json({
+      return res.json({
         service: 'CIC Autonomy API',
         version: '1.0.0',
         phase: '23.7',
@@ -105,6 +123,14 @@ export class AutonomyAPIServer {
             'PUT /autonomy/proposals/:id': 'Update proposal status',
             'POST /autonomy/proposals/simulate': 'Simulate proposal execution',
           },
+          cache: {
+            'GET /autonomy/cache/metrics': 'Cache statistics (JSON)',
+            'GET /autonomy/cache/status': 'Cache status (human-readable)',
+          },
+          observability: {
+            'GET /metrics': 'Prometheus format metrics',
+            'GET /metrics/json': 'JSON format metrics',
+          },
         },
       });
     });
@@ -112,13 +138,15 @@ export class AutonomyAPIServer {
     // Mount routers
     const signalsRouter = createSignalsRouter(this.service);
     const proposalsRouter = createProposalsRouter(this.service);
+    const cacheRouter = createCacheRouter(this.service.getCacheAdapter());
 
     this.app.use('/autonomy', signalsRouter);
     this.app.use('/autonomy', proposalsRouter);
+    this.app.use('/autonomy', cacheRouter);
 
     // 404 handler
     this.app.use((req: Request, res: Response) => {
-      res.status(404).json({
+      return res.status(404).json({
         error: 'Not found',
         path: req.path,
         method: req.method,
@@ -131,8 +159,8 @@ export class AutonomyAPIServer {
    */
   private setupErrorHandler(): void {
     this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-      console.error('Unhandled error:', err);
-      console.error('Stack:', err.stack);
+      const logger = this.observability.getLogger();
+      logger.error('api', 'Unhandled error', err);
 
       // Sanitize error message to prevent path leakage
       let sanitizedMessage = 'Internal server error';
@@ -140,7 +168,7 @@ export class AutonomyAPIServer {
         sanitizedMessage = err.message;
       }
 
-      res.status(500).json({
+      return res.status(500).json({
         error: 'Internal server error',
         message: sanitizedMessage,
       });
