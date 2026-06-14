@@ -161,7 +161,7 @@ export function createMockProposal(
   status: 'pending' | 'approved' | 'rejected' | 'executed' = 'pending'
 ): RoadmapProposal {
   return {
-    id: `proposal_Phase24_${Date.now()}`,
+    id: `proposal_Phase24_${Date.now()}_${Math.random()}`,
     timestamp: new Date().toISOString(),
     triggeredBy: [createMockDriftSignal('critical')],
     actions: [

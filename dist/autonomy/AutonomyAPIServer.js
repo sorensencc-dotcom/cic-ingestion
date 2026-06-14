@@ -11,6 +11,7 @@ import express from 'express';
 import { AutonomyService } from './AutonomyService';
 import { createSignalsRouter } from './routes/signals';
 import { createProposalsRouter } from './routes/proposals';
+import { ObservabilityManager } from './ObservabilityManager';
 export class AutonomyAPIServer {
     constructor(config) {
         this.server = null;
@@ -19,6 +20,7 @@ export class AutonomyAPIServer {
             host: 'localhost',
             ...config,
         };
+        this.observability = ObservabilityManager.getInstance();
         this.app = express();
         this.service = new AutonomyService(config);
         this.setupMiddleware();
@@ -31,12 +33,17 @@ export class AutonomyAPIServer {
     setupMiddleware() {
         // JSON body parser
         this.app.use(express.json({ limit: '10mb' }));
-        // Request logging middleware
+        // Observability middleware (request/response tracking)
         this.app.use((req, res, next) => {
             const start = Date.now();
             res.on('finish', () => {
                 const duration = Date.now() - start;
-                console.log(`[${new Date().toISOString()}] ${req.method} ${req.path} ${res.statusCode} ${duration}ms`);
+                this.observability.recordRequest(req, res, duration);
+                const logger = this.observability.getLogger();
+                logger.info('api', `${req.method} ${req.path}`, {
+                    status: res.statusCode,
+                    duration_ms: duration,
+                });
             });
             next();
         });
@@ -59,16 +66,25 @@ export class AutonomyAPIServer {
     setupRoutes() {
         // Health check
         this.app.get('/health', (req, res) => {
-            res.json({
+            return res.json({
                 status: 'ok',
                 service: 'autonomy-api',
                 uptime: process.uptime(),
                 timestamp: new Date().toISOString(),
             });
         });
+        // Metrics endpoint (Prometheus format)
+        this.app.get('/metrics', (req, res) => {
+            res.set('Content-Type', 'text/plain; charset=utf-8');
+            return res.send(this.observability.getMetricsPrometheus());
+        });
+        // Metrics JSON endpoint
+        this.app.get('/metrics/json', (req, res) => {
+            return res.json(this.observability.getMetricsJSON());
+        });
         // API info
         this.app.get('/autonomy', (req, res) => {
-            res.json({
+            return res.json({
                 service: 'CIC Autonomy API',
                 version: '1.0.0',
                 phase: '23.7',
@@ -86,6 +102,10 @@ export class AutonomyAPIServer {
                         'PUT /autonomy/proposals/:id': 'Update proposal status',
                         'POST /autonomy/proposals/simulate': 'Simulate proposal execution',
                     },
+                    observability: {
+                        'GET /metrics': 'Prometheus format metrics',
+                        'GET /metrics/json': 'JSON format metrics',
+                    },
                 },
             });
         });
@@ -96,7 +116,7 @@ export class AutonomyAPIServer {
         this.app.use('/autonomy', proposalsRouter);
         // 404 handler
         this.app.use((req, res) => {
-            res.status(404).json({
+            return res.status(404).json({
                 error: 'Not found',
                 path: req.path,
                 method: req.method,
@@ -108,10 +128,16 @@ export class AutonomyAPIServer {
      */
     setupErrorHandler() {
         this.app.use((err, req, res, next) => {
-            console.error('Unhandled error:', err);
-            res.status(500).json({
+            const logger = this.observability.getLogger();
+            logger.error('api', 'Unhandled error', err);
+            // Sanitize error message to prevent path leakage
+            let sanitizedMessage = 'Internal server error';
+            if (err.message && !err.message.includes('/') && !err.message.includes('\\')) {
+                sanitizedMessage = err.message;
+            }
+            return res.status(500).json({
                 error: 'Internal server error',
-                message: err.message,
+                message: sanitizedMessage,
             });
         });
     }

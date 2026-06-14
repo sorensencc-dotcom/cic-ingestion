@@ -8,19 +8,31 @@ import { AutonomyToARPSBridge } from './AutonomyToARPSBridge';
 import { AutonomyGovernanceBridge } from './AutonomyGovernanceBridge';
 export class BridgeOrchestrator {
     constructor(config) {
+        this.config = {
+            plannerBridgeTimeoutMs: 5000,
+            arpsBridgeTimeoutMs: 3000,
+            governanceBridgeTimeoutMs: 10000,
+            ...config,
+        };
         this.plannerBridge = new AutonomyToPlannerBridge({
-            aprControlPlaneUrl: config.aprControlPlaneUrl,
-            replanThresholds: config.replanThresholds,
+            aprControlPlaneUrl: this.config.aprControlPlaneUrl,
+            replanThresholds: this.config.replanThresholds,
         });
         this.arpsBridge = new AutonomyToARPSBridge({
-            memoryStoreUrl: config.memoryStoreUrl,
+            memoryStoreUrl: this.config.memoryStoreUrl,
         });
         this.governanceBridge = new AutonomyGovernanceBridge({
-            governanceControlPlaneUrl: config.governanceControlPlaneUrl,
-            councilSize: config.councilSize,
-            approvalThreshold: config.approvalThreshold,
-            autoApproveThreshold: config.autoApproveThreshold,
+            governanceControlPlaneUrl: this.config.governanceControlPlaneUrl,
+            councilSize: this.config.councilSize,
+            approvalThreshold: this.config.approvalThreshold,
+            autoApproveThreshold: this.config.autoApproveThreshold,
         });
+    }
+    async withTimeout(promise, timeoutMs, name) {
+        return Promise.race([
+            promise,
+            new Promise((_, reject) => setTimeout(() => reject(new Error(`${name} timeout after ${timeoutMs}ms`)), timeoutMs)),
+        ]);
     }
     /**
      * Process detected signals through all bridges
@@ -37,7 +49,7 @@ export class BridgeOrchestrator {
         };
         // Feed to planner (may trigger replanning)
         try {
-            await this.plannerBridge.feedSignalsToPlanner(signals);
+            await this.withTimeout(this.plannerBridge.feedSignalsToPlanner(signals), this.config.plannerBridgeTimeoutMs, 'PlannerBridge');
         }
         catch (err) {
             result.errors.push({
@@ -48,7 +60,7 @@ export class BridgeOrchestrator {
         // Log each signal to ARPS
         for (const signal of signals) {
             try {
-                await this.arpsBridge.logSignalToARPS(signal);
+                await this.withTimeout(this.arpsBridge.logSignalToARPS(signal), this.config.arpsBridgeTimeoutMs, 'ARPSBridge');
             }
             catch (err) {
                 result.errors.push({
@@ -75,7 +87,7 @@ export class BridgeOrchestrator {
         for (const proposal of proposals) {
             // Route to governance if needed
             try {
-                await this.governanceBridge.routeProposalToGovernance(proposal);
+                await this.withTimeout(this.governanceBridge.routeProposalToGovernance(proposal), this.config.governanceBridgeTimeoutMs, 'GovernanceBridge');
                 result.proposalsRouted++;
             }
             catch (err) {
@@ -86,7 +98,7 @@ export class BridgeOrchestrator {
             }
             // Log to ARPS
             try {
-                await this.arpsBridge.logProposalToARPS(proposal);
+                await this.withTimeout(this.arpsBridge.logProposalToARPS(proposal), this.config.arpsBridgeTimeoutMs, 'ARPSBridge');
             }
             catch (err) {
                 result.errors.push({
@@ -97,7 +109,7 @@ export class BridgeOrchestrator {
             // Feed to planner (as constraints)
             if (proposal.status === 'approved') {
                 try {
-                    await this.plannerBridge.feedProposalToPlanner(proposal);
+                    await this.withTimeout(this.plannerBridge.feedProposalToPlanner(proposal), this.config.plannerBridgeTimeoutMs, 'PlannerBridge');
                     result.proposalsApproved++;
                 }
                 catch (err) {

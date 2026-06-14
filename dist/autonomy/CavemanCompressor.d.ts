@@ -46,6 +46,7 @@ export declare class CavemanCompressor {
             arraysProcessed: number;
             objectsProcessed: number;
             recompressionBlocked: boolean;
+            error?: string;
         };
     };
 }

@@ -130,7 +130,7 @@ export function createMockTimelineEvent(type = 'PIPELINE_RUN') {
  */
 export function createMockProposal(status = 'pending') {
     return {
-        id: `proposal_Phase24_${Date.now()}`,
+        id: `proposal_Phase24_${Date.now()}_${Math.random()}`,
         timestamp: new Date().toISOString(),
         triggeredBy: [createMockDriftSignal('critical')],
         actions: [

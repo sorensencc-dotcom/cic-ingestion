@@ -4,8 +4,12 @@
  * GET /autonomy/signals — query signals
  */
 import { Router } from 'express';
+import { CavemanCompressor } from '../CavemanCompressor';
+import { ObservabilityManager } from '../ObservabilityManager';
 export function createSignalsRouter(service) {
     const router = Router();
+    const caveman = new CavemanCompressor();
+    const observability = ObservabilityManager.getInstance();
     /**
      * POST /autonomy/signals
      * Detect signals from event history
@@ -14,7 +18,7 @@ export function createSignalsRouter(service) {
      *   startDate (ISO 8601) - default: 7 days ago
      *   endDate (ISO 8601) - default: now
      *
-     * Response: { signals: AutonomySignal[], count: number, detectedAt: ISO8601 }
+     * Response: { signals: AutonomySignal[], count: number, detectedAt: ISO8601, CAVEMAN_STATS? }
      */
     router.post('/signals', async (req, res) => {
         try {
@@ -37,20 +41,33 @@ export function createSignalsRouter(service) {
             }
             // Detect signals
             const signals = await service.detectSignals(start, end);
-            res.json({
-                signals,
-                count: signals.length,
+            // Apply Caveman compression
+            const { data: compressedSignals, stats } = caveman.compress(signals, [
+                'description',
+                'rationale',
+            ]);
+            // Record compression stats with observability
+            observability.recordCavemanStats(stats);
+            observability.setActiveSignals(signals.length);
+            return res.json({
+                signals: compressedSignals,
+                count: compressedSignals.length,
                 window: {
                     startDate: start.toISOString(),
                     endDate: end.toISOString(),
                 },
                 detectedAt: new Date().toISOString(),
+                CAVEMAN_STATS: stats,
             });
         }
         catch (err) {
             console.error('POST /autonomy/signals error:', err);
-            res.status(500).json({
-                error: err instanceof Error ? err.message : 'Unknown error',
+            let sanitized = 'Internal server error';
+            if (err instanceof Error && !err.message.includes('/') && !err.message.includes('\\')) {
+                sanitized = err.message;
+            }
+            return res.status(500).json({
+                error: sanitized,
             });
         }
     });
@@ -70,20 +87,31 @@ export function createSignalsRouter(service) {
      */
     router.get('/signals', (req, res) => {
         try {
-            // Parse query parameters
+            // Parse and sanitize query parameters
             const query = {
-                type: req.query.type ? req.query.type.split(',') : undefined,
+                type: req.query.type
+                    ? req.query.type
+                        .split(',')
+                        .map((s) => s.trim())
+                        .filter((s) => s.length > 0)
+                    : undefined,
                 severity: req.query.severity
-                    ? req.query.severity.split(',')
+                    ? req.query.severity
+                        .split(',')
+                        .map((s) => s.trim())
+                        .filter((s) => s.length > 0)
                     : undefined,
                 phase: req.query.phase
-                    ? req.query.phase.split(',')
+                    ? req.query.phase
+                        .split(',')
+                        .map((s) => s.trim())
+                        .filter((s) => s.length > 0)
                     : undefined,
                 minConfidence: req.query.minConfidence
-                    ? parseFloat(req.query.minConfidence)
+                    ? parseFloat(req.query.minConfidence.trim())
                     : undefined,
-                limit: req.query.limit ? parseInt(req.query.limit, 10) : 100,
-                offset: req.query.offset ? parseInt(req.query.offset, 10) : 0,
+                limit: req.query.limit ? parseInt(req.query.limit.trim(), 10) : 100,
+                offset: req.query.offset ? parseInt(req.query.offset.trim(), 10) : 0,
             };
             // Validate pagination
             if (query.limit < 1 || query.limit > 1000) {
@@ -103,20 +131,28 @@ export function createSignalsRouter(service) {
                     error: 'minConfidence must be between 0.0 and 1.0',
                 });
             }
-            // Query signals
-            const signals = service.querySignals(query);
-            const total = service.querySignals({ ...query, limit: undefined, offset: undefined }).length;
-            res.json({
-                signals,
-                count: signals.length,
+            // Query signals with total count (single pass)
+            const { results: signals, total } = service.querySignalsWithTotal(query);
+            // Apply Caveman compression
+            const { data: compressedSignals, stats } = caveman.compress(signals, [
+                'description',
+                'rationale',
+            ]);
+            // Record compression stats with observability
+            observability.recordCavemanStats(stats);
+            observability.setActiveSignals(total);
+            return res.json({
+                signals: compressedSignals,
+                count: compressedSignals.length,
                 total,
                 query,
                 queriedAt: new Date().toISOString(),
+                CAVEMAN_STATS: stats,
             });
         }
         catch (err) {
             console.error('GET /autonomy/signals error:', err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }
@@ -136,11 +172,11 @@ export function createSignalsRouter(service) {
                     error: `Signal not found: ${id}`,
                 });
             }
-            res.json({ signal });
+            return res.json({ signal });
         }
         catch (err) {
             console.error(`GET /autonomy/signals/${req.params.id} error:`, err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }
@@ -176,7 +212,7 @@ export function createSignalsRouter(service) {
                 Date.now() - days * 24 * 60 * 60 * 1000);
             // Group and aggregate by window
             const trends = calculateTrends(recentSignals, metric, window);
-            res.json({
+            return res.json({
                 trends,
                 metric,
                 window,
@@ -186,7 +222,7 @@ export function createSignalsRouter(service) {
         }
         catch (err) {
             console.error(`GET /autonomy/signals/trends/${req.params.metric} error:`, err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }
@@ -196,7 +232,7 @@ export function createSignalsRouter(service) {
 /**
  * Helper: Calculate signal trends over time
  */
-function calculateTrends(signals, metric, window) {
+function calculateTrends(signals, _metric, window) {
     const grouped = {};
     for (const signal of signals) {
         const date = new Date(signal.timestamp);

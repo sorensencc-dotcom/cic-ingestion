@@ -210,6 +210,10 @@ describe('Routes Integration Tests', () => {
       service['store'].addProposal(pending);
       service['store'].addProposal(approved);
 
+      // Verify proposals were added
+      const allProposals = service.queryProposals({});
+      expect(allProposals.length).toBeGreaterThanOrEqual(2);
+
       const res = await request(app)
         .get('/autonomy/proposals')
         .query({ status: 'pending' })
@@ -218,6 +222,7 @@ describe('Routes Integration Tests', () => {
       expect(res.body.proposals.every((p: any) => p.status === 'pending')).toBe(
         true
       );
+      expect(res.body.proposals.length).toBeGreaterThan(0);
       expect(res.body.total).toBe(1);
     });
   });
@@ -416,8 +421,8 @@ describe('Routes Integration Tests', () => {
         .expect(200);
 
       expect(res.body.CAVEMAN_STATS).toBeDefined();
-      expect(res.body.CAVEMAN_STATS.originalSize).toBeGreaterThan(0);
-      expect(res.body.CAVEMAN_STATS.compressedSize).toBeGreaterThan(0);
+      expect(res.body.CAVEMAN_STATS.bytesIn).toBeGreaterThan(0);
+      expect(res.body.CAVEMAN_STATS.bytesOut).toBeGreaterThan(0);
     });
 
     it('includes CAVEMAN_STATS in signal query response', async () => {

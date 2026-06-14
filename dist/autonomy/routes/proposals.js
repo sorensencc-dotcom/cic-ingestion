@@ -6,8 +6,12 @@
  */
 import { Router } from 'express';
 import { scoreProposalPriority } from '../models/RoadmapProposal';
+import { CavemanCompressor } from '../CavemanCompressor';
+import { ObservabilityManager } from '../ObservabilityManager';
 export function createProposalsRouter(service) {
     const router = Router();
+    const caveman = new CavemanCompressor();
+    const observability = ObservabilityManager.getInstance();
     /**
      * GET /autonomy/proposals
      * Query stored proposals with filters
@@ -22,16 +26,23 @@ export function createProposalsRouter(service) {
      */
     router.get('/proposals', (req, res) => {
         try {
-            // Parse query parameters
+            // Parse and sanitize query parameters
+            const statusValues = req.query.status
+                ? req.query.status
+                    .split(',')
+                    .map((s) => s.trim())
+                    .filter((s) => s.length > 0 &&
+                    ['pending', 'approved', 'rejected', 'executed'].includes(s))
+                : [];
             const query = {
-                status: req.query.status
-                    ? req.query.status.split(',').filter((s) => ['pending', 'approved', 'rejected', 'executed'].includes(s))
+                status: statusValues.length > 0
+                    ? statusValues
                     : undefined,
                 minPriority: req.query.minPriority
-                    ? parseFloat(req.query.minPriority)
+                    ? parseFloat(req.query.minPriority.trim())
                     : undefined,
-                limit: req.query.limit ? parseInt(req.query.limit, 10) : 100,
-                offset: req.query.offset ? parseInt(req.query.offset, 10) : 0,
+                limit: req.query.limit ? parseInt(req.query.limit.trim(), 10) : 100,
+                offset: req.query.offset ? parseInt(req.query.offset.trim(), 10) : 0,
             };
             // Validate pagination
             if (query.limit < 1 || query.limit > 1000) {
@@ -51,29 +62,34 @@ export function createProposalsRouter(service) {
                     error: 'minPriority must be between 0 and 100',
                 });
             }
-            // Query proposals
-            const proposals = service.queryProposals(query);
-            const total = service.queryProposals({
-                ...query,
-                limit: undefined,
-                offset: undefined,
-            }).length;
+            // Query proposals with total count (single pass)
+            const { results: proposals, total } = service.queryProposalsWithTotal(query);
             // Add priority scores
             const proposalsWithPriority = proposals.map((p) => ({
                 ...p,
                 priority: scoreProposalPriority(p),
             }));
-            res.json({
-                proposals: proposalsWithPriority,
-                count: proposals.length,
+            // Apply Caveman compression
+            const { data: compressedProposals, stats } = caveman.compress(proposalsWithPriority, [
+                'description',
+                'reasoning',
+                'impact',
+            ]);
+            // Record compression stats with observability
+            observability.recordCavemanStats(stats);
+            observability.setActiveProposals(total);
+            return res.json({
+                proposals: compressedProposals,
+                count: compressedProposals.length,
                 total,
                 query,
                 queriedAt: new Date().toISOString(),
+                CAVEMAN_STATS: stats,
             });
         }
         catch (err) {
             console.error('GET /autonomy/proposals error:', err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }
@@ -93,14 +109,14 @@ export function createProposalsRouter(service) {
                     error: `Proposal not found: ${id}`,
                 });
             }
-            res.json({
+            return res.json({
                 proposal,
                 priority: scoreProposalPriority(proposal),
             });
         }
         catch (err) {
             console.error(`GET /autonomy/proposals/${req.params.id} error:`, err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }
@@ -136,7 +152,9 @@ export function createProposalsRouter(service) {
                 ...p,
                 priority: scoreProposalPriority(p),
             }));
-            res.status(201).json({
+            // Record proposal count with observability
+            observability.setActiveProposals(proposals.length);
+            return res.status(201).json({
                 proposals: proposalsWithPriority,
                 count: proposals.length,
                 generatedAt: new Date().toISOString(),
@@ -144,7 +162,7 @@ export function createProposalsRouter(service) {
         }
         catch (err) {
             console.error('POST /autonomy/proposals error:', err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }
@@ -161,13 +179,15 @@ export function createProposalsRouter(service) {
     router.put('/proposals/:id', (req, res) => {
         try {
             const { id } = req.params;
-            const { status } = req.body;
+            const rawStatus = req.body.status;
             // Validate status
-            if (!status) {
+            if (!rawStatus) {
                 return res.status(400).json({
                     error: 'status is required',
                 });
             }
+            // Trim whitespace
+            const status = typeof rawStatus === 'string' ? rawStatus.trim() : rawStatus;
             if (!['pending', 'approved', 'rejected', 'executed'].includes(status)) {
                 return res.status(400).json({
                     error: 'status must be one of: pending, approved, rejected, executed',
@@ -180,7 +200,7 @@ export function createProposalsRouter(service) {
                     error: `Proposal not found: ${id}`,
                 });
             }
-            res.json({
+            return res.json({
                 proposal: {
                     ...updated,
                     priority: scoreProposalPriority(updated),
@@ -190,7 +210,7 @@ export function createProposalsRouter(service) {
         }
         catch (err) {
             console.error(`PUT /autonomy/proposals/${req.params.id} error:`, err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }
@@ -230,14 +250,14 @@ export function createProposalsRouter(service) {
                 },
                 confidence: proposal.confidence,
             };
-            res.json({
+            return res.json({
                 result: simulationResult,
                 simulatedAt: new Date().toISOString(),
             });
         }
         catch (err) {
             console.error('POST /autonomy/proposals/simulate error:', err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }

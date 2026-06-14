@@ -18,6 +18,7 @@ export declare class AutonomyAPIServer {
     private service;
     private config;
     private server;
+    private observability;
     constructor(config: AutonomyAPIServerConfig);
     /**
      * Setup Express middleware

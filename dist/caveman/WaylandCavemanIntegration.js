@@ -34,49 +34,84 @@ export class WaylandCavemanIntegration {
                 CAVEMAN_STATS: stats,
             };
         }
-        // Measure compression
-        const originalJson = JSON.stringify(output);
-        const bytesIn = originalJson.length;
-        // Compress data payload if present
-        let compressedData = output.data;
-        if (output.ok && output.data) {
-            const result = this.caveman.compress(output.data);
-            compressedData = result.data;
-        }
-        // Build compressed response
-        const response = {
-            tool_id: output.tool_id,
-            ok: output.ok,
-            data: compressedData,
-            error: output.error,
-            metadata: output.metadata,
-            CAVEMAN_STATS: createCavemanStats(bytesIn, 0, {
+        try {
+            // Measure compression
+            let originalJson;
+            try {
+                originalJson = JSON.stringify(output);
+            }
+            catch (err) {
+                console.error(`[Wayland] JSON.stringify failed for tool ${toolId}:`, err);
+                return {
+                    ...output,
+                    CAVEMAN_STATS: createCavemanStats(0, 0, {
+                        pipeline_stage: 'wayland.tool',
+                        tool_id: toolId,
+                        agent_id: this.agentId,
+                        phase_id: this.phaseId,
+                        compression_error: 'stringify_failed',
+                    }),
+                };
+            }
+            const bytesIn = originalJson.length;
+            // Compress data payload if present
+            let compressedData = output.data;
+            if (output.ok && output.data) {
+                const result = this.caveman.compress(output.data);
+                compressedData = result.data;
+            }
+            // Build compressed response
+            const response = {
+                tool_id: output.tool_id,
+                ok: output.ok,
+                data: compressedData,
+                error: output.error,
+                metadata: output.metadata,
+                CAVEMAN_STATS: createCavemanStats(bytesIn, 0, {
+                    pipeline_stage: 'wayland.tool',
+                    tool_id: toolId,
+                    agent_id: this.agentId,
+                    phase_id: this.phaseId,
+                }),
+            };
+            // Recalculate stats with compressed size
+            let compressedJson;
+            try {
+                compressedJson = JSON.stringify(response);
+            }
+            catch (err) {
+                console.error(`[Wayland] JSON.stringify failed for compressed response ${toolId}:`, err);
+                compressedJson = originalJson;
+            }
+            const bytesOut = compressedJson.length;
+            response.CAVEMAN_STATS = createCavemanStats(bytesIn, bytesOut, {
                 pipeline_stage: 'wayland.tool',
                 tool_id: toolId,
                 agent_id: this.agentId,
                 phase_id: this.phaseId,
-            }),
-        };
-        // Recalculate stats with compressed size
-        const compressedJson = JSON.stringify(response);
-        const bytesOut = compressedJson.length;
-        response.CAVEMAN_STATS = createCavemanStats(bytesIn, bytesOut, {
-            pipeline_stage: 'wayland.tool',
-            tool_id: toolId,
-            agent_id: this.agentId,
-            phase_id: this.phaseId,
-        });
-        // Record against budget
-        this.budget.record(response.CAVEMAN_STATS);
-        // Log
-        logCavemanStats(`wayland:${toolId}`, response.CAVEMAN_STATS);
-        return response;
+            });
+            // Record against budget
+            this.budget.record(response.CAVEMAN_STATS);
+            // Log
+            logCavemanStats(`wayland:${toolId}`, response.CAVEMAN_STATS);
+            return response;
+        }
+        catch (err) {
+            console.error(`[Wayland] processToolOutput error for tool ${toolId}:`, err);
+            throw err;
+        }
     }
     /**
      * Batch process multiple tool outputs
      */
     async processBatch(outputs) {
-        return Promise.all(outputs.map(({ tool_id, output }) => this.processToolOutput(tool_id, output)));
+        try {
+            return await Promise.all(outputs.map(({ tool_id, output }) => this.processToolOutput(tool_id, output)));
+        }
+        catch (err) {
+            console.error('[Wayland] Batch processing error:', err);
+            throw err;
+        }
     }
     /**
      * Get current budget usage for monitoring

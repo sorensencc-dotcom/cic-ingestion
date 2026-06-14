@@ -7,10 +7,12 @@
 import { Router, Request, Response } from 'express';
 import { AutonomyService, SignalQuery } from '../AutonomyService';
 import { CavemanCompressor } from '../CavemanCompressor';
+import { ObservabilityManager } from '../ObservabilityManager';
 
 export function createSignalsRouter(service: AutonomyService): Router {
   const router = Router();
   const caveman = new CavemanCompressor();
+  const observability = ObservabilityManager.getInstance();
 
   /**
    * POST /autonomy/signals
@@ -54,6 +56,10 @@ export function createSignalsRouter(service: AutonomyService): Router {
         'rationale',
       ]);
 
+      // Record compression stats with observability
+      observability.recordCavemanStats(stats);
+      observability.setActiveSignals(signals.length);
+
       return res.json({
         signals: compressedSignals,
         count: compressedSignals.length,
@@ -66,8 +72,12 @@ export function createSignalsRouter(service: AutonomyService): Router {
       });
     } catch (err) {
       console.error('POST /autonomy/signals error:', err);
+      let sanitized = 'Internal server error';
+      if (err instanceof Error && !err.message.includes('/') && !err.message.includes('\\')) {
+        sanitized = err.message;
+      }
       return res.status(500).json({
-        error: err instanceof Error ? err.message : 'Unknown error',
+        error: sanitized,
       });
     }
   });
@@ -146,6 +156,10 @@ export function createSignalsRouter(service: AutonomyService): Router {
         'description',
         'rationale',
       ]);
+
+      // Record compression stats with observability
+      observability.recordCavemanStats(stats);
+      observability.setActiveSignals(total);
 
       return res.json({
         signals: compressedSignals,

@@ -2,7 +2,7 @@
  * Phase 25 → Phase 26 Caveman Adapter
  * Wires Caveman compression into TorqueQuery ingestion pipeline
  */
-import { CavemanCompressor } from './CavemanCompressor';
+import { CavemanCompressor } from '../autonomy/CavemanCompressor';
 import { CavemanStatsV1 } from './CavemanStats';
 export interface ConsolidatedKnowledgeObject {
     id: string;

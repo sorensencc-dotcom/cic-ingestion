@@ -19,6 +19,9 @@ export interface BridgeOrchestratorConfig {
     councilSize: number;
     approvalThreshold: number;
     autoApproveThreshold: number;
+    plannerBridgeTimeoutMs?: number;
+    arpsBridgeTimeoutMs?: number;
+    governanceBridgeTimeoutMs?: number;
 }
 export interface BridgeIntegrationResult {
     signalsProcessed: number;
@@ -35,7 +38,9 @@ export declare class BridgeOrchestrator {
     private plannerBridge;
     private arpsBridge;
     private governanceBridge;
+    private config;
     constructor(config: BridgeOrchestratorConfig);
+    private withTimeout;
     /**
      * Process detected signals through all bridges
      * Flow: signals → planner goals + ARPS logging

@@ -14,6 +14,7 @@ import { createSignalsRouter } from './routes/signals';
 import { createProposalsRouter } from './routes/proposals';
 import { createCacheRouter } from './routes/cache';
 import { ObservabilityManager } from './ObservabilityManager';
+import { wireVectorLayer } from '../vector/index.js';
 
 export interface AutonomyAPIServerConfig extends AutonomyServiceConfig {
   port?: number;
@@ -179,6 +180,13 @@ export class AutonomyAPIServer {
    * Start the server
    */
   async start(): Promise<void> {
+    try {
+      await wireVectorLayer(this.app);
+    } catch (err) {
+      console.error('Failed to wire VectorLayer:', err);
+      throw err;
+    }
+
     return new Promise((resolve, reject) => {
       try {
         this.server = this.app.listen(

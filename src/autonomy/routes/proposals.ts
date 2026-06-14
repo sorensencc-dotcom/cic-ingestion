@@ -9,10 +9,12 @@ import { Router, Request, Response } from 'express';
 import { AutonomyService, ProposalQuery } from '../AutonomyService';
 import { scoreProposalPriority } from '../models/RoadmapProposal';
 import { CavemanCompressor } from '../CavemanCompressor';
+import { ObservabilityManager } from '../ObservabilityManager';
 
 export function createProposalsRouter(service: AutonomyService): Router {
   const router = Router();
   const caveman = new CavemanCompressor();
+  const observability = ObservabilityManager.getInstance();
 
   /**
    * GET /autonomy/proposals
@@ -89,6 +91,10 @@ export function createProposalsRouter(service: AutonomyService): Router {
         'reasoning',
         'impact',
       ]);
+
+      // Record compression stats with observability
+      observability.recordCavemanStats(stats);
+      observability.setActiveProposals(total);
 
       return res.json({
         proposals: compressedProposals,
@@ -171,6 +177,9 @@ export function createProposalsRouter(service: AutonomyService): Router {
         priority: scoreProposalPriority(p),
       }));
 
+      // Record proposal count with observability
+      observability.setActiveProposals(proposals.length);
+
       return res.status(201).json({
         proposals: proposalsWithPriority,
         count: proposals.length,
@@ -196,14 +205,17 @@ export function createProposalsRouter(service: AutonomyService): Router {
   router.put('/proposals/:id', (req: Request, res: Response) => {
     try {
       const { id } = req.params;
-      const { status } = req.body;
+      const rawStatus = req.body.status;
 
       // Validate status
-      if (!status) {
+      if (!rawStatus) {
         return res.status(400).json({
           error: 'status is required',
         });
       }
+
+      // Trim whitespace
+      const status = typeof rawStatus === 'string' ? rawStatus.trim() : rawStatus;
 
       if (
         !['pending', 'approved', 'rejected', 'executed'].includes(status)

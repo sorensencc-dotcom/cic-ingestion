@@ -1,0 +1,2 @@
+[2026-06-14T09:52:08.627Z] start: host=claude-code, reason=session_end, project=C:/dev/cic-ingestion
+[2026-06-14T09:52:08.649Z] end: caught EPERM: operation not permitted, rename 'C:\dev\cic-ingestion\.ijfw\.dream-state-v2.json.tmp' -> 'C:\dev\cic-ingestion\.ijfw\.dream-state-v2.json'

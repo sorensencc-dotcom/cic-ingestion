@@ -47,6 +47,20 @@ export declare class AutonomyService {
      */
     queryProposals(query: ProposalQuery): RoadmapProposal[];
     /**
+     * Query signals with total count (single pass)
+     */
+    querySignalsWithTotal(query: SignalQuery): {
+        results: AutonomySignal[];
+        total: number;
+    };
+    /**
+     * Query proposals with total count (single pass)
+     */
+    queryProposalsWithTotal(query: ProposalQuery): {
+        results: RoadmapProposal[];
+        total: number;
+    };
+    /**
      * Get signal by ID
      */
     getSignal(id: string): AutonomySignal | undefined;

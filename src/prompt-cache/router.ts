@@ -14,6 +14,7 @@
 import { Anthropic } from '@anthropic-ai/sdk';
 import { canonicalize, computeHash, estimateTokens } from './canonicalize';
 import { CacheRegistry, CacheMetrics, CacheSummary } from './registry';
+import { BatchOperationsManager, BatchDocument, BatchAnalysisRequest, BatchAnalysisResult } from './batch';
 
 export interface GenerateOptions {
   docId: string;
@@ -42,6 +43,7 @@ export interface GenerateResult {
 export class CICPromptCacheRouter {
   private client: Anthropic;
   private registry: CacheRegistry;
+  private batchManager: BatchOperationsManager;
   private model = 'claude-3-5-sonnet-20241022';
 
   constructor(registryDbPath?: string) {
@@ -49,6 +51,7 @@ export class CICPromptCacheRouter {
       apiKey: process.env.ANTHROPIC_API_KEY,
     });
     this.registry = new CacheRegistry(registryDbPath);
+    this.batchManager = new BatchOperationsManager(this.registry, 3);
   }
 
   async generateWithCache(opts: GenerateOptions): Promise<GenerateResult> {
@@ -154,6 +157,23 @@ export class CICPromptCacheRouter {
         timestamp: new Date().toISOString(),
       },
     };
+  }
+
+  async generateBatchWithCache(req: BatchAnalysisRequest): Promise<BatchAnalysisResult> {
+    return this.batchManager.generateBatchWithCache(req, async (doc, task) => {
+      const result = await this.generateWithCache({
+        docId: doc.docId,
+        docText: doc.docText,
+        userPrompt: task.systemPrompt,
+        model: this.model,
+      });
+
+      return {
+        analysis: result.response,
+        hit: result.metadata.cacheHit,
+        costSavings: result.metadata.costSavings,
+      };
+    });
   }
 
   getMetrics(contentHash: string): CacheMetrics | null {
