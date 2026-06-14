@@ -1,0 +1,19 @@
+TESTING.md
+  s_bc7d61b0ee4497::t_44734a23613058 1-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "147c9ad5dd34984f8e5510cb8d846e921cdc053b",
+  "prompts": {},
+  "sessions": {
+    "s_bc7d61b0ee4497": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9692580d-38e5-4383-8340-759022fadf47",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
