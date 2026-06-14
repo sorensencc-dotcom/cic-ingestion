@@ -1,0 +1,45 @@
+src/prompt-cache/metrics/CacheMetricsExporter.ts
+  s_bc7d61b0ee4497::t_e26d6d235e9cb2 1-126
+src/prompt-cache/metrics/index.ts
+  s_bc7d61b0ee4497::t_8c47c4d62a88e9 1
+src/prompt-cache/metrics/CacheMetricsExporter.test.ts
+  s_bc7d61b0ee4497::t_558c9723c92e39 1-117,119,121-123,127-161
+  s_bc7d61b0ee4497::t_330a5e78fe8c7a 118,120,124-126
+src/autonomy/routes/cache.ts
+  s_bc7d61b0ee4497::t_de53f43c180ec1 25-33
+  s_bc7d61b0ee4497::t_8b9c4eaaa45073 3-4,10
+src/autonomy/AutonomyAPIServer.ts
+  s_8ba98690d2f3b2::t_4f739daa8d5587 17
+  s_8ba98690d2f3b2::t_ad58464831da11 176-183
+  s_8ba98690d2f3b2::t_242f9bab83c8b7 112-127,129-146,163
+  s_8ba98690d2f3b2::t_e3e5714c791fec 147-158,162
+  s_bc7d61b0ee4497::t_f0072b6b33d267 128
+  s_8ba98690d2f3b2::t_3b68611c5db1e1 184-187
+  s_8ba98690d2f3b2::t_c9ae30d424a2d2 16,20
+src/autonomy/routes/__tests__/cache.test.ts
+  s_bc7d61b0ee4497::t_f5c8a323d04b19 1-160
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "3d4bd4b839afdc55c3b1c7aa125de3a9b7358271",
+  "prompts": {},
+  "sessions": {
+    "s_8ba98690d2f3b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0253e0ca-9f2a-4b11-b97b-4bd94b977b92",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_bc7d61b0ee4497": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9692580d-38e5-4383-8340-759022fadf47",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
