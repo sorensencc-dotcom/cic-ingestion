@@ -1,0 +1,70 @@
+src/prompt-cache/router.ts
+  s_bc7d61b0ee4497::t_e80c40e6d8e662 114-115
+  s_bc7d61b0ee4497::t_e1d3b551ac21c4 75-97,101
+  s_bc7d61b0ee4497::t_9eb3a2e9334add 1-74,98-100,102-113,116-170
+src/prompt-cache/README.md
+  s_bc7d61b0ee4497::t_52079bf0b3cc40 1-212
+PROMPT_CACHE_WEEK1.md
+  s_bc7d61b0ee4497::t_a4cc80d1a8c582 1-48,50-78,83-86,91,93-96,98-100,102-105,109-260
+  s_bc7d61b0ee4497::t_d70b536ff1506d 49,79-82,87-90,92,97,101,106-108
+src/prompt-cache/canonicalize.ts
+  s_bc7d61b0ee4497::t_8b14e2296bfa0b 1-9,12,14-15,17-40
+  s_bc7d61b0ee4497::t_ca97e6abbae8ca 10-11,13,16
+src/autonomy/AutonomyAPIServer.ts
+  s_e91e1961abab82::t_bade83a275717e 162-163,171
+  s_e91e1961abab82::t_2ea1eaeb45edce 87,95-105,108,130-132,149
+  s_bc7d61b0ee4497::t_0030c8ea9a3fb8 15
+  s_bc7d61b0ee4497::t_ba83d73df4f70e 141,145
+  s_e91e1961abab82::t_42dd3b4fd8a2d7 16
+  s_bc7d61b0ee4497::t_53b57e01939791 126-129
+  s_e91e1961abab82::t_a3072c16f1cc75 53,58-63
+  s_e91e1961abab82::t_7e5519f13cb288 28,37
+src/prompt-cache/__tests__/integration.test.ts
+  s_bc7d61b0ee4497::t_1f0f4074d47091 1-67
+src/autonomy/AutonomyService.ts
+  s_bc7d61b0ee4497::t_c2e2be75211727 87,94
+  s_bc7d61b0ee4497::t_c95d21009b3848 380-400
+  s_bc7d61b0ee4497::t_834cc368ddbadb 336-341
+  s_bc7d61b0ee4497::t_d49f15403561f9 11
+src/prompt-cache/registry.ts
+  s_bc7d61b0ee4497::t_1bd279da9b3541 1-216
+src/autonomy/AutonomyPromptCacheAdapter.ts
+  s_bc7d61b0ee4497::t_a68e69846d238e 1-136
+src/autonomy/routes/cache.ts
+  s_bc7d61b0ee4497::t_5a005969ca5799 14,24
+  s_bc7d61b0ee4497::t_3aae582079670e 1-13,15-23,25-44
+PROMPT_CACHE_IMPLEMENTATION_SUMMARY.md
+  s_bc7d61b0ee4497::t_831ecc10981a05 1-480
+src/prompt-cache/__tests__/canonicalize.test.ts
+  s_bc7d61b0ee4497::t_19f1e7780f3564 1-33,35-36,38-84
+  s_bc7d61b0ee4497::t_ddde66074f5b24 37
+  s_bc7d61b0ee4497::t_31ff0e5a4f9864 34
+package.json
+  s_bc7d61b0ee4497::t_07b1a6dce6bb78 19
+src/prompt-cache/__tests__/registry.test.ts
+  s_bc7d61b0ee4497::t_f290d7a99b88a2 1-125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "5fef9bb1c8ae56b862136e3d25ddb5b4ac3fb638",
+  "prompts": {},
+  "sessions": {
+    "s_bc7d61b0ee4497": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9692580d-38e5-4383-8340-759022fadf47",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_e91e1961abab82": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "827b6e81-0dce-4c50-b5b2-ead5a93e500a",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
