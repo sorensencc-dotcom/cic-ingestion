@@ -14,7 +14,7 @@
 import { Anthropic } from '@anthropic-ai/sdk';
 import { canonicalize, computeHash, estimateTokens } from './canonicalize';
 import { CacheRegistry, CacheMetrics, CacheSummary } from './registry';
-import { BatchOperationsManager, BatchDocument, BatchAnalysisRequest, BatchAnalysisResult } from './batch';
+import { BatchOperationsManager, BatchAnalysisRequest, BatchAnalysisResult } from './batch';
 
 export interface GenerateOptions {
   docId: string;
