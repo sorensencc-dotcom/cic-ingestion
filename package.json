@@ -9,9 +9,9 @@
     "start": "node dist/autonomy/AutonomyAPIServer.js",
     "start:dev": "tsc 2>/dev/null || true; node dist/orchestrator/index.js",
     "dev": "tsc && node dist/autonomy/AutonomyAPIServer.js",
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
+    "test": "node scripts/test-setup.js && npx jest",
+    "test:watch": "node scripts/test-setup.js && npx jest --watch",
+    "test:coverage": "node scripts/test-setup.js && npx jest --coverage",
     "typecheck": "tsc --noEmit",
     "lint": "tsc --noEmit"
   },
