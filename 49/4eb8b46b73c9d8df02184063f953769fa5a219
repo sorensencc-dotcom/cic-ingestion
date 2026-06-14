@@ -1,0 +1,19 @@
+PROMPT_CACHE_WEEK2.md
+  s_bc7d61b0ee4497::t_0db702d8245990 1-665
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "494eb8b46b73c9d8df02184063f953769fa5a219",
+  "prompts": {},
+  "sessions": {
+    "s_bc7d61b0ee4497": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9692580d-38e5-4383-8340-759022fadf47",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
