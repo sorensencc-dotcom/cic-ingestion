@@ -3,8 +3,8 @@
  * Handles bulk registration and analysis with controlled parallelism.
  */
 
-import { CacheRegistry } from './registry';
-import { SQLiteRegistry } from './persistence/SQLiteRegistry';
+import { CacheRegistry } from './registry.js';
+import { SQLiteRegistry } from './persistence/SQLiteRegistry.js';
 
 export interface BatchDocument {
   docId: string;

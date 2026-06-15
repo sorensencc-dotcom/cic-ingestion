@@ -4,9 +4,9 @@
  */
 
 import { Command } from 'commander';
-import { CICPromptCacheRouter } from '../prompt-cache/router';
-import { CacheMetricsExporter } from '../prompt-cache/metrics/CacheMetricsExporter';
-import { loadCacheConfig } from '../prompt-cache/config';
+import { CICPromptCacheRouter } from '../prompt-cache/router.js';
+import { CacheMetricsExporter } from '../prompt-cache/metrics/CacheMetricsExporter.js';
+import { loadCacheConfig } from '../prompt-cache/config/index.js';
 import * as readline from 'readline';
 
 export function createCacheCommand(): Command {

@@ -4,7 +4,7 @@
  * Metrics: hits, misses, hit_rate, tokens_saved, documents
  */
 
-import { CacheSummary } from '../registry';
+import { CacheSummary } from '../registry.js';
 
 export interface PrometheusMetric {
   name: string;

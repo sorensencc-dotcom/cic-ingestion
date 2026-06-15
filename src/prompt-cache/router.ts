@@ -12,10 +12,10 @@
  */
 
 import { Anthropic } from '@anthropic-ai/sdk';
-import { canonicalize, computeHash, estimateTokens } from './canonicalize';
-import { CacheRegistry, CacheMetrics, CacheSummary } from './registry';
-import { BatchOperationsManager, BatchAnalysisRequest, BatchAnalysisResult } from './batch';
-import { CacheConfig, DEFAULT_CACHE_CONFIG } from './config';
+import { canonicalize, computeHash, estimateTokens } from './canonicalize.js';
+import { CacheRegistry, CacheMetrics, CacheSummary } from './registry.js';
+import { BatchOperationsManager, BatchAnalysisRequest, BatchAnalysisResult } from './batch.js';
+import { CacheConfig, DEFAULT_CACHE_CONFIG } from './config/index.js';
 
 export interface GenerateOptions {
   docId: string;
