@@ -1,0 +1,40 @@
+src/prompt-cache/config/ConfigLoader.ts
+  s_ec542e15186aed::t_0841f7e86730f1 1-49
+src/cli/cic-cli-cache.ts
+  s_ec542e15186aed::t_126a0cc78da2df 17-18,27
+  s_ec542e15186aed::t_db0808f84eebd4 133
+  s_ec542e15186aed::t_8aa70795b5d996 59
+  s_ec542e15186aed::t_8a4241987f9257 9
+  s_ec542e15186aed::t_9342ede82cb33f 100
+src/prompt-cache/config/index.ts
+  s_ec542e15186aed::t_0412ddbd0b83c5 1-2
+src/prompt-cache/config/__tests__/config.test.ts
+  s_ec542e15186aed::t_5d4ddd32106c14 1-84
+src/prompt-cache/router.ts
+  s_ec542e15186aed::t_127ce0379fe10c 66
+  s_ec542e15186aed::t_9fc4919e0d9a28 48,50-51,55-57
+  s_ec542e15186aed::t_9800692a69caaf 18
+  s_ec542e15186aed::t_fa170cd23c6d98 178
+  s_ec542e15186aed::t_756954a8eb9233 135-144,149
+src/autonomy/AutonomyPromptCacheAdapter.ts
+  s_ec542e15186aed::t_fa935577890173 47-48
+  s_ec542e15186aed::t_7d5d1b61c72db7 15
+src/prompt-cache/config/CacheConfig.ts
+  s_ec542e15186aed::t_b530061265d60d 1-30
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "4988ceda6b3fe6d9321bae36ec714f8599f0b487",
+  "prompts": {},
+  "sessions": {
+    "s_ec542e15186aed": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0c2ec307-f399-4172-a64f-ff384b666c54",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
