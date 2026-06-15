@@ -15,6 +15,7 @@ import { Anthropic } from '@anthropic-ai/sdk';
 import { canonicalize, computeHash, estimateTokens } from './canonicalize';
 import { CacheRegistry, CacheMetrics, CacheSummary } from './registry';
 import { BatchOperationsManager, BatchAnalysisRequest, BatchAnalysisResult } from './batch';
+import { CacheConfig, DEFAULT_CACHE_CONFIG } from './config';
 
 export interface GenerateOptions {
   docId: string;
@@ -44,13 +45,16 @@ export class CICPromptCacheRouter {
   private client: Anthropic;
   private registry: CacheRegistry;
   private batchManager: BatchOperationsManager;
-  private model = 'claude-3-5-sonnet-20241022';
+  private config: CacheConfig;
 
-  constructor(registryDbPath?: string) {
+  constructor(config?: CacheConfig, registryDbPath?: string) {
+    this.config = config || DEFAULT_CACHE_CONFIG;
     this.client = new Anthropic({
       apiKey: process.env.ANTHROPIC_API_KEY,
     });
-    this.registry = new CacheRegistry(registryDbPath);
+    // Use config.registryPath if no explicit path provided
+    const dbPath = registryDbPath || this.config.registryPath;
+    this.registry = new CacheRegistry(dbPath);
     this.batchManager = new BatchOperationsManager(this.registry, 3);
   }
 
@@ -59,7 +63,7 @@ export class CICPromptCacheRouter {
       docId,
       docText,
       userPrompt,
-      model = this.model,
+      model = this.config.model,
       maxTokens = 2000,
     } = opts;
 
@@ -128,15 +132,21 @@ export class CICPromptCacheRouter {
       inputTokens
     );
 
-    // Estimate cost (Sonnet 3.5 pricing as of 2026)
-    const inputCost = (inputTokens / 1_000_000) * 3.0;
-    const cacheReadCost = (cacheReadTokens / 1_000_000) * 0.3;
-    const outputCost = (outputTokens / 1_000_000) * 15.0;
+    // Estimate cost using configured pricing tiers
+    const {
+      inputCost: inputPricing,
+      cacheReadCost: cacheReadPricing,
+      outputCost: outputPricing,
+    } = this.config.pricingTiers;
+
+    const inputCost = (inputTokens / 1_000_000) * inputPricing;
+    const cacheReadCost = (cacheReadTokens / 1_000_000) * cacheReadPricing;
+    const outputCost = (outputTokens / 1_000_000) * outputPricing;
     const totalCost = inputCost + cacheReadCost + outputCost;
 
     // Cost if no cache
     const costWithoutCache =
-      ((inputTokens + cacheReadTokens) / 1_000_000) * 3.0 + outputCost;
+      ((inputTokens + cacheReadTokens) / 1_000_000) * inputPricing + outputCost;
     const costSavings = costWithoutCache - totalCost;
 
     // Extract response text
@@ -165,7 +175,7 @@ export class CICPromptCacheRouter {
         docId: doc.docId,
         docText: doc.docText,
         userPrompt: task.systemPrompt,
-        model: this.model,
+        model: this.config.model,
       });
 
       return {

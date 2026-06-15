@@ -12,6 +12,7 @@
  */
 
 import { CICPromptCacheRouter } from '../prompt-cache/router';
+import { loadCacheConfig } from '../prompt-cache/config';
 
 export type AnalysisTask =
   | 'extract_findings'
@@ -43,7 +44,8 @@ export class AutonomyPromptCacheAdapter {
   private router: CICPromptCacheRouter;
 
   constructor(registryDbPath?: string) {
-    this.router = new CICPromptCacheRouter(registryDbPath);
+    const config = loadCacheConfig();
+    this.router = new CICPromptCacheRouter(config, registryDbPath);
   }
 
   async analyzeDocumentWithCache(

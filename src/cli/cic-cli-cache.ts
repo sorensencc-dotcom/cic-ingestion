@@ -6,12 +6,15 @@
 import { Command } from 'commander';
 import { CICPromptCacheRouter } from '../prompt-cache/router';
 import { CacheMetricsExporter } from '../prompt-cache/metrics/CacheMetricsExporter';
+import { loadCacheConfig } from '../prompt-cache/config';
 import * as readline from 'readline';
 
 export function createCacheCommand(): Command {
   const cacheCommand = new Command('cache').description(
     'Cache management and monitoring'
   );
+
+  const config = loadCacheConfig();
 
   /**
    * cache status — Show current cache metrics
@@ -21,7 +24,7 @@ export function createCacheCommand(): Command {
     .description('Show cache status')
     .action(async () => {
       try {
-        const router = new CICPromptCacheRouter();
+        const router = new CICPromptCacheRouter(config);
         const summary = router.getSummary();
 
         console.log('\n📊 Cache Status\n');
@@ -53,7 +56,7 @@ export function createCacheCommand(): Command {
     .option('-f, --force', 'Skip confirmation prompt')
     .action(async (opts: { force?: boolean }) => {
       try {
-        const router = new CICPromptCacheRouter();
+        const router = new CICPromptCacheRouter(config);
         const summary = router.getSummary();
 
         if (!opts.force) {
@@ -94,7 +97,7 @@ export function createCacheCommand(): Command {
     .option('--format <format>', 'Output format (json|prometheus)', 'json')
     .action(async (opts: { format?: string }) => {
       try {
-        const router = new CICPromptCacheRouter();
+        const router = new CICPromptCacheRouter(config);
         const summary = router.getSummary();
 
         if (opts.format === 'prometheus') {
@@ -127,7 +130,7 @@ export function createCacheCommand(): Command {
           process.exit(1);
         }
 
-        const router = new CICPromptCacheRouter();
+        const router = new CICPromptCacheRouter(config);
 
         // Display immediately
         const displayStatus = () => {
