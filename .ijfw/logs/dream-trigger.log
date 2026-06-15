@@ -13,3 +13,7 @@
 [dream] stage tier_promotion skipped: no-op
 [dream] stage wiki-compile skipped: db-unavailable
 [dream] stage profile_derive skipped: no-signals
+[dream] stage tier_promotion skipped: no-op
+[dream] stage wiki-compile skipped: db-unavailable
+[dream] stage tier_promotion skipped: no-op
+[dream] stage wiki-compile skipped: db-unavailable

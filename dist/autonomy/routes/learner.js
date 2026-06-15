@@ -14,17 +14,17 @@ export function createLearnerRouter(learner) {
      *
      * Response: { metrics: LearnerMetrics }
      */
-    router.get('/learner/metrics', (req, res) => {
+    router.get('/learner/metrics', (_req, res) => {
         try {
             const metrics = learner.getMetrics();
-            res.json({
+            return res.json({
                 metrics,
                 queriedAt: new Date().toISOString(),
             });
         }
         catch (err) {
             console.error('GET /autonomy/learner/metrics error:', err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }
@@ -35,11 +35,11 @@ export function createLearnerRouter(learner) {
      *
      * Response: { thresholds: SignalThresholds, history: ThresholdUpdate[] }
      */
-    router.get('/learner/thresholds', (req, res) => {
+    router.get('/learner/thresholds', (_req, res) => {
         try {
             const thresholds = learner.getCurrentThresholds();
             const history = learner.getThresholdHistory();
-            res.json({
+            return res.json({
                 thresholds,
                 history,
                 adjustmentCount: history.length,
@@ -48,7 +48,7 @@ export function createLearnerRouter(learner) {
         }
         catch (err) {
             console.error('GET /autonomy/learner/thresholds error:', err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }
@@ -78,7 +78,7 @@ export function createLearnerRouter(learner) {
         }
         catch (err) {
             console.error(`GET /autonomy/learner/accuracy/${req.params.signalType} error:`, err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }
@@ -130,14 +130,14 @@ export function createLearnerRouter(learner) {
             await learner.evaluateProposalOutcome(mockProposal, outcome, actualDurationChange, reason);
             // Return updated metrics
             const metrics = learner.getMetrics();
-            res.status(201).json({
+            return res.status(201).json({
                 metrics,
                 feedbackRecordedAt: new Date().toISOString(),
             });
         }
         catch (err) {
             console.error('POST /autonomy/learner/feedback error:', err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }
@@ -163,7 +163,7 @@ export function createLearnerRouter(learner) {
             }
             // Run decay process
             const decayedCount = await learner.decayOldSignals(age);
-            res.json({
+            return res.json({
                 decayedCount,
                 maxAgeDays: age,
                 completedAt: new Date().toISOString(),
@@ -171,7 +171,7 @@ export function createLearnerRouter(learner) {
         }
         catch (err) {
             console.error('POST /autonomy/learner/decay error:', err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }
@@ -198,7 +198,7 @@ export function createLearnerRouter(learner) {
             const allOutcomes = learner.getAllOutcomes();
             const total = allOutcomes.length;
             const outcomes = allOutcomes.slice(offset, offset + limit);
-            res.json({
+            return res.json({
                 outcomes,
                 count: outcomes.length,
                 total,
@@ -209,7 +209,7 @@ export function createLearnerRouter(learner) {
         }
         catch (err) {
             console.error('GET /autonomy/learner/outcomes error:', err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }
@@ -220,7 +220,7 @@ export function createLearnerRouter(learner) {
      *
      * Response: { summary: LearnerSummary }
      */
-    router.get('/learner/summary', (req, res) => {
+    router.get('/learner/summary', (_req, res) => {
         try {
             const metrics = learner.getMetrics();
             const thresholds = learner.getCurrentThresholds();
@@ -240,14 +240,14 @@ export function createLearnerRouter(learner) {
                 },
                 signalAccuracy: metrics.accuracyBySignalType,
             };
-            res.json({
+            return res.json({
                 summary,
                 queriedAt: new Date().toISOString(),
             });
         }
         catch (err) {
             console.error('GET /autonomy/learner/summary error:', err);
-            res.status(500).json({
+            return res.status(500).json({
                 error: err instanceof Error ? err.message : 'Unknown error',
             });
         }

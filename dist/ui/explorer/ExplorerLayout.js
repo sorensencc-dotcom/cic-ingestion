@@ -74,7 +74,7 @@ export const ExplorerLayout = ({ apiBaseUrl, pollInterval = 5000, }) => {
             events: [], // clear events, will reload
         }));
     };
-    const handleCorrelationSelect = (correlationId) => {
+    const _handleCorrelationSelect = (correlationId) => {
         setState((prev) => ({
             ...prev,
             selectedCorrelationId: correlationId,

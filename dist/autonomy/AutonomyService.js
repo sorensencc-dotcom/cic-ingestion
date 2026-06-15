@@ -4,6 +4,8 @@
  */
 import { SignalDetectionEngine } from './SignalDetection';
 import { RoadmapProposalEngine } from './RoadmapProposalEngine';
+import { AutonomyPromptCacheAdapter } from './AutonomyPromptCacheAdapter';
+import { MemoryStoreAdapter } from './adapters/MemoryStoreAdapter';
 /**
  * In-memory store for signals and proposals (in production, use database)
  */
@@ -48,14 +50,17 @@ export class AutonomyService {
         this.signalEngine = new SignalDetectionEngine();
         this.proposalEngine = new RoadmapProposalEngine();
         this.store = new AutonomyStore();
+        this.cacheAdapter = new AutonomyPromptCacheAdapter();
+        this.memoryStore = config.memoryStore;
+        this.sessionId = MemoryStoreAdapter.generateSessionId();
     }
     /**
      * Detect signals from event history
-     * Fetches events/metrics from MemoryQueryAPI and runs detection
+     * Fetches events/metrics from MemoryStore (Phase 23.2) or MemoryQueryAPI fallback
      */
     async detectSignals(startDate, endDate) {
         try {
-            // Fetch events and metrics from MemoryQueryAPI
+            // Fetch events and metrics (Phase 23.2: use MemoryStore directly if available)
             const [events, driftMetrics, healthMetrics] = await Promise.all([
                 this.fetchEvents(startDate, endDate),
                 this.fetchDriftMetrics(),
@@ -67,16 +72,27 @@ export class AutonomyService {
                 driftMetrics,
                 healthMetrics,
                 baselineMetrics: {
-                    latency: 500, // TODO: fetch from config or baseline store
+                    latency: 500,
                     successRate: 0.95,
                     errorRate: 0.05,
                 },
             };
             // Run signal detection
             const signals = await this.signalEngine.detectSignals(context);
-            // Store and return
+            // Store in autonomy store
             for (const signal of signals) {
                 this.store.addSignal(signal);
+            }
+            // (Phase 23.2) Write signals to MemoryStore
+            if (this.memoryStore) {
+                for (const signal of signals) {
+                    try {
+                        await this.memoryStore.append(MemoryStoreAdapter.signalToMemoryEvent(signal, this.sessionId));
+                    }
+                    catch (err) {
+                        console.warn(`Failed to append signal to MemoryStore: ${err}`);
+                    }
+                }
             }
             return signals;
         }
@@ -89,6 +105,7 @@ export class AutonomyService {
     }
     /**
      * Generate proposals from signals
+     * (Phase 23.2) Writes proposals to MemoryStore
      */
     async generateProposals(signals) {
         try {
@@ -99,9 +116,20 @@ export class AutonomyService {
             }
             // Generate proposals
             const proposals = await this.proposalEngine.generateProposals(signalsToUse, this.config.roadmapContext);
-            // Store and return
+            // Store in autonomy store
             for (const proposal of proposals) {
                 this.store.addProposal(proposal);
+            }
+            // (Phase 23.2) Write proposals to MemoryStore
+            if (this.memoryStore) {
+                for (const proposal of proposals) {
+                    try {
+                        await this.memoryStore.append(MemoryStoreAdapter.proposalToMemoryEvent(proposal, this.sessionId));
+                    }
+                    catch (err) {
+                        console.warn(`Failed to append proposal to MemoryStore: ${err}`);
+                    }
+                }
             }
             return proposals;
         }
@@ -217,6 +245,12 @@ export class AutonomyService {
         };
     }
     /**
+     * Get cache adapter (for metrics/status endpoints)
+     */
+    getCacheAdapter() {
+        return this.cacheAdapter;
+    }
+    /**
      * Get signal by ID
      */
     getSignal(id) {
@@ -241,6 +275,22 @@ export class AutonomyService {
         const signals = await this.detectSignals(startDate, endDate);
         const proposals = await this.generateProposals(signals);
         return { signals, proposals };
+    }
+    /**
+     * Analyze archival batch with prompt caching
+     * Task types: 'findings' | 'gaps' | 'patterns'
+     */
+    async analyzeArchivalBatch(docId, batchContent, analysisType) {
+        const taskMap = {
+            findings: 'extract_findings',
+            gaps: 'identify_gaps',
+            patterns: 'detect_patterns',
+        };
+        return await this.cacheAdapter.analyzeDocumentWithCache({
+            docId,
+            docText: batchContent,
+            task: taskMap[analysisType],
+        });
     }
     /**
      * Helper: Fetch events from MemoryQueryAPI
