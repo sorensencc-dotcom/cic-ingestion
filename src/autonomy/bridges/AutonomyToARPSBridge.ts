@@ -156,7 +156,7 @@ export class AutonomyToARPSBridge {
       metadata: {
         proposalId: proposal.id,
         decision,
-        rejectionReason: reason,
+        rejectionReason: decision === 'rejected' ? reason : undefined,
         triggeredBySignals: proposal.triggeredBy.map((s) => s.id),
         affectedPhases: proposal.impact.affectedPhases,
       },

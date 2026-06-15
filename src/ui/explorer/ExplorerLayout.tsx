@@ -111,12 +111,7 @@ export const ExplorerLayout: React.FC<ExplorerLayoutProps> = ({
     }));
   };
 
-  const handleCorrelationSelect = (correlationId: string) => {
-    setState((prev) => ({
-      ...prev,
-      selectedCorrelationId: correlationId,
-    }));
-  };
+
 
   return (
     <div className="explorer-layout">

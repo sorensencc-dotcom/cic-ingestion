@@ -189,11 +189,9 @@ describe('AutonomyLearner', () => {
 
   describe('Metrics Reporting', () => {
     it('calculates success rate correctly', async () => {
-      const proposal = createMockProposal('executed');
-
-      await learner.evaluateProposalOutcome(proposal, 'success');
-      await learner.evaluateProposalOutcome(proposal, 'success');
-      await learner.evaluateProposalOutcome(proposal, 'failure');
+      await learner.evaluateProposalOutcome(createMockProposal('executed'), 'success');
+      await learner.evaluateProposalOutcome(createMockProposal('executed'), 'success');
+      await learner.evaluateProposalOutcome(createMockProposal('executed'), 'failure');
 
       const metrics = learner.getMetrics();
       expect(metrics.proposalsEvaluated).toBe(3);
@@ -269,10 +267,8 @@ describe('AutonomyLearner', () => {
 
   describe('State Management', () => {
     it('retrieves all recorded outcomes', async () => {
-      const proposal = createMockProposal('executed');
-
-      await learner.evaluateProposalOutcome(proposal, 'success');
-      await learner.evaluateProposalOutcome(proposal, 'failure');
+      await learner.evaluateProposalOutcome(createMockProposal('executed'), 'success');
+      await learner.evaluateProposalOutcome(createMockProposal('executed'), 'failure');
 
       const outcomes = learner.getAllOutcomes();
       expect(outcomes).toHaveLength(2);

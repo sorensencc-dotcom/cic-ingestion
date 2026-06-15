@@ -16,7 +16,7 @@ interface TimelineViewProps {
 
 export const TimelineView: React.FC<TimelineViewProps> = ({
   events,
-  driftMetrics,
+  driftMetrics: _driftMetrics,
   selectedEvent,
   onEventClick,
   isLoading,

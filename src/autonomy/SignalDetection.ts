@@ -400,11 +400,13 @@ export class SignalDetectionEngine {
     const phases = new Set<string>();
 
     for (const event of events) {
-      if (event.metadata.phase) {
-        phases.add(event.metadata.phase);
-      }
-      if (event.metadata.affectedPhases && Array.isArray(event.metadata.affectedPhases)) {
-        event.metadata.affectedPhases.forEach((p: string) => phases.add(p));
+      if (event.metadata) {
+        if (event.metadata.phase) {
+          phases.add(event.metadata.phase);
+        }
+        if (event.metadata.affectedPhases && Array.isArray(event.metadata.affectedPhases)) {
+          event.metadata.affectedPhases.forEach((p: string) => phases.add(p));
+        }
       }
     }
 

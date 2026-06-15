@@ -24,21 +24,41 @@ export interface TorqueQueryHit {
 export interface TorqueQueryResponse {
   hits: TorqueQueryHit[];
   facets: Record<string, Record<string, number>>;
+  debug?: any;
 }
 
 export class TorqueQueryPlanner {
-  constructor(_targets: Record<string, TorqueCollectionTarget>) {}
+  #targets: Record<string, TorqueCollectionTarget>;
+
+  constructor(targets: Record<string, TorqueCollectionTarget>) {
+    this.#targets = targets;
+  }
+
+  getTargets() {
+    return this.#targets;
+  }
 
   async execute(plan: TorqueQueryPlan): Promise<TorqueQueryResponse> {
     const perCollectionLimit = plan.limit;
 
     const resultsByCollection: Record<string, QdrantQueryResult[]> = {};
 
+    const debug: any = {
+      collectionsQueried: [],
+      primaryResults: {},
+      secondaryResults: {},
+      rrfScores: {},
+      mmrDecisions: [],
+    };
+
     for (const target of plan.collections) {
+      debug.collectionsQueried.push(target.name);
+
       const primary = await target.client.query(
         plan.vectorPrimary,
         perCollectionLimit
       );
+      debug.primaryResults[target.name] = primary;
 
       let secondary: QdrantQueryResult[] = [];
       if (plan.vectorSecondary) {
@@ -46,14 +66,15 @@ export class TorqueQueryPlanner {
           plan.vectorSecondary,
           perCollectionLimit
         );
+        debug.secondaryResults[target.name] = secondary;
       }
 
-      const fused = this.#rrfFuse(primary, secondary, perCollectionLimit);
+      const fused = this.#rrfFuse(primary, secondary, perCollectionLimit, debug);
       resultsByCollection[target.name] = fused;
     }
 
     const fusedAll = this.#fanIn(resultsByCollection, plan.limit);
-    const diversified = this.#mmrDiversify(fusedAll, 0.7);
+    const diversified = this.#mmrDiversify(fusedAll, 0.7, debug);
 
     const hits: TorqueQueryHit[] = diversified.map((r) => ({
       id: r.id,
@@ -66,7 +87,7 @@ export class TorqueQueryPlanner {
       ? this.#computeFacets(hits, plan.facets)
       : {};
 
-    return { hits, facets };
+    return { hits, facets, debug };
   }
 
   #fanIn(
@@ -88,7 +109,8 @@ export class TorqueQueryPlanner {
   #rrfFuse(
     a: QdrantQueryResult[],
     b: QdrantQueryResult[],
-    limit: number
+    limit: number,
+    debug?: any
   ): QdrantQueryResult[] {
     const k = 60;
     const scores = new Map<string, number>();
@@ -106,7 +128,7 @@ export class TorqueQueryPlanner {
     add(a);
     add(b);
 
-    return Array.from(scores.entries())
+    const fused = Array.from(scores.entries())
       .map(([id, score]) => ({
         id,
         score,
@@ -114,11 +136,20 @@ export class TorqueQueryPlanner {
       }))
       .sort((x, y) => y.score - x.score)
       .slice(0, limit);
+
+    if (debug && debug.rrfScores) {
+      for (const item of fused) {
+        debug.rrfScores[item.id] = item.score;
+      }
+    }
+
+    return fused;
   }
 
   #mmrDiversify(
     results: QdrantQueryResult[],
-    lambda: number
+    lambda: number,
+    debug?: any
   ): QdrantQueryResult[] {
     if (results.length <= 1) return results;
 
@@ -128,6 +159,7 @@ export class TorqueQueryPlanner {
     while (remaining.length > 0 && selected.length < results.length) {
       let bestIdx = 0;
       let bestScore = -Infinity;
+      let bestDetails: any = null;
 
       for (let i = 0; i < remaining.length; i++) {
         const candidate = remaining[i];
@@ -140,7 +172,19 @@ export class TorqueQueryPlanner {
         if (mmrScore > bestScore) {
           bestScore = mmrScore;
           bestIdx = i;
+          if (debug) {
+            bestDetails = {
+              candidate: candidate.id,
+              relevance,
+              redundancy,
+              mmrScore,
+            };
+          }
         }
+      }
+
+      if (debug && debug.mmrDecisions && bestDetails) {
+        debug.mmrDecisions.push(bestDetails);
       }
 
       selected.push(remaining[bestIdx]);

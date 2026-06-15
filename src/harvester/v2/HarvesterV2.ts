@@ -21,10 +21,8 @@ export interface HarvesterV2Config {
 }
 
 export class HarvesterV2 {
-  private config: HarvesterV2Config;
-
-  constructor(config: HarvesterV2Config) {
-    this.config = config;
+  constructor(_config: HarvesterV2Config) {
+    // Empty
   }
 
   // Extractor: build logs
@@ -43,17 +41,17 @@ export class HarvesterV2 {
   }
 
   // Transformer: normalize telemetry
-  normalizeTelemetry(raw: any[]): Promise<PhaseMetrics[]> {
+  normalizeTelemetry(_raw: any[]): Promise<PhaseMetrics[]> {
     throw new Error('Not implemented');
   }
 
   // Emitter: to MemoryStore
-  emitToMemory(metrics: PhaseMetrics[]): Promise<void> {
+  emitToMemory(_metrics: PhaseMetrics[]): Promise<void> {
     throw new Error('Not implemented');
   }
 
   // Emitter: to Autonomy API (scheduler feedback)
-  emitToScheduler(metrics: PhaseMetrics[]): Promise<void> {
+  emitToScheduler(_metrics: PhaseMetrics[]): Promise<void> {
     throw new Error('Not implemented');
   }
 

@@ -55,8 +55,8 @@ export class QdrantClient {
     }
   }
 
-  // Getter for the collection name, needed for testing or indexing
-  get collectionName(): string {
+  // Method for the collection name, needed for testing or indexing
+  collectionName(): string {
     return this.#collection;
   }
 
@@ -220,6 +220,19 @@ export class QdrantClient {
     } catch {
       return false;
     }
+  }
+
+  async stats(): Promise<{ points_count: number; indexing: string }> {
+    const res = await this.#req(`/collections/${this.#collection}`, {
+      method: "GET",
+    });
+    return {
+      points_count: res?.result?.points_count ?? 0,
+      indexing:
+        typeof res?.result?.optimizer_status === "string"
+          ? res.result.optimizer_status
+          : res?.result?.status ?? "unknown",
+    };
   }
 }
 

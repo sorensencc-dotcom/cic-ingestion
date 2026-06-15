@@ -1,4 +1,5 @@
 import QdrantClient, { QdrantPoint } from "./qdrantClient.js";
+import QdrantObservability from "./qdrantObservability.js";
 
 export interface CICChunk {
   id: string;
@@ -15,9 +16,11 @@ export interface CICChunk {
 
 export class HarvesterIndexer {
   #client: QdrantClient;
+  #observability?: QdrantObservability;
 
-  constructor(client: QdrantClient) {
+  constructor(client: QdrantClient, observability?: QdrantObservability) {
     this.#client = client;
+    this.#observability = observability;
   }
 
   async indexChunk(chunk: CICChunk): Promise<void> {
@@ -37,7 +40,11 @@ export class HarvesterIndexer {
       },
     };
 
+    const start = performance.now();
     await this.#client.upsert([point]);
+    if (this.#observability) {
+      this.#observability.recordIndexLatency(performance.now() - start);
+    }
   }
 
   async bulkIndex(chunks: CICChunk[]): Promise<void> {
@@ -57,7 +64,11 @@ export class HarvesterIndexer {
       },
     }));
 
+    const start = performance.now();
     await this.#client.upsert(points);
+    if (this.#observability) {
+      this.#observability.recordIndexLatency(performance.now() - start);
+    }
   }
 }
 

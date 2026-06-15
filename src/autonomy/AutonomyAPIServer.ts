@@ -17,7 +17,7 @@ import { createMemoryRouter } from './routes/memory';
 import { createGovernanceRouter } from '../governance/routes/governance';
 import { ObservabilityManager } from './ObservabilityManager';
 import { wireVectorLayer } from '../vector/index.js';
-import { MemoryStore } from '../../rewrite-mcp/src/memory/MemoryStore';
+
 
 export interface AutonomyAPIServerConfig extends AutonomyServiceConfig {
   port?: number;
@@ -87,7 +87,7 @@ export class AutonomyAPIServer {
    */
   private setupRoutes(): void {
     // Health check
-    this.app.get('/health', (req: Request, res: Response) => {
+    this.app.get('/health', (_req: Request, res: Response) => {
       return res.json({
         status: 'ok',
         service: 'autonomy-api',
@@ -97,18 +97,18 @@ export class AutonomyAPIServer {
     });
 
     // Metrics endpoint (Prometheus format)
-    this.app.get('/metrics', (req: Request, res: Response) => {
+    this.app.get('/metrics', (_req: Request, res: Response) => {
       res.set('Content-Type', 'text/plain; charset=utf-8');
       return res.send(this.observability.getMetricsPrometheus());
     });
 
     // Metrics JSON endpoint
-    this.app.get('/metrics/json', (req: Request, res: Response) => {
+    this.app.get('/metrics/json', (_req: Request, res: Response) => {
       return res.json(this.observability.getMetricsJSON());
     });
 
     // API info
-    this.app.get('/autonomy', (req: Request, res: Response) => {
+    this.app.get('/autonomy', (_req: Request, res: Response) => {
       const endpoints: any = {
         signals: {
           'POST /autonomy/signals': 'Detect signals from event history',
@@ -199,7 +199,7 @@ export class AutonomyAPIServer {
    * Setup error handler
    */
   private setupErrorHandler(): void {
-    this.app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
+    this.app.use((err: Error, _req: Request, res: Response, _next: NextFunction) => {
       const logger = this.observability.getLogger();
       logger.error('api', 'Unhandled error', err);
 
@@ -230,8 +230,8 @@ export class AutonomyAPIServer {
     return new Promise((resolve, reject) => {
       try {
         this.server = this.app.listen(
-          this.config.port,
-          this.config.host,
+          this.config.port || 3000,
+          this.config.host || 'localhost',
           () => {
             console.log(
               `[${new Date().toISOString()}] Autonomy API Server started on http://${this.config.host}:${this.config.port}`

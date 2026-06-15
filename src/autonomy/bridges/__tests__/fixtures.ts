@@ -20,7 +20,7 @@ export function createMockDriftSignal(
   severity: 'info' | 'warning' | 'critical' = 'warning'
 ): DriftSignal {
   return {
-    id: `drift_${Date.now()}`,
+    id: `drift_${Date.now()}_${Math.random()}`,
     type: 'drift',
     severity,
     confidence: severity === 'critical' ? 0.85 : 0.65,
@@ -50,7 +50,7 @@ export function createMockInstabilitySignal(
   severity: 'info' | 'warning' | 'critical' = 'warning'
 ): InstabilitySignal {
   return {
-    id: `instability_${Date.now()}`,
+    id: `instability_${Date.now()}_${Math.random()}`,
     type: 'instability',
     severity,
     confidence: severity === 'critical' ? 0.8 : 0.7,
@@ -79,7 +79,7 @@ export function createMockRegressionSignal(
   severity: 'info' | 'warning' | 'critical' = 'warning'
 ): RegressionSignal {
   return {
-    id: `regression_${Date.now()}`,
+    id: `regression_${Date.now()}_${Math.random()}`,
     type: 'regression',
     severity,
     confidence: severity === 'critical' ? 0.9 : 0.75,
@@ -108,7 +108,7 @@ export function createMockRegressionSignal(
  */
 export function createMockOpportunitySignal(): OpportunitySignal {
   return {
-    id: `opportunity_${Date.now()}`,
+    id: `opportunity_${Date.now()}_${Math.random()}`,
     type: 'opportunity',
     severity: 'info',
     confidence: 0.92,

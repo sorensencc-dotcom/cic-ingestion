@@ -21,7 +21,7 @@ export class ExplorerClient {
   private baseUrl: string;
   private timeout: number;
   private pollInterval: number;
-  private subscriptions: Map<string, NodeJS.Timer> = new Map();
+  private subscriptions: Map<string, any> = new Map();
 
   constructor(options: ExplorerQueryOptions) {
     this.baseUrl = options.baseUrl;
@@ -145,7 +145,7 @@ export class ExplorerClient {
     return () => {
       const timer = this.subscriptions.get(subscriptionId);
       if (timer) {
-        clearInterval(timer);
+        clearInterval(timer as any);
         this.subscriptions.delete(subscriptionId);
       }
     };
@@ -190,7 +190,7 @@ export class ExplorerClient {
    */
   destroy(): void {
     for (const timerId of this.subscriptions.values()) {
-      clearInterval(timerId);
+      clearInterval(timerId as any);
     }
     this.subscriptions.clear();
   }

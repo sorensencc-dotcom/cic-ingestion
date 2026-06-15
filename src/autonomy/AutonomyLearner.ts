@@ -89,7 +89,11 @@ class LearnerStore {
 
   getMetrics(): LearnerMetrics {
     const outcomes = this.getAllOutcomes();
-    const successCount = outcomes.filter((o) => o.outcome === 'success').length;
+    const successValue = outcomes.reduce((acc, o) => {
+      if (o.outcome === 'success') return acc + 1;
+      if (o.outcome === 'partial') return acc + 0.5;
+      return acc;
+    }, 0);
     const confidenceImprovements = outcomes
       .map((o) => o.feedback?.confidenceImprovement || 0)
       .filter((v) => v > 0);
@@ -99,7 +103,7 @@ class LearnerStore {
       proposalsEvaluated: outcomes.length,
       successRate:
         outcomes.length > 0
-          ? (successCount / outcomes.length) * 100
+          ? (successValue / outcomes.length) * 100
           : 0,
       accuracyBySignalType: Object.fromEntries(
         Array.from(this.signalAccuracies.entries())
@@ -235,10 +239,10 @@ export class AutonomyLearner {
       for (const signal of proposal.triggeredBy) {
         switch (signal.type) {
           case 'drift':
-            if (this.thresholds.DRIFT_CRITICAL > 0.7) {
+            if (this.thresholds.DRIFT_CRITICAL < 1.0) {
               this.adjustThreshold(
                 'DRIFT_CRITICAL',
-                this.thresholds.DRIFT_CRITICAL + 0.05,
+                Math.min(1.0, this.thresholds.DRIFT_CRITICAL + 0.05),
                 `Proposal ${proposal.id} failed; increased drift threshold`
               );
             }
@@ -272,10 +276,10 @@ export class AutonomyLearner {
       for (const signal of proposal.triggeredBy) {
         switch (signal.type) {
           case 'drift':
-            if (this.thresholds.DRIFT_CRITICAL < 0.75) {
+            if (this.thresholds.DRIFT_CRITICAL > 0.5) {
               this.adjustThreshold(
                 'DRIFT_CRITICAL',
-                this.thresholds.DRIFT_CRITICAL - 0.02,
+                Math.max(0.5, this.thresholds.DRIFT_CRITICAL - 0.02),
                 `Proposal ${proposal.id} succeeded; decreased drift threshold`
               );
             }

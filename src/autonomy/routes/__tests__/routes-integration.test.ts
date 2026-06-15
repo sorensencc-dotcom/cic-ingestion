@@ -51,7 +51,7 @@ describe('Routes Integration Tests', () => {
       global.fetch = jest.fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => [createMockTimelineEvent()],
+          json: async () => Array(10).fill(null).map(() => createMockTimelineEvent()),
         })
         .mockResolvedValueOnce({
           ok: true,
@@ -145,7 +145,7 @@ describe('Routes Integration Tests', () => {
   describe('Proposal Generation → Update → Query Flow', () => {
     beforeEach(() => {
       // Pre-populate signals for proposal generation
-      createMockSignals(2).forEach((sig) => service['store'].addSignal(sig));
+      createMockSignals(1).forEach((sig) => service['store'].addSignal(sig));
     });
 
     it('generates proposals and updates status', async () => {
@@ -382,7 +382,7 @@ describe('Routes Integration Tests', () => {
       global.fetch = jest.fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => [createMockTimelineEvent()],
+          json: async () => Array(10).fill(null).map(() => createMockTimelineEvent()),
         })
         .mockResolvedValueOnce({
           ok: true,
@@ -498,7 +498,7 @@ describe('Routes Integration Tests', () => {
       global.fetch = jest.fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => [createMockTimelineEvent()],
+          json: async () => Array(10).fill(null).map(() => createMockTimelineEvent()),
         })
         .mockResolvedValueOnce({
           ok: true,

@@ -67,11 +67,12 @@ export class VectorLayer {
       vectorSize: cfg.vectorSize,
     });
 
+    const chunksObs = new QdrantObservability(chunksClient);
     this.chunks = {
       client: chunksClient,
-      indexer: new HarvesterIndexer(chunksClient),
-      search: new TorqueQueryEngine(chunksClient),
-      observability: new QdrantObservability(chunksClient),
+      indexer: new HarvesterIndexer(chunksClient, chunksObs),
+      search: new TorqueQueryEngine(chunksClient, chunksObs),
+      observability: chunksObs,
     };
 
     //
@@ -104,10 +105,11 @@ export class VectorLayer {
       vectorSize: cfg.vectorSize,
     });
 
+    const skillsObs = new QdrantObservability(skillsClient);
     this.skills = {
       client: skillsClient,
-      search: new TorqueQueryEngine(skillsClient),
-      observability: new QdrantObservability(skillsClient),
+      search: new TorqueQueryEngine(skillsClient, skillsObs),
+      observability: skillsObs,
     };
 
     this.planner = new TorqueQueryPlanner({

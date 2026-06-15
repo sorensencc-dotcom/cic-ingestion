@@ -309,7 +309,11 @@ describe('AutonomyGovernanceBridge', () => {
       const proposal = createMockProposal('pending');
       proposal.confidence = 0.96; // >0.95
       proposal.impact.riskLevel = 'low';
-      proposal.triggeredBy = [createMockDriftSignal('info')]; // no critical signals
+      proposal.triggeredBy = Array.from({ length: 11 }, () => {
+        const sig = createMockDriftSignal('warning');
+        sig.confidence = 1.0;
+        return sig;
+      });
 
       await bridge.routeProposalToGovernance(proposal);
 
@@ -482,13 +486,15 @@ describe('AutonomyGovernanceBridge', () => {
       const proposal = createMockProposal('approved');
       const votes = [
         { proposalId: proposal.id, voterId: 'm1', decision: 'approve' as const, timestamp: new Date().toISOString() },
-        { proposalId: proposal.id, voterId: 'm2', decision: 'abstain' as const, timestamp: new Date().toISOString() },
-        { proposalId: proposal.id, voterId: 'm3', decision: 'abstain' as const, timestamp: new Date().toISOString() },
+        { proposalId: proposal.id, voterId: 'm2', decision: 'approve' as const, timestamp: new Date().toISOString() },
+        { proposalId: proposal.id, voterId: 'm3', decision: 'approve' as const, timestamp: new Date().toISOString() },
+        { proposalId: proposal.id, voterId: 'm4', decision: 'abstain' as const, timestamp: new Date().toISOString() },
+        { proposalId: proposal.id, voterId: 'm5', decision: 'abstain' as const, timestamp: new Date().toISOString() },
       ];
 
       const decision = await bridge.finalizeDecision(proposal, votes);
 
-      // 1 approve / (1 + 0) = 100%, should pass
+      // 3 approve / (3 + 0) = 100%, should pass
       expect(decision.status).toBe('approved');
     });
   });

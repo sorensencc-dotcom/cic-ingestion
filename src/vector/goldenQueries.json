@@ -1,0 +1,9 @@
+[
+  {
+    "id": "gq-1",
+    "description": "Basic vector search over chunks/context/skills",
+    "vectorPrimary": [0.1, 0.2, 0.3, 0.4],
+    "collections": ["chunks", "context", "skills"],
+    "expectedTopIds": ["chunk-1", "ctx-1", "skill-1"]
+  }
+]

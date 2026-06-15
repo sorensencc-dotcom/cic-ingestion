@@ -193,7 +193,7 @@ export function findConnectedComponents(graph: SkillGraph): SkillNode[][] {
   const visited = new Set<string>();
   const components: SkillNode[][] = [];
 
-  for (const [nodeId, node] of graph.nodes) {
+  for (const nodeId of graph.nodes.keys()) {
     if (!visited.has(nodeId)) {
       const component = dfsComponent(nodeId, graph, visited);
       if (component.length > 0) {

@@ -3,12 +3,12 @@
   "version": "0.1.0",
   "description": "CIC Autonomy & Memory Ingestion Engine with Caveman token compression",
   "type": "module",
-  "main": "dist/autonomy/AutonomyAPIServer.js",
+  "main": "dist/cic-ingestion/src/autonomy/AutonomyAPIServer.js",
   "scripts": {
     "build": "tsc",
-    "start": "node dist/autonomy/AutonomyAPIServer.js",
-    "start:dev": "tsc 2>/dev/null || true; node dist/orchestrator/index.js",
-    "dev": "tsc && node dist/autonomy/AutonomyAPIServer.js",
+    "start": "node dist/cic-ingestion/src/autonomy/AutonomyAPIServer.js",
+    "start:dev": "tsc 2>/dev/null || true; node dist/cic-ingestion/src/orchestrator/index.js",
+    "dev": "tsc && node dist/cic-ingestion/src/autonomy/AutonomyAPIServer.js",
     "test": "node scripts/test-setup.js && npx jest",
     "test:watch": "node scripts/test-setup.js && npx jest --watch",
     "test:coverage": "node scripts/test-setup.js && npx jest --coverage",
@@ -17,7 +17,7 @@
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.16.0",
-    "better-sqlite3": "^9.2.2",
+    "better-sqlite3": "^12.10.1",
     "express": "^4.18.2"
   },
   "devDependencies": {

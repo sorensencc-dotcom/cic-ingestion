@@ -18,6 +18,7 @@ export interface CavemanStatsV1 {
 
   // safety / guardrails
   recompression_blocked: boolean;
+  compression_error?: string;
 
   // context
   pipeline_stage: string; // e.g. "wayland.tool", "cic.memory", "autonomy.api", "torque.ingestion"
@@ -42,6 +43,7 @@ export function createCavemanStats(
     phase_id?: number;
     agent_id?: string;
     hash?: string;
+    compression_error?: string;
   } = {}
 ): CavemanStatsV1 {
   const bytesSaved = bytesIn - bytesOut;
@@ -56,6 +58,7 @@ export function createCavemanStats(
     arrays_processed: context.arrays_processed ?? 0,
     objects_processed: context.objects_processed ?? 0,
     recompression_blocked: context.recompression_blocked ?? false,
+    compression_error: context.compression_error,
     pipeline_stage: context.pipeline_stage ?? 'unknown',
     tool_id: context.tool_id,
     phase_id: context.phase_id,

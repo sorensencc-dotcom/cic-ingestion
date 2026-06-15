@@ -22,6 +22,7 @@ export interface TimelineEvent {
   summary: string;
   severity: EventSeverity;
   metadata: Record<string, any>;
+  metrics?: Record<string, any>;
   relatedEventIds?: string[];
 }
 

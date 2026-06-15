@@ -47,7 +47,7 @@ describe('Autonomy Integration Tests', () => {
       global.fetch = jest.fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => [createMockTimelineEvent()],
+          json: async () => Array(10).fill(null).map(() => createMockTimelineEvent()),
         })
         .mockResolvedValueOnce({
           ok: true,
@@ -314,27 +314,25 @@ describe('Autonomy Integration Tests', () => {
       global.fetch = jest.fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => [
-            {
-              id: 'event-1',
-              timestamp: new Date().toISOString(),
-              type: 'PIPELINE_RUN',
-            },
-          ],
+          json: async () => Array(10).fill(null).map((_, i) => ({
+            id: `event-${i + 1}`,
+            timestamp: new Date().toISOString(),
+            type: 'PIPELINE_RUN',
+          })),
         })
         .mockResolvedValueOnce({
           ok: true,
           json: async () => [
             {
               timestamp: new Date().toISOString(),
-              driftScore: 0.5,
+              driftScore: 0.72,
               signals: {
-                semantic_drift: 0.5,
-                temporal_drift: 0.5,
-                narrative_drift: 0.5,
-                causal_drift: 0.5,
+                semantic_drift: 0.72,
+                temporal_drift: 0.68,
+                narrative_drift: 0.75,
+                causal_drift: 0.70,
               },
-              severity: 'normal',
+              severity: 'warning',
             },
           ],
         })
@@ -425,7 +423,7 @@ describe('Autonomy Integration Tests', () => {
       global.fetch = jest.fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => [createMockTimelineEvent()],
+          json: async () => Array(10).fill(null).map(() => createMockTimelineEvent()),
         })
         .mockResolvedValueOnce({
           ok: true,
@@ -471,7 +469,7 @@ describe('Autonomy Integration Tests', () => {
       global.fetch = jest.fn()
         .mockResolvedValueOnce({
           ok: true,
-          json: async () => [createMockTimelineEvent()],
+          json: async () => Array(10).fill(null).map(() => createMockTimelineEvent()),
         })
         .mockResolvedValueOnce({
           ok: true,

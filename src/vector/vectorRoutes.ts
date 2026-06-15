@@ -48,5 +48,47 @@ export function createVectorRouter(layer: VectorLayer) {
     }
   });
 
+  router.get("/vector/metrics", async (_req, res) => {
+    try {
+      const chunks = await layer.chunks.observability.metrics();
+      const context = await layer.context.observability.metrics();
+      const skills = await layer.skills.observability.metrics();
+      res.status(200).json({ ok: true, chunks, context, skills });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: String(err) });
+    }
+  });
+
+  router.post("/vector/debug/torque-query", async (req, res) => {
+    try {
+      const { vectorPrimary, vectorSecondary, limit, collections, facets } = req.body;
+
+      const resolvedCollections = (collections || []).map((col: any) => {
+        const name = typeof col === "string" ? col : col.name;
+        if (name === "chunks") return { name: "chunks" as const, client: layer.chunks.client };
+        if (name === "context") return { name: "context" as const, client: layer.context.client };
+        if (name === "skills") return { name: "skills" as const, client: layer.skills.client };
+        throw new Error(`Unknown collection: ${name}`);
+      });
+
+      const result = await layer.planner.execute({
+        vectorPrimary,
+        vectorSecondary,
+        limit,
+        collections: resolvedCollections,
+        facets,
+      });
+
+      res.status(200).json({
+        ok: true,
+        hits: result.hits,
+        facets: result.facets,
+        debug: result.debug,
+      });
+    } catch (err) {
+      res.status(500).json({ ok: false, error: String(err) });
+    }
+  });
+
   return router;
 }
