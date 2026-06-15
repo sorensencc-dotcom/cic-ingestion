@@ -1,0 +1,42 @@
+src/autonomy/__tests__/phase-23-2-integration.test.ts
+  s_d56352375308c6::t_a856bdfa68abed 73
+  s_8ba98690d2f3b2::t_b374773590a6d6 1-12,14-34,52,55-72,75-76,78-91,93-101,126-140,142-162,164-165,167-186,189-190,192-254,256-291,293-309,312-339,342-343
+  s_d56352375308c6::t_1eb10da8b697ca 187
+  s_d56352375308c6::t_e571be0acdfe4a 141
+  s_d56352375308c6::t_e1b42bbc50b216 310
+src/autonomy/adapters/MemoryStoreAdapter.ts
+  s_8ba98690d2f3b2::t_7e3a6797c11cfc 1-12,15-35,37-43,45-50,52-68,70-71,79-86,88-89,91,93-94,98-103,105-113,115,117-118,120,122-124,126-143
+src/autonomy/AutonomyService.ts
+  s_8ba98690d2f3b2::t_de092ea9977d81 106,113,126,135,140-150
+  s_8ba98690d2f3b2::t_01a2215e64ae8f 167,184,189-199
+  s_8ba98690d2f3b2::t_12fa66f3f9c697 13,16-17
+  s_8ba98690d2f3b2::t_47ba1ebe6c47ac 91-92,100-101
+src/autonomy/routes/memory.ts
+  s_8ba98690d2f3b2::t_ae43001ef54112 1-12,15-105,108-121,124-153,155-211,213-232
+src/governance/routes/governance.ts
+  s_8ba98690d2f3b2::t_daa1660a25888b 1-16,21-176
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "d7808eb104e551d2c3a4b02511d8df0b7306920d",
+  "prompts": {},
+  "sessions": {
+    "s_8ba98690d2f3b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0253e0ca-9f2a-4b11-b97b-4bd94b977b92",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_d56352375308c6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a425f21-d8b9-4736-9496-1ad596b09055",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
