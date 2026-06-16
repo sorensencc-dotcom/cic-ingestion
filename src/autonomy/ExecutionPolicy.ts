@@ -5,6 +5,10 @@
  * before harness sees the tool call. Harness permission system is last line of defense only.
  */
 
+import * as fs from 'fs';
+import * as path from 'path';
+import { homedir } from 'os';
+
 /**
  * Execution context determines how permission checks behave
  */
@@ -20,6 +24,18 @@ export enum ExecutionMode {
 
   /** Service/daemon: pre-approved trusted pattern set */
   MAINTENANCE = 'MAINTENANCE',
+}
+
+/**
+ * Mode settings loaded from .claude/settings.json
+ */
+export interface ModeSettings {
+  description?: string;
+  preapprovedTools?: string[];
+  exitOnUnauthorized?: boolean;
+  timeout?: number;
+  allowsAgentSpawn?: boolean;
+  allowsUserInteraction?: boolean;
 }
 
 /**
@@ -66,9 +82,32 @@ interface ModePolicy {
 }
 
 /**
+ * Load execution mode settings from .claude/settings.json
+ */
+function loadModeSettingsFromFile(): Record<ExecutionMode, ModeSettings> | null {
+  try {
+    // Try to read from Claude project settings
+    const claudeDir = path.join(homedir(), '.claude');
+    const settingsPath = path.join(claudeDir, 'settings.json');
+
+    if (fs.existsSync(settingsPath)) {
+      const content = fs.readFileSync(settingsPath, 'utf-8');
+      const settings = JSON.parse(content);
+      if (settings.executionModes) {
+        return settings.executionModes as Record<ExecutionMode, ModeSettings>;
+      }
+    }
+  } catch (err) {
+    // Silently fail, use defaults
+  }
+  return null;
+}
+
+/**
  * Policy engine: decides if a tool call is allowed in current execution context
  */
 export class ExecutionPolicyEngine {
+  private modeSettings: Record<ExecutionMode, ModeSettings> | null;
   private policies: Map<ExecutionMode, ModePolicy> = new Map([
     [
       ExecutionMode.INTERACTIVE,
@@ -148,6 +187,39 @@ export class ExecutionPolicyEngine {
       },
     ],
   ]);
+
+  constructor() {
+    this.modeSettings = loadModeSettingsFromFile();
+  }
+
+  /**
+   * Get mode settings from file or defaults
+   */
+  getModeSettings(mode: ExecutionMode): ModeSettings {
+    if (this.modeSettings && this.modeSettings[mode]) {
+      return this.modeSettings[mode];
+    }
+    // Return empty defaults if not found
+    return {};
+  }
+
+  /**
+   * Merge task context with mode settings defaults
+   * Task context takes precedence over settings defaults
+   */
+  mergeContextWithSettings(context: ExecutionContext): ExecutionContext {
+    const modeSettings = this.getModeSettings(context.mode);
+
+    return {
+      ...context,
+      // Settings defaults fill in missing values
+      preapprovedTools: context.preapprovedTools?.length
+        ? context.preapprovedTools
+        : (modeSettings.preapprovedTools || []),
+      exitOnUnauthorized: context.exitOnUnauthorized ?? (modeSettings.exitOnUnauthorized ?? false),
+      timeout: context.timeout ?? (modeSettings.timeout ?? 3600),
+    };
+  }
 
   /**
    * Check if tool is allowed in given execution context

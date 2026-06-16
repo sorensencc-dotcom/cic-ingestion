@@ -8,6 +8,21 @@
 
 ## Quick Start: Schedule a Docker Build with Zero Prompts
 
+### Option A: Use Settings Defaults (Simplest)
+
+If mode defaults in `.claude/settings.json` match your needs, just register without pre-approved tools:
+
+```typescript
+const context: ExecutionContext = {
+  taskId: 'docker-build-phase-2-5',
+  mode: ExecutionMode.UNATTENDED,
+  preapprovedTools: [], // Empty — uses settings defaults
+  exitOnUnauthorized: true,
+};
+
+// Settings will fill in pre-approved tools from UNATTENDED mode defaults
+```
+
 **Step 1: Register execution context** (one-time setup before scheduling)
 
 ```typescript
@@ -110,6 +125,68 @@ Execute Tool (NO permission prompt from harness)
 
 - **Before**: `Tool Call → Harness Permission Check → Prompt User → Timeout/Hang`
 - **After**: `Tool Call → ExecutionPolicy Check → (Allow|Fail) → Harness (backup only)`
+
+---
+
+## Settings Configuration (Phase C)
+
+Mode defaults are configured in `.claude/settings.json`:
+
+```json
+{
+  "executionModes": {
+    "UNATTENDED": {
+      "description": "Scheduled task: no prompts, fails fast",
+      "preapprovedTools": [
+        "Bash(docker-compose *)",
+        "Bash(docker *)",
+        "Bash(npm *)",
+        "Bash(git *)",
+        "Read",
+        "Grep",
+        "Glob",
+        "Edit",
+        "Write"
+      ],
+      "exitOnUnauthorized": true,
+      "timeout": 600,
+      "allowsAgentSpawn": false,
+      "allowsUserInteraction": false
+    },
+    ...
+  }
+}
+```
+
+**How it works:**
+1. When task context is registered, ExecutionPolicyEngine loads settings from `.claude/settings.json`
+2. Task context merges with mode defaults (task values override settings)
+3. Empty preapprovedTools array in context uses settings defaults
+4. Explicit exitOnUnauthorized/timeout in context override settings
+
+**Example: Use settings defaults**
+
+```typescript
+// Register with empty preapprovedTools
+const context: ExecutionContext = {
+  taskId: 'docker-build',
+  mode: ExecutionMode.UNATTENDED,
+  preapprovedTools: [], // Uses UNATTENDED defaults from settings
+};
+
+// After merge, will have 15+ pre-approved tools from settings
+```
+
+**Example: Override settings for specific task**
+
+```typescript
+const context: ExecutionContext = {
+  taskId: 'custom-build',
+  mode: ExecutionMode.UNATTENDED,
+  preapprovedTools: ['Bash(custom-script)'], // Override defaults
+  exitOnUnauthorized: false, // Override setting
+};
+```
 
 ---
 

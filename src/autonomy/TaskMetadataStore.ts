@@ -6,7 +6,7 @@
  * When task is scheduled, metadata is stored here; when task wakes, it looks up its context.
  */
 
-import { ExecutionContext, ExecutionMode } from './ExecutionPolicy';
+import { ExecutionContext, ExecutionMode, getExecutionPolicyEngine } from './ExecutionPolicy';
 
 /**
  * Audit record for a tool call
@@ -42,11 +42,15 @@ export class TaskMetadataStore {
 
   /**
    * Store execution context for a task (called before ScheduleWakeup)
+   * Merges task context with mode settings defaults from .claude/settings.json
    */
   registerTask(context: ExecutionContext): void {
+    const engine = getExecutionPolicyEngine();
+    const mergedContext = engine.mergeContextWithSettings(context);
+
     this.contexts.set(context.taskId, {
-      ...context,
-      createdAt: context.createdAt || new Date(),
+      ...mergedContext,
+      createdAt: mergedContext.createdAt || new Date(),
     });
   }
 

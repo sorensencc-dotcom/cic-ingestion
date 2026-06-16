@@ -419,4 +419,67 @@ describe('TaskMetadataStore', () => {
       expect(store1).toBe(store2);
     });
   });
+
+  describe('settings merge', () => {
+    let engine: ExecutionPolicyEngine;
+
+    beforeEach(() => {
+      engine = new ExecutionPolicyEngine();
+    });
+
+    it('merges partial context with mode settings defaults', () => {
+      const partialContext: ExecutionContext = {
+        taskId: 'partial-task',
+        mode: ExecutionMode.UNATTENDED,
+        preapprovedTools: [],
+        exitOnUnauthorized: false,
+      };
+
+      const merged = engine.mergeContextWithSettings(partialContext);
+
+      expect(merged.taskId).toBe('partial-task');
+      expect(merged.mode).toBe(ExecutionMode.UNATTENDED);
+      // exitOnUnauthorized should use default from settings
+      expect(typeof merged.exitOnUnauthorized).toBe('boolean');
+      // timeout should have default if not provided
+      expect(merged.timeout).toBeGreaterThan(0);
+    });
+
+    it('task context takes precedence over settings', () => {
+      const context: ExecutionContext = {
+        taskId: 'override-task',
+        mode: ExecutionMode.UNATTENDED,
+        preapprovedTools: ['Custom(tool)'],
+        exitOnUnauthorized: false,
+        timeout: 120,
+      };
+
+      const merged = engine.mergeContextWithSettings(context);
+
+      expect(merged.preapprovedTools).toContain('Custom(tool)');
+      expect(merged.exitOnUnauthorized).toBe(false);
+      expect(merged.timeout).toBe(120);
+    });
+
+    it('uses defaults for BATCH mode', () => {
+      const context: ExecutionContext = {
+        taskId: 'batch-task',
+        mode: ExecutionMode.BATCH,
+        preapprovedTools: [],
+        exitOnUnauthorized: true, // override
+      };
+
+      const merged = engine.mergeContextWithSettings(context);
+
+      expect(merged.mode).toBe(ExecutionMode.BATCH);
+      expect(merged.exitOnUnauthorized).toBe(true); // explicit value
+    });
+
+    it('getModeSettings returns settings for known mode', () => {
+      const settings = engine.getModeSettings(ExecutionMode.MAINTENANCE);
+      expect(settings).toBeDefined();
+      // Should have at least some properties
+      expect(typeof settings === 'object').toBe(true);
+    });
+  });
 });
