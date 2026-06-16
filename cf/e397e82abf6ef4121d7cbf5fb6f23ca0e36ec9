@@ -1,0 +1,30 @@
+.claude/settings.json
+  s_877bf20f17af00::t_485c5aeddbfc96 30-34
+src/config/ConfigValidator.ts
+  s_877bf20f17af00::t_614a8e4a0b0970 13
+src/autonomy/AutonomyAPIServer.ts
+  s_877bf20f17af00::t_76f2f454faa44d 254-255
+  s_877bf20f17af00::t_74da518afbab43 32,43
+  s_877bf20f17af00::t_a7e8ec5671f714 20
+  s_877bf20f17af00::t_4dc54e3249d86e 170-180
+src/config/ConfigLoader.ts
+  s_877bf20f17af00::t_bb8d7bb2d01691 26
+src/config/__tests__/loader.test.ts
+  s_877bf20f17af00::t_3d2c9da6af814b 52,55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "cfe397e82abf6ef4121d7cbf5fb6f23ca0e36ec9",
+  "prompts": {},
+  "sessions": {
+    "s_877bf20f17af00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a9deac7d-e868-4c54-938d-571b7e9264a3",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
