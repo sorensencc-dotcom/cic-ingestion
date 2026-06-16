@@ -1,0 +1,37 @@
+config/schema.json
+  s_877bf20f17af00::t_34ca05b98bfe59 1-51
+src/config/__tests__/validator.test.ts
+  s_877bf20f17af00::t_ca795cd391ce9c 1-62
+src/config/ConfigValidator.ts
+  s_877bf20f17af00::t_2d364b8456cb53 1-31
+package.json
+  s_877bf20f17af00::t_7ccca968174440 24
+src/config/__tests__/loader.test.ts
+  s_877bf20f17af00::t_0d45480b647a08 1-9,11-58
+  s_877bf20f17af00::t_fd9e562517b848 10
+config/defaults.json
+  s_877bf20f17af00::t_573d3fbfbb05f9 1-13
+src/config/__tests__/schema.test.ts
+  s_877bf20f17af00::t_57f02208c3ac6f 11,17
+  s_877bf20f17af00::t_dea6d031f8fa33 1-10,12-16,18-25
+src/config/index.ts
+  s_877bf20f17af00::t_b4d798e90de13b 1-13
+src/config/ConfigLoader.ts
+  s_877bf20f17af00::t_dc2128c3821609 1-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "676fb13cf158f2a28b00bfb845322a23ebfa118b",
+  "prompts": {},
+  "sessions": {
+    "s_877bf20f17af00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a9deac7d-e868-4c54-938d-571b7e9264a3",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
