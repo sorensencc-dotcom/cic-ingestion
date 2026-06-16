@@ -9,12 +9,11 @@ import { RoadmapProposal } from './models/RoadmapProposal';
 import { SignalDetectionEngine, SignalDetectionContext } from './SignalDetection';
 import { RoadmapProposalEngine, RoadmapContext } from './RoadmapProposalEngine';
 import { AutonomyPromptCacheAdapter } from './AutonomyPromptCacheAdapter';
-import { MemoryStore } from '../../../rewrite-mcp/src/memory/MemoryStore';
 import { MemoryStoreAdapter } from './adapters/MemoryStoreAdapter';
 
 export interface AutonomyServiceConfig {
   memoryQueryApiUrl?: string;
-  memoryStore?: MemoryStore;
+  memoryStore?: any; // Disabled for Docker isolation
   roadmapContext: RoadmapContext;
 }
 
@@ -88,7 +87,7 @@ export class AutonomyService {
   private proposalEngine: RoadmapProposalEngine;
   private store: AutonomyStore;
   private cacheAdapter: AutonomyPromptCacheAdapter;
-  private memoryStore?: MemoryStore;
+  private memoryStore?: any;
   private sessionId: string;
 
   constructor(config: AutonomyServiceConfig) {
@@ -446,7 +445,7 @@ export class AutonomyService {
         const { createMockTimelineEvent } = require('./bridges/__tests__/fixtures');
         return Array(10).fill(null).map(() => createMockTimelineEvent());
       }
-      return memoryEvents.map(evt => ({
+      return memoryEvents.map((evt: any) => ({
         id: evt.id,
         timestamp: evt.timestamp,
         type: evt.event_type as any,
@@ -483,7 +482,7 @@ export class AutonomyService {
       const govEvents = await this.memoryStore.query({
         event_type: 'GOVERNANCE_SIGNAL',
       });
-      const driftEvents = govEvents.filter(e => e.payload.signal_type === 'drift');
+      const driftEvents = govEvents.filter((e: any) => e.payload.signal_type === 'drift');
       if (driftEvents.length === 0) {
         return [
           {
@@ -499,7 +498,7 @@ export class AutonomyService {
           }
         ];
       }
-      return driftEvents.map(evt => ({
+      return driftEvents.map((evt: any) => ({
         timestamp: evt.timestamp,
         driftScore: evt.payload.metadata?.confidence || 0.5,
         signals: {
@@ -544,7 +543,7 @@ export class AutonomyService {
           }
         ];
       }
-      return telemetryEvents.map(evt => ({
+      return telemetryEvents.map((evt: any) => ({
         window: '24h',
         timestamp: evt.timestamp,
         uptime: evt.payload.uptime_seconds ? 100 : 99.9,
