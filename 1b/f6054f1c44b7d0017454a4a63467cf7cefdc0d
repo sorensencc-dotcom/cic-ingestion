@@ -1,0 +1,43 @@
+Dockerfile
+  s_877bf20f17af00::t_527942177fad5a 1-7,11-32,34,36-47
+  s_877bf20f17af00::t_017cfcaff6f5b0 33,35
+  s_877bf20f17af00::t_04320a94b77b32 48
+  s_877bf20f17af00::t_2e957a563c7fe3 8-10
+src/server.ts
+  s_877bf20f17af00::t_6a115e1ca9af69 16,20
+  s_877bf20f17af00::t_053d770e0980e3 17-19
+  s_877bf20f17af00::t_d07fbf4694a063 1-15,21-37
+src/autonomy/AutonomyAPIServer.ts
+  s_877bf20f17af00::t_2799621b408227 18-19
+  s_877bf20f17af00::t_1dc02ee53d4cfa 175
+  s_877bf20f17af00::t_3ffded469bd4f0 177
+  s_877bf20f17af00::t_06da6f23fb9997 144-145
+  s_877bf20f17af00::t_98eecd46ed435c 16-17
+  s_877bf20f17af00::t_1ab300c8c43ea7 142
+src/autonomy/AutonomyService.ts
+  s_877bf20f17af00::t_9034e5468ca2d5 448
+  s_877bf20f17af00::t_3c1217688e836c 16
+  s_877bf20f17af00::t_9f717be2069667 501
+  s_877bf20f17af00::t_993de542823c62 546
+  s_877bf20f17af00::t_d07fc5cc828c99 90
+  s_877bf20f17af00::t_74bc98b341d85e 485
+src/autonomy/adapters/MemoryStoreAdapter.ts
+  s_877bf20f17af00::t_8cc0420df7d9e5 20,22-25
+  s_877bf20f17af00::t_4dfda7c3a18b9d 2-3,7-8,11,13-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "1bf6054f1c44b7d0017454a4a63467cf7cefdc0d",
+  "prompts": {},
+  "sessions": {
+    "s_877bf20f17af00": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a9deac7d-e868-4c54-938d-571b7e9264a3",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
