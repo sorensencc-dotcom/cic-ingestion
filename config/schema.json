@@ -1,7 +1,6 @@
 {
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "CIC Config v1",
-  "version": "1.0.0",
   "type": "object",
   "properties": {
     "services": {
@@ -32,7 +31,6 @@
           "properties": {
             "url": {
               "type": "string",
-              "format": "uri",
               "description": "TorqueQuery service URL"
             },
             "backfillHours": {

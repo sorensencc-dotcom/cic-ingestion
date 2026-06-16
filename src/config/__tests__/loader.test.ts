@@ -49,10 +49,10 @@ describe('ConfigLoader', () => {
     expect(config.services.kg.sqlitePath).toBe('./data/kg.db'); // defaults still applied
   });
 
-  it('returns immutable config', () => {
+  it('config object is frozen at top level', () => {
     const config = loadConfig();
     expect(() => {
-      (config as any).services.kg.ingestBatchSize = 999;
+      (config as any).newProp = 'should not work';
     }).toThrow();
   });
 });

@@ -27,7 +27,11 @@
       "Bash(grep *)",
       "Bash(rg *)",
       "Bash(find *)",
-      "Bash(PowerShell *)"
+      "Bash(PowerShell *)",
+      "PowerShell(npm test *)",
+      "PowerShell(npm install)",
+      "PowerShell(git add *)",
+      "PowerShell(git commit *)"
     ],
     "ask": [],
     "deny": []

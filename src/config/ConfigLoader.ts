@@ -6,10 +6,6 @@
 
 import fs from 'fs';
 import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
 
 export interface CICConfig {
   services: {
@@ -27,7 +23,7 @@ export interface CICConfig {
 
 export function loadConfig(): CICConfig {
   // Load defaults from bundled file
-  const defaultsPath = path.join(__dirname, '../../config/defaults.json');
+  const defaultsPath = path.join(process.cwd(), 'config/defaults.json');
   const defaultsContent = fs.readFileSync(defaultsPath, 'utf8');
   const defaults: CICConfig = JSON.parse(defaultsContent);
 

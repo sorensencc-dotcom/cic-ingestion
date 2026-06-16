@@ -6,16 +6,11 @@
 import Ajv from 'ajv';
 import { readFileSync } from 'fs';
 import { join } from 'path';
-import { fileURLToPath } from 'url';
-import { dirname } from 'path';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
 
 const ajv = new Ajv({ allErrors: true });
 
 // Load schema at module initialization
-const schemaPath = join(__dirname, '../../config/schema.json');
+const schemaPath = join(process.cwd(), 'config/schema.json');
 const schemaContent = readFileSync(schemaPath, 'utf8');
 const schema = JSON.parse(schemaContent);
 
