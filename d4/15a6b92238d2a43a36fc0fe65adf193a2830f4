@@ -1,0 +1,32 @@
+src/autonomy/ExecutionPolicy.ts
+  s_e705c2172b6489::t_6f0029c293dd91 191-205
+  s_e705c2172b6489::t_b35eb373803bb2 8-11,29-38
+  s_e705c2172b6489::t_753c8615c1a418 85-105,110
+  s_e705c2172b6489::t_a5e7ec21144091 207-223
+src/autonomy/EXECUTION_POLICY_GUIDE.md
+  s_e705c2172b6489::t_9781ca12b300db 11-25
+  s_e705c2172b6489::t_b14980759a6ede 131-192
+.claude/settings.json
+  s_e705c2172b6489::t_776fad066699b7 40-109
+src/autonomy/ExecutionPolicy.test.ts
+  s_e705c2172b6489::t_f9cad6409a8c18 422-484
+src/autonomy/TaskMetadataStore.ts
+  s_e705c2172b6489::t_2d6d03d7ecafba 9
+  s_e705c2172b6489::t_b44271be46ad54 45,48-50,52-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "d415a6b92238d2a43a36fc0fe65adf193a2830f4",
+  "prompts": {},
+  "sessions": {
+    "s_e705c2172b6489": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "55c3ba62-7bef-4512-9cc5-6e337a2f342e",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
