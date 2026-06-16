@@ -13,6 +13,7 @@ import { AutonomyService, AutonomyServiceConfig } from './AutonomyService';
 import { createSignalsRouter } from './routes/signals';
 import { createProposalsRouter } from './routes/proposals';
 import { createCacheRouter } from './routes/cache';
+import { createExecutionRouter } from './routes/execution';
 // Memory router commented out for Docker isolation (rewrite-mcp not in context)
 // import { createMemoryRouter } from './routes/memory';
 // Governance router commented out for Docker isolation (rewrite-mcp not in context)
@@ -133,6 +134,13 @@ export class AutonomyAPIServer {
           'GET /autonomy/cache/metrics/prometheus': 'Cache metrics in Prometheus text format',
           'GET /autonomy/cache/status': 'Cache status (human-readable)',
         },
+        execution: {
+          'POST /autonomy/execution/register': 'Register execution context before scheduling',
+          'GET /autonomy/execution/status/:taskId': 'Get current execution status',
+          'GET /autonomy/execution/audit/:taskId': 'Get detailed audit trail',
+          'POST /autonomy/execution/check': 'Pre-flight check if tool would be allowed',
+          'GET /autonomy/execution/modes': 'List available execution modes and policies',
+        },
         observability: {
           'GET /metrics': 'Prometheus format metrics',
           'GET /metrics/json': 'JSON format metrics',
@@ -167,10 +175,12 @@ export class AutonomyAPIServer {
     const signalsRouter = createSignalsRouter(this.service);
     const proposalsRouter = createProposalsRouter(this.service);
     const cacheRouter = createCacheRouter(this.service.getCacheAdapter());
+    const executionRouter = createExecutionRouter();
 
     this.app.use('/autonomy', signalsRouter);
     this.app.use('/autonomy', proposalsRouter);
     this.app.use('/autonomy', cacheRouter);
+    this.app.use('/autonomy', executionRouter);
 
     // (Phase 23.2) Memory routes disabled for Docker isolation
 
