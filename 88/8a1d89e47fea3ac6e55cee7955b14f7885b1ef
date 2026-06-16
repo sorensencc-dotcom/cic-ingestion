@@ -1,0 +1,37 @@
+src/autonomy/TaskMetadataStore.ts
+  s_e705c2172b6489::t_9559293a3005ac 1-222
+src/autonomy/ExecutionPolicyInterceptor.test.ts
+  s_e705c2172b6489::t_fc48d9234496d2 1-225
+src/autonomy/ExecutionPolicy.ts
+  s_e705c2172b6489::t_bf8c077e622521 1-205,211-264
+  s_e705c2172b6489::t_ff60c4b2f09dfe 206-210
+src/autonomy/ExecutionPolicy.test.ts
+  s_e705c2172b6489::t_7e633ab4df2c8e 1-219,221-223,225-422
+  s_e705c2172b6489::t_3004bfde439797 220,224
+src/autonomy/routes/execution.ts
+  s_e705c2172b6489::t_d6e8c8f6cd2ec5 1-250
+src/autonomy/ExecutionPolicyInterceptor.ts
+  s_e705c2172b6489::t_6829cc7a3b72a7 1-164
+src/autonomy/EXECUTION_POLICY_GUIDE.md
+  s_e705c2172b6489::t_809753e68c9ec8 1-471
+src/autonomy/AutonomyAPIServer.ts
+  s_e705c2172b6489::t_f951c4aef287ea 16
+  s_e705c2172b6489::t_81c827bd9e5894 137-143
+  s_e705c2172b6489::t_6d4e91f5d7f628 178,183
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "888a1d89e47fea3ac6e55cee7955b14f7885b1ef",
+  "prompts": {},
+  "sessions": {
+    "s_e705c2172b6489": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "55c3ba62-7bef-4512-9cc5-6e337a2f342e",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
