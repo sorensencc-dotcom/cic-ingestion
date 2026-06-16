@@ -32,12 +32,6 @@ export default {
       'ts-jest',
       {
         useESM: true,
-        tsconfig: {
-          esModuleInterop: true,
-          allowSyntheticDefaultImports: true,
-          module: 'esnext',
-          moduleResolution: 'node',
-        },
       },
     ],
   },

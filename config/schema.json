@@ -1,0 +1,51 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CIC Config v1",
+  "version": "1.0.0",
+  "type": "object",
+  "properties": {
+    "services": {
+      "type": "object",
+      "properties": {
+        "kg": {
+          "type": "object",
+          "properties": {
+            "sqlitePath": {
+              "type": "string",
+              "description": "Knowledge Graph SQLite database path"
+            },
+            "ingestBatchSize": {
+              "type": "number",
+              "minimum": 1,
+              "description": "Batch size for ingestion operations"
+            },
+            "maxLagMs": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Maximum lag in milliseconds for ingestion"
+            }
+          },
+          "required": ["sqlitePath", "ingestBatchSize", "maxLagMs"]
+        },
+        "torquequery": {
+          "type": "object",
+          "properties": {
+            "url": {
+              "type": "string",
+              "format": "uri",
+              "description": "TorqueQuery service URL"
+            },
+            "backfillHours": {
+              "type": "number",
+              "minimum": 0,
+              "description": "Backfill window in hours"
+            }
+          },
+          "required": ["url", "backfillHours"]
+        }
+      },
+      "required": ["kg", "torquequery"]
+    }
+  },
+  "required": ["services"]
+}

@@ -1,0 +1,13 @@
+{
+  "services": {
+    "kg": {
+      "sqlitePath": "./data/kg.db",
+      "ingestBatchSize": 50,
+      "maxLagMs": 5000
+    },
+    "torquequery": {
+      "url": "http://torquequery:8080",
+      "backfillHours": 48
+    }
+  }
+}
