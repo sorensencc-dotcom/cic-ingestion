@@ -1,0 +1,18 @@
+name: Bootstrap Validation
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  bootstrap:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run validator
+        run: |
+          if [ -f setup/validate.sh ]; then
+            sh setup/validate.sh
+          else
+            echo "setup/validate.sh not found"
+            exit 1
+          fi
+

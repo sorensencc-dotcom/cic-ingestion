@@ -1,0 +1,34 @@
+name: Dashboard Summary
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 3 * * *"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run validator
+        run: |
+          mkdir -p .github/reports
+          if [ -f setup/validate.sh ]; then
+            sh setup/validate.sh > .github/reports/validation.log 2>&1
+          fi
+      - name: Create summary
+        run: |
+          cat > .github/reports/validation-summary.json << JSON_EOF
+          {
+            "timestamp": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "repository": "${{ github.repository }}",
+            "workflow": "dashboard",
+            "status": "complete"
+          }
+          JSON_EOF
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: validation-summary
+          path: .github/reports/
+
