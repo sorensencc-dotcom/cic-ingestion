@@ -1,0 +1,20 @@
+src/autonomy/ExecutionPolicy.phase-d.test.ts
+  s_e705c2172b6489::t_5debabf24d612e 1-457,459-461,463-469,471-518
+  s_e705c2172b6489::t_456298a51a9fda 458,462,470
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "865848e4e52d23fc6477b6a8c0a5479175ecdf8e",
+  "prompts": {},
+  "sessions": {
+    "s_e705c2172b6489": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "55c3ba62-7bef-4512-9cc5-6e337a2f342e",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
