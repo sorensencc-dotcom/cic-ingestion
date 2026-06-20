@@ -1,0 +1,22 @@
+jest.config.js
+  s_7e0f14790716a3::t_3747f0f279e633 40
+  s_7e0f14790716a3::t_446c9749c2beec 30-32
+src/vector/qdrantClient.ts
+  s_7e0f14790716a3::t_fe5a21f5262eee 218-223
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "b0798415329890eb04e3dd17e1d9ce26112f4fc5",
+  "prompts": {},
+  "sessions": {
+    "s_7e0f14790716a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0cc31302-c349-44b7-a681-b74f8682d4bb",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
