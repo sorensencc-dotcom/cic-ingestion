@@ -215,8 +215,12 @@ export class QdrantClient {
 
   async health(): Promise<boolean> {
     try {
-      const res = await this.#req(`/healthz`, { method: "GET" });
-      return res?.status === "ok";
+      const res = await fetch(`${this.#url}/healthz`, {
+        method: "GET",
+        headers: this.#headers,
+      });
+      // /healthz returns plain text "healthz check passed", not JSON
+      return res.status === 200;
     } catch {
       return false;
     }
