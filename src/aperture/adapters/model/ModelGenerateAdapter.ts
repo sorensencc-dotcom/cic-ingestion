@@ -7,14 +7,24 @@ import { BaseAdapter } from '../BaseAdapter';
 import { SandboxHandle, ExecutionOptions } from '../../types';
 import { JSONSchema7 } from 'json-schema';
 import { ValidationUtils } from '../ValidationUtils';
+import { AnthropicClient } from '../../engines/anthropic/AnthropicClient';
 
 export class ModelGenerateAdapter extends BaseAdapter {
+  private static readonly ALLOWED_MODELS = [
+    'claude-3-sonnet-20240229',
+    'claude-3-opus-20240229',
+    'claude-3-haiku-20240307'
+  ];
+
   constructor() {
     const inputSchema: JSONSchema7 = {
       type: 'object',
       properties: {
         prompt: { type: 'string' },
-        model: { type: 'string', enum: ['claude-3-5-sonnet', 'claude-3-opus', 'claude-3-haiku'] },
+        model: {
+          type: 'string',
+          enum: ModelGenerateAdapter.ALLOWED_MODELS
+        },
         maxTokens: { type: 'number' },
         temperature: { type: 'number' }
       },
@@ -27,7 +37,8 @@ export class ModelGenerateAdapter extends BaseAdapter {
         success: { type: 'boolean' },
         text: { type: 'string' },
         model: { type: 'string' },
-        tokensUsed: { type: 'number' },
+        inputTokens: { type: 'number' },
+        outputTokens: { type: 'number' },
         timestamp: { type: 'string' }
       }
     };
@@ -36,8 +47,8 @@ export class ModelGenerateAdapter extends BaseAdapter {
   }
 
   /**
-   * Generate text using LLM
-   * Note: Requires Anthropic SDK (stub for Phase 27)
+   * Generate text using Anthropic SDK
+   * Validated, bounded, cost-tracked model invocation
    */
   async execute(
     input: any,
@@ -46,51 +57,101 @@ export class ModelGenerateAdapter extends BaseAdapter {
   ): Promise<any> {
     const {
       prompt,
-      model = 'claude-3-5-sonnet',
+      model = 'claude-3-sonnet-20240229',
       maxTokens = 1000,
-      temperature = 0.7
+      temperature = 0.0,
+      systemPrompt
     } = input;
 
+    const timestamp = Date.now();
+
+    // Validate prompt
     if (!prompt || typeof prompt !== 'string') {
-      throw new Error('Invalid input: prompt must be a string');
+      return {
+        success: false,
+        model,
+        error: 'Invalid input: prompt must be a string',
+        timestamp
+      };
     }
 
-    // Validate body size
+    // Validate body size (prompt)
     const sizeValidation = ValidationUtils.validateBodySize(prompt);
     if (!sizeValidation.valid) {
-      throw new Error(sizeValidation.error);
+      return {
+        success: false,
+        model,
+        error: sizeValidation.error,
+        timestamp
+      };
     }
 
     // Validate model
-    const validModels = ['claude-3-5-sonnet', 'claude-3-opus', 'claude-3-haiku'];
-    if (!validModels.includes(model)) {
-      throw new Error(`model must be one of: ${validModels.join(', ')}`);
+    if (!ModelGenerateAdapter.ALLOWED_MODELS.includes(model)) {
+      return {
+        success: false,
+        model,
+        error: `model must be one of: ${ModelGenerateAdapter.ALLOWED_MODELS.join(', ')}`,
+        timestamp
+      };
     }
 
-    // Validate maxTokens
-    if (maxTokens < 1 || maxTokens > 100000) {
-      throw new Error('maxTokens must be between 1 and 100000');
+    // Validate maxTokens (tighter bounds)
+    if (maxTokens < 1 || maxTokens > 4096) {
+      return {
+        success: false,
+        model,
+        error: 'maxTokens must be between 1 and 4096',
+        timestamp
+      };
     }
 
     // Validate temperature
-    if (temperature < 0 || temperature > 2) {
-      throw new Error('temperature must be between 0 and 2');
+    if (temperature < 0 || temperature > 1) {
+      return {
+        success: false,
+        model,
+        error: 'temperature must be between 0 and 1',
+        timestamp
+      };
     }
 
     try {
-      // TODO: Integrate with Anthropic SDK for actual generation
-      // For Phase 27 skeleton, return stub response
-      const timestamp = new Date().toISOString();
+      // Call Anthropic
+      const result = await AnthropicClient.generate({
+        model,
+        prompt,
+        maxTokens,
+        systemPrompt,
+        temperature
+      });
+
+      // Validate output size
+      const outputSizeValidation = ValidationUtils.validateBodySize(result.text);
+      if (!outputSizeValidation.valid) {
+        return {
+          success: false,
+          model,
+          error: `Output too large: ${outputSizeValidation.error}`,
+          timestamp
+        };
+      }
 
       return {
         success: true,
-        text: 'Generated response text', // Stub
+        text: result.text,
         model,
-        tokensUsed: 0, // Stub
+        inputTokens: result.inputTokens,
+        outputTokens: result.outputTokens,
         timestamp
       };
     } catch (err: any) {
-      throw new Error(`Failed to generate text: ${err.message}`);
+      return {
+        success: false,
+        model,
+        error: err.message,
+        timestamp
+      };
     }
   }
 }

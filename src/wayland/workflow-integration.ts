@@ -2,13 +2,13 @@
 // Wayland Workflow Integration Example
 // Shows how to invoke workflows via Wayland adapters
 
-import { createDefaultRegistry } from './wayland-adapter-registry';
-import { createDefaultSecurityPolicy } from './wayland-security-policy';
+import { createDefaultRegistry } from './wayland-adapter-registry.js';
+import { createDefaultSecurityPolicy } from './wayland-security-policy.js';
 import {
   WorkflowRunner,
   WorkflowContext,
   dailyIngestReasoningWorkflow,
-} from './workflow';
+} from './workflow.js';
 
 // Example: Run daily ingest reasoning workflow
 export async function runDailyIngestReasoning(
@@ -111,3 +111,4 @@ export function triggerWorkflowAsync(
     resolve(`Workflow ${workflowId} queued`);
   });
 }
+

@@ -3,7 +3,7 @@
  * Signals triggered by drift, instability, regression, or opportunity detection
  */
 
-import { TimelineEvent } from '../../ui/models/TimelineEvent';
+import { TimelineEvent } from '../../ui/models/TimelineEvent.js';
 
 export type SignalType = 'drift' | 'instability' | 'regression' | 'opportunity';
 export type SignalSeverity = 'info' | 'warning' | 'critical';
@@ -125,3 +125,4 @@ export function isSignalValid(signal: AutonomySignal): boolean {
     signal.confidence >= SIGNAL_THRESHOLDS.SIGNAL_CONFIDENCE_MIN
   );
 }
+

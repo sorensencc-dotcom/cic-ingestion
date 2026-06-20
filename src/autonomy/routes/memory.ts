@@ -1,232 +1,182 @@
 /**
- * Memory Query Routes (Phase 23.2)
- * Expose MemoryStore as HTTP API
- *
- * Routes:
- * - GET /memory/events — query by type/agent/session/time
- * - GET /memory/summaries — signal summaries (drift/health metrics)
- * - GET /memory/stats — store statistics
- * - POST /memory/append — append event (internal use)
+ * Memory Router (Phase 5b)
+ * Exposes memory store queries through autonomy API
+ * Routes all memory-related queries to the memory backend
  */
 
-import { Router, Request, Response } from 'express';
-import { MemoryStore, QueryOptions } from '../../../../rewrite-mcp/src/memory/MemoryStore';
-import { MemoryQuery } from '../../../../rewrite-mcp/projects/cic/memory/query/memory-query';
-import { ObservabilityManager } from '../ObservabilityManager';
+import { Router, Request, Response, NextFunction } from 'express';
 
-export interface MemoryRoutesConfig {
-  memoryStore: MemoryStore;
-  memoryQuery?: MemoryQuery;
+export interface MemoryRouterConfig {
+  memoryStoreUrl?: string;
 }
 
-export function createMemoryRouter(config: MemoryRoutesConfig): Router {
+export function createMemoryRouter(config?: MemoryRouterConfig): Router {
   const router = Router();
-  const observability = ObservabilityManager.getInstance();
-  const { memoryStore, memoryQuery } = config;
+
+  // Memory store URL (defaults to localhost for Docker local development)
+  const memoryStoreUrl = config?.memoryStoreUrl || process.env.MEMORY_STORE_URL || 'http://localhost:3110';
 
   /**
-   * GET /memory/events
-   * Query events with filters
-   *
-   * Query params:
-   *   eventType?: string — filter by event type
-   *   sourceAgent?: string — filter by source agent
-   *   sessionId?: string — filter by session ID
-   *   correlationId?: string — filter by correlation ID
-   *   startDate?: ISO8601 — filter by start timestamp
-   *   endDate?: ISO8601 — filter by end timestamp
-   *   limit?: number — max results (default: 1000)
-   *   offset?: number — pagination offset (default: 0)
-   *
-   * Response: { events: MemoryEvent[], total: number, limit: number, offset: number }
+   * POST /memory/ingest
+   * Ingest event into memory store
    */
-  router.get('/events', async (req: Request, res: Response) => {
+  router.post('/memory/ingest', async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const {
-        eventType,
-        sourceAgent,
-        sessionId,
-        correlationId,
-        startDate,
-        endDate,
-        limit = '1000',
-        offset = '0',
-      } = req.query;
-
-      const queryOptions: QueryOptions = {
-        event_type: eventType as string | undefined,
-        source_agent: sourceAgent as string | undefined,
-        session_id: sessionId as string | undefined,
-        correlation_id: correlationId as string | undefined,
-        after_timestamp: startDate as string | undefined,
-        before_timestamp: endDate as string | undefined,
-        limit: Math.min(parseInt(limit as string) || 1000, 10000),
-        offset: Math.max(parseInt(offset as string) || 0, 0),
-      };
-
-      const events = await memoryStore.query(queryOptions);
-      const counts = await memoryStore.getEventCounts();
-
-      observability.getLogger().info('memory', `Query: ${eventType || 'all'} returned ${events.length} events`);
-
-      return res.json({
-        events,
-        total: counts[eventType as string] || 0,
-        limit: queryOptions.limit,
-        offset: queryOptions.offset,
-        queried_at: new Date().toISOString(),
+      const response = await fetch(`${memoryStoreUrl}/memory/ingest`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req.body),
       });
+
+      if (!response.ok) {
+        res.status(response.status).json({
+          error: 'Memory store error',
+          message: response.statusText,
+        });
+        return;
+      }
+
+      const data = await response.json();
+      res.status(201).json(data);
     } catch (err) {
-      console.error('GET /memory/events error:', err);
-      return res.status(500).json({
-        error: err instanceof Error ? err.message : 'Internal server error',
-      });
+      next(err);
     }
   });
 
   /**
-   * GET /memory/summaries
-   * Return metric summaries (for autonomy signal detection)
-   *
-   * Query params:
-   *   window?: 'hourly' | 'daily' — aggregation window
-   *   metric?: 'drift' | 'health' — metric type
-   *
-   * Response: { drift_metrics?: DriftMetric[], health_metrics?: HealthMetric[], aggregated_at: ISO8601 }
+   * POST /memory/ingest-batch
+   * Ingest multiple events into memory store
    */
-  router.get('/summaries', async (req: Request, res: Response) => {
+  router.post('/memory/ingest-batch', async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { window = 'hourly', metric = 'drift' } = req.query;
-
-      // Fetch recent events for summary
-      const recentEvents = await memoryStore.getRecent(7);
-
-      if (metric === 'drift' || metric === 'all') {
-        // Calculate drift metrics from ARPS_DELTA events
-        const deltasEvents = recentEvents.filter((e: any) => e.event_type === 'ARPS_DELTA');
-        const driftMetrics = deltasEvents.map((e: any) => ({
-          timestamp: e.timestamp,
-          value: (e.payload as any).confidence || 0,
-          type: (e.payload as any).change_type || 'unknown',
-        }));
-
-        return res.json({
-          drift_metrics: driftMetrics,
-          window,
-          aggregated_at: new Date().toISOString(),
-        });
-      }
-
-      if (metric === 'health' || metric === 'all') {
-        // Calculate health metrics from AGENT_TELEMETRY events
-        const telemetryEvents = recentEvents.filter((e: any) => e.event_type === 'AGENT_TELEMETRY');
-        const healthMetrics = telemetryEvents.map((e: any) => ({
-          timestamp: e.timestamp,
-          status: (e.payload as any).status || 'unknown',
-          task_success_rate: (e.payload as any).task_success_rate || 0,
-          uptime_seconds: (e.payload as any).uptime_seconds || 0,
-        }));
-
-        return res.json({
-          health_metrics: healthMetrics,
-          window,
-          aggregated_at: new Date().toISOString(),
-        });
-      }
-
-      return res.status(400).json({
-        error: 'metric must be one of: drift, health, all',
+      const response = await fetch(`${memoryStoreUrl}/memory/ingest-batch`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(req.body),
       });
+
+      if (!response.ok) {
+        res.status(response.status).json({
+          error: 'Memory store error',
+          message: response.statusText,
+        });
+        return;
+      }
+
+      const data = await response.json();
+      res.status(201).json(data);
     } catch (err) {
-      console.error('GET /memory/summaries error:', err);
-      return res.status(500).json({
-        error: err instanceof Error ? err.message : 'Internal server error',
-      });
+      next(err);
     }
   });
 
   /**
-   * GET /memory/stats
-   * Return store statistics
-   *
-   * Response: { total_events: number, event_types: Record<string, number>, store_size_bytes: number, ... }
+   * GET /memory/search
+   * Search memory store
    */
-  router.get('/stats', async (_req: Request, res: Response) => {
+  router.get('/memory/search', async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const stats = await memoryStore.getStats();
-      return res.json(stats);
-    } catch (err) {
-      console.error('GET /memory/stats error:', err);
-      return res.status(500).json({
-        error: err instanceof Error ? err.message : 'Internal server error',
+      const queryParams = new URLSearchParams(req.query as Record<string, string>).toString();
+      const response = await fetch(`${memoryStoreUrl}/memory/search?${queryParams}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
       });
+
+      if (!response.ok) {
+        res.status(response.status).json({
+          error: 'Memory store error',
+          message: response.statusText,
+        });
+        return;
+      }
+
+      const data = await response.json();
+      res.json(data);
+    } catch (err) {
+      next(err);
     }
   });
 
   /**
-   * POST /memory/append
-   * Append a single event (internal use)
-   *
-   * Body: { event_type, source_agent, session_id, correlation_id, retention_days, payload }
-   * Response: { id: string, timestamp: string, ... }
+   * GET /memory/by-type/:type
+   * Query memory by event type
    */
-  router.post('/append', async (req: Request, res: Response) => {
+  router.get('/memory/by-type/:type', async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { event_type, source_agent, session_id, correlation_id, retention_days, payload } = req.body;
+      const { type } = req.params;
+      const response = await fetch(`${memoryStoreUrl}/memory/by-type/${type}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
 
-      // Validate required fields
-      if (!event_type || !source_agent || !session_id || !correlation_id || !retention_days || !payload) {
-        return res.status(400).json({
-          error: 'Missing required fields: event_type, source_agent, session_id, correlation_id, retention_days, payload',
+      if (!response.ok) {
+        res.status(response.status).json({
+          error: 'Memory store error',
+          message: response.statusText,
         });
+        return;
       }
 
-      const appended = await memoryStore.append({
-        event_type,
-        source_agent,
-        session_id,
-        correlation_id,
-        retention_days,
-        payload,
-      });
-
-      observability.getLogger().info('memory', `Appended ${event_type} event: ${appended.id}`);
-
-      return res.status(201).json(appended);
+      const data = await response.json();
+      res.json(data);
     } catch (err) {
-      console.error('POST /memory/append error:', err);
-      return res.status(400).json({
-        error: err instanceof Error ? err.message : 'Validation error',
-      });
+      next(err);
     }
   });
 
   /**
-   * GET /memory/query/type/:eventType
-   * Query by event type using MemoryQuery (if available)
+   * GET /memory/by-agent/:agentId
+   * Query memory by agent ID
    */
-  if (memoryQuery) {
-    router.get('/query/type/:eventType', async (req: Request, res: Response) => {
-      try {
-        const { eventType } = req.params;
-        const { limit = '100', offset = '0' } = req.query;
+  router.get('/memory/by-agent/:agentId', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { agentId } = req.params;
+      const response = await fetch(`${memoryStoreUrl}/memory/by-agent/${agentId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
 
-        const result = await memoryQuery.queryByType({
-          eventType: eventType as any,
-          timeRange: undefined,
-          limit: parseInt(limit as string),
-          offset: parseInt(offset as string),
+      if (!response.ok) {
+        res.status(response.status).json({
+          error: 'Memory store error',
+          message: response.statusText,
         });
-
-        return res.json(result);
-      } catch (err) {
-        console.error('GET /memory/query/type error:', err);
-        return res.status(500).json({
-          error: err instanceof Error ? err.message : 'Internal server error',
-        });
+        return;
       }
-    });
-  }
+
+      const data = await response.json();
+      res.json(data);
+    } catch (err) {
+      next(err);
+    }
+  });
+
+  /**
+   * GET /memory/by-correlation/:correlationId
+   * Query memory by correlation ID
+   */
+  router.get('/memory/by-correlation/:correlationId', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { correlationId } = req.params;
+      const response = await fetch(`${memoryStoreUrl}/memory/by-correlation/${correlationId}`, {
+        method: 'GET',
+        headers: { 'Content-Type': 'application/json' },
+      });
+
+      if (!response.ok) {
+        res.status(response.status).json({
+          error: 'Memory store error',
+          message: response.statusText,
+        });
+        return;
+      }
+
+      const data = await response.json();
+      res.json(data);
+    } catch (err) {
+      next(err);
+    }
+  });
 
   return router;
 }

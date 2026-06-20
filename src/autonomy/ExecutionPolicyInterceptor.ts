@@ -10,8 +10,8 @@ import {
   ExecutionMode,
   ExecutionContext,
   getExecutionPolicyEngine,
-} from './ExecutionPolicy';
-import { getTaskMetadataStore } from './TaskMetadataStore';
+} from './ExecutionPolicy.js';
+import { getTaskMetadataStore } from './TaskMetadataStore.js';
 
 /**
  * Result of policy check
@@ -162,3 +162,4 @@ export function getExecutionPolicyInterceptor(): ExecutionPolicyInterceptor {
   }
   return globalInterceptor;
 }
+

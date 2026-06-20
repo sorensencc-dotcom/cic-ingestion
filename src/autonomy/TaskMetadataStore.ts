@@ -6,7 +6,7 @@
  * When task is scheduled, metadata is stored here; when task wakes, it looks up its context.
  */
 
-import { ExecutionContext, ExecutionMode, getExecutionPolicyEngine } from './ExecutionPolicy';
+import { ExecutionContext, ExecutionMode, getExecutionPolicyEngine } from './ExecutionPolicy.js';
 
 /**
  * Audit record for a tool call
@@ -224,3 +224,4 @@ export function getTaskMetadataStore(): TaskMetadataStore {
   }
   return globalStore;
 }
+

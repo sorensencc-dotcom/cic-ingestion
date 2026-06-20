@@ -5,9 +5,9 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { AutonomyService, SignalQuery } from '../AutonomyService';
-import { CavemanCompressor } from '../CavemanCompressor';
-import { ObservabilityManager } from '../ObservabilityManager';
+import { AutonomyService, SignalQuery } from '../AutonomyService.js';
+import { CavemanCompressor } from '../CavemanCompressor.js';
+import { ObservabilityManager } from '../ObservabilityManager.js';
 
 export function createSignalsRouter(service: AutonomyService): Router {
   const router = Router();
@@ -300,3 +300,4 @@ function calculateTrends(
         items.length,
     }));
 }
+

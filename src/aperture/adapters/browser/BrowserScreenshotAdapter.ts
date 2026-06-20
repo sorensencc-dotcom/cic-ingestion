@@ -7,6 +7,7 @@ import { BaseAdapter } from '../BaseAdapter';
 import { SandboxHandle, ExecutionOptions } from '../../types';
 import { JSONSchema7 } from 'json-schema';
 import { ValidationUtils } from '../ValidationUtils';
+import { PuppeteerEngine } from '../../engines/puppeteer/PuppeteerEngine';
 
 export class BrowserScreenshotAdapter extends BaseAdapter {
   constructor() {
@@ -37,14 +38,14 @@ export class BrowserScreenshotAdapter extends BaseAdapter {
 
   /**
    * Capture screenshot of web page
-   * Note: Requires puppeteer/playwright (stub for Phase 27)
+   * Uses shared Puppeteer engine for deterministic browser management
    */
   async execute(
     input: any,
     sandbox: SandboxHandle,
     options?: ExecutionOptions
   ): Promise<any> {
-    const { url, width = 1920, height = 1080, timeout = 30000 } = input;
+    const { url, width = 1280, height = 1024, timeout = 30000 } = input;
 
     if (!url || typeof url !== 'string') {
       throw new Error('Invalid input: url must be a string');
@@ -65,21 +66,64 @@ export class BrowserScreenshotAdapter extends BaseAdapter {
       throw new Error('Height must be between 100 and 4096');
     }
 
+    const page = await PuppeteerEngine.newPage();
+    const startTime = Date.now();
+
     try {
-      // TODO: Integrate with Puppeteer/Playwright for actual screenshot capture
-      // For Phase 27 skeleton, return stub response
+      // Navigate to URL
+      await page.setViewport({ width, height });
+      await page.goto(url, {
+        waitUntil: 'networkidle2',
+        timeout: Math.min(timeout, 15000)
+      });
+
+      // Capture screenshot
+      const buffer = await page.screenshot({
+        type: 'png',
+        fullPage: true
+      });
+
+      // Validate screenshot size
+      const sizeValidation = ValidationUtils.validateBodySize(
+        buffer.toString('base64'),
+        5 * 1024 * 1024
+      );
+
+      if (!sizeValidation.valid) {
+        return {
+          success: false,
+          url,
+          error: sizeValidation.error,
+          timestamp: new Date().toISOString()
+        };
+      }
+
       const timestamp = new Date().toISOString();
-      const screenshotPath = `screenshot-${Date.now()}.png`;
+      const loadTime = Date.now() - startTime;
 
       return {
         success: true,
         url,
-        path: screenshotPath,
-        size: 0, // Stub
+        screenshotBase64: buffer.toString('base64'),
+        size: buffer.length,
+        width,
+        height,
+        loadTime,
         timestamp
       };
     } catch (err: any) {
-      throw new Error(`Failed to capture screenshot: ${err.message}`);
+      const timestamp = new Date().toISOString();
+      const loadTime = Date.now() - startTime;
+
+      return {
+        success: false,
+        url,
+        error: err.message,
+        loadTime,
+        timestamp
+      };
+    } finally {
+      await PuppeteerEngine.closePage(page);
     }
   }
 }

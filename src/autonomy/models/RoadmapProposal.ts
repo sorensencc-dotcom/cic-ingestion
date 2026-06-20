@@ -3,7 +3,7 @@
  * Proposals generated from autonomy signals to adjust CIC roadmap
  */
 
-import { AutonomySignal } from './AutonomySignal';
+import { AutonomySignal } from './AutonomySignal.js';
 
 export type ProposalStatus = 'pending' | 'approved' | 'rejected' | 'executed';
 
@@ -135,3 +135,4 @@ export function estimateCompletionAfterProposal(
   const durationChangeMs = proposal.impact.estimatedDurationChange * 3600000; // hours to ms
   return new Date(baseCompletionDate.getTime() + durationChangeMs);
 }
+

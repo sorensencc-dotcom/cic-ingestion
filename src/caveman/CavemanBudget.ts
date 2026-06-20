@@ -3,7 +3,7 @@
  * Governance layer: per-tool, per-phase, per-agent compression caps
  */
 
-import { CavemanStatsV1 } from './CavemanStats';
+import { CavemanStatsV1 } from './CavemanStats.js';
 
 export interface CavemanBudgetRule {
   id: string; // "tool:shell", "phase:25", "agent:foreman"
@@ -155,3 +155,4 @@ export const FOUNDRY_DEFAULT_BUDGET: CavemanBudgetConfig = {
     },
   ],
 };
+

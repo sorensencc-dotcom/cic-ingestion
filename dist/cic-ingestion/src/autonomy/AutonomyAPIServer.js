@@ -16,6 +16,7 @@ import { createMemoryRouter } from './routes/memory';
 import { createGovernanceRouter } from '../governance/routes/governance';
 import { ObservabilityManager } from './ObservabilityManager';
 import { wireVectorLayer } from '../vector/index.js';
+import cicConfig from '../config';
 export class AutonomyAPIServer {
     constructor(config) {
         this.server = null;
@@ -24,6 +25,7 @@ export class AutonomyAPIServer {
             host: 'localhost',
             ...config,
         };
+        this.cicConfig = cicConfig;
         this.observability = ObservabilityManager.getInstance();
         this.app = express();
         this.service = new AutonomyService(config);
@@ -139,6 +141,16 @@ export class AutonomyAPIServer {
                 endpoints,
             });
         });
+        // Phase 2.5: Config endpoint
+        this.app.get('/autonomy/config', (_req, res) => {
+            return res.json({
+                phase: '2.5',
+                loaded: true,
+                source: 'env+defaults',
+                services: this.cicConfig.services,
+                timestamp: new Date().toISOString(),
+            });
+        });
         // Mount routers
         const signalsRouter = createSignalsRouter(this.service);
         const proposalsRouter = createProposalsRouter(this.service);
@@ -198,6 +210,7 @@ export class AutonomyAPIServer {
             try {
                 this.server = this.app.listen(this.config.port || 3000, this.config.host || 'localhost', () => {
                     console.log(`[${new Date().toISOString()}] Autonomy API Server started on http://${this.config.host}:${this.config.port}`);
+                    console.log(`[${new Date().toISOString()}] Phase 2.5 Config loaded successfully`);
                     console.log(`[${new Date().toISOString()}] MemoryQueryAPI: ${this.config.memoryQueryApiUrl}`);
                     resolve();
                 });

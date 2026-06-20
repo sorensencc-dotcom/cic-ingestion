@@ -7,8 +7,8 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { AutonomyLearner } from '../AutonomyLearner';
-import { RoadmapProposal } from '../models/RoadmapProposal';
+import { AutonomyLearner } from '../AutonomyLearner.js';
+import { RoadmapProposal } from '../models/RoadmapProposal.js';
 
 export function createLearnerRouter(learner: AutonomyLearner): Router {
   const router = Router();
@@ -289,3 +289,4 @@ export function createLearnerRouter(learner: AutonomyLearner): Router {
 
   return router;
 }
+

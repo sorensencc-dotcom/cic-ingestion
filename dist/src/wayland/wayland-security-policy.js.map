@@ -1,0 +1,1 @@
+{"version":3,"file":"wayland-security-policy.js","sourceRoot":"","sources":["../../../src/wayland/wayland-security-policy.ts"],"names":[],"mappings":"AAAA,wCAAwC;AACxC,MAAM,OAAO,qBAAqB;IAChC,aAAa;QACX,OAAO,IAAI,CAAC;IACd,CAAC;CACF;AAED,MAAM,UAAU,2BAA2B;IACzC,OAAO,IAAI,qBAAqB,EAAE,CAAC;AACrC,CAAC"}

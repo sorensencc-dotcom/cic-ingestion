@@ -4,8 +4,8 @@
  * Feeds memory-driven autonomy back into the roadmap state (Phase 22)
  */
 
-import { RoadmapProposal } from '../models/RoadmapProposal';
-import { AutonomySignal } from '../models/AutonomySignal';
+import { RoadmapProposal } from '../models/RoadmapProposal.js';
+import { AutonomySignal } from '../models/AutonomySignal.js';
 
 export interface ARPSDelta {
   id: string;
@@ -268,3 +268,4 @@ export class AutonomyToARPSBridge {
     return Math.min(priority, 100);
   }
 }
+

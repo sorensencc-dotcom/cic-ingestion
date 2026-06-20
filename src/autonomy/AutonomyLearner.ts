@@ -4,8 +4,8 @@
  * Decays old signals automatically
  */
 
-import { RoadmapProposal } from './models/RoadmapProposal';
-import { SIGNAL_THRESHOLDS } from './models/AutonomySignal';
+import { RoadmapProposal } from './models/RoadmapProposal.js';
+import { SIGNAL_THRESHOLDS } from './models/AutonomySignal.js';
 
 export type ProposalOutcome = 'success' | 'partial' | 'failure';
 
@@ -400,3 +400,4 @@ export class AutonomyLearner {
     this.thresholds = { ...SIGNAL_THRESHOLDS };
   }
 }
+

@@ -9,7 +9,7 @@ import {
   DriftMetric,
   HealthMetric,
   CorrelationTrace,
-} from '../models/TimelineEvent';
+} from '../models/TimelineEvent.js';
 
 export interface ExplorerQueryOptions {
   baseUrl: string;
@@ -195,3 +195,4 @@ export class ExplorerClient {
     this.subscriptions.clear();
   }
 }
+

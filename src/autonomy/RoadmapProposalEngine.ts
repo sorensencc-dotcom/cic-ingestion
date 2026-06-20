@@ -3,13 +3,13 @@
  * Converts autonomy signals into actionable roadmap proposals
  */
 
-import { AutonomySignal } from './models/AutonomySignal';
+import { AutonomySignal } from './models/AutonomySignal.js';
 import {
   RoadmapProposal,
   ProposalAction,
   ProposalImpact,
   requiresGovernanceApproval,
-} from './models/RoadmapProposal';
+} from './models/RoadmapProposal.js';
 
 export interface RoadmapContext {
   currentPhases: PhaseInfo[];
@@ -269,3 +269,4 @@ export class RoadmapProposalEngine {
     return grouped;
   }
 }
+

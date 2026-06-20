@@ -4,11 +4,11 @@
  * Single integration point for autonomy → rest of CIC
  */
 
-import { AutonomySignal } from '../models/AutonomySignal';
-import { RoadmapProposal } from '../models/RoadmapProposal';
-import { AutonomyToPlannerBridge } from './AutonomyToPlannerBridge';
-import { AutonomyToARPSBridge } from './AutonomyToARPSBridge';
-import { AutonomyGovernanceBridge } from './AutonomyGovernanceBridge';
+import { AutonomySignal } from '../models/AutonomySignal.js';
+import { RoadmapProposal } from '../models/RoadmapProposal.js';
+import { AutonomyToPlannerBridge } from './AutonomyToPlannerBridge.js';
+import { AutonomyToARPSBridge } from './AutonomyToARPSBridge.js';
+import { AutonomyGovernanceBridge } from './AutonomyGovernanceBridge.js';
 
 export interface BridgeOrchestratorConfig {
   // Planner bridge
@@ -278,3 +278,4 @@ export class BridgeOrchestrator {
     return this.governanceBridge;
   }
 }
+

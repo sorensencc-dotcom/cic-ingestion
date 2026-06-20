@@ -9,9 +9,9 @@ import {
   InstabilitySignal,
   RegressionSignal,
   OpportunitySignal,
-} from '../../models/AutonomySignal';
-import { RoadmapProposal } from '../../models/RoadmapProposal';
-import { TimelineEvent } from '../../../ui/models/TimelineEvent';
+} from '../../models/AutonomySignal.js';
+import { RoadmapProposal } from '../../models/RoadmapProposal.js';
+import { TimelineEvent } from '../../../ui/models/TimelineEvent.js';
 
 /**
  * Create mock drift signal
@@ -297,3 +297,4 @@ export function createMockProposals(count: number = 2): RoadmapProposal[] {
 
   return proposals;
 }
+

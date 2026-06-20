@@ -11,8 +11,8 @@
  *   });
  */
 
-import { CICPromptCacheRouter } from '../prompt-cache/router';
-import { loadCacheConfig } from '../prompt-cache/config';
+import { CICPromptCacheRouter } from '../prompt-cache/router.js';
+import { loadCacheConfig } from '../prompt-cache/config/index.js';
 
 export type AnalysisTask =
   | 'extract_findings'
@@ -136,3 +136,4 @@ export class AutonomyPromptCacheAdapter {
     });
   }
 }
+

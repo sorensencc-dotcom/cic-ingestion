@@ -4,8 +4,8 @@
  * Integrates memory-driven autonomy with governance (Phase 24)
  */
 
-import { RoadmapProposal } from '../models/RoadmapProposal';
-import { requiresGovernanceApproval, scoreProposalPriority } from '../models/RoadmapProposal';
+import { RoadmapProposal } from '../models/RoadmapProposal.js';
+import { requiresGovernanceApproval, scoreProposalPriority } from '../models/RoadmapProposal.js';
 
 export interface GovernanceVoteRequest {
   proposalId: string;
@@ -43,6 +43,7 @@ export interface GovernanceBridgeConfig {
   councilSize: number; // total council members
   approvalThreshold: number; // percentage (e.g., 66 for 2/3 majority)
   autoApproveThreshold: number; // confidence threshold for auto-approval (e.g., 0.95)
+  cicToken?: string; // CIC governance token; falls back to CIC_GOVERNANCE_TOKEN env var
 }
 
 export class AutonomyGovernanceBridge {
@@ -50,6 +51,25 @@ export class AutonomyGovernanceBridge {
 
   constructor(config: GovernanceBridgeConfig) {
     this.config = config;
+  }
+
+  /**
+   * Build request headers including the CIC governance token.
+   * Token source priority: config.cicToken → CIC_GOVERNANCE_TOKEN env var.
+   * All requests to the governance control plane must include this token.
+   */
+  private governanceHeaders(): Record<string, string> {
+    const token = this.config.cicToken ?? process.env['CIC_GOVERNANCE_TOKEN'];
+    if (!token) {
+      throw new Error(
+        '[GovernanceBridge] CIC_GOVERNANCE_TOKEN is required but not set. ' +
+        'Set the CIC_GOVERNANCE_TOKEN environment variable or pass cicToken in config.'
+      );
+    }
+    return {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`,
+    };
   }
 
   /**
@@ -249,7 +269,7 @@ export class AutonomyGovernanceBridge {
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.governanceHeaders(),
       body: JSON.stringify(request),
     });
 
@@ -268,7 +288,7 @@ export class AutonomyGovernanceBridge {
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.governanceHeaders(),
       body: JSON.stringify(vote),
     });
 
@@ -287,7 +307,7 @@ export class AutonomyGovernanceBridge {
 
     const response = await fetch(url, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.governanceHeaders(),
       body: JSON.stringify(decision),
     });
 
@@ -298,3 +318,4 @@ export class AutonomyGovernanceBridge {
     }
   }
 }
+

@@ -6,10 +6,10 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { AutonomyService, ProposalQuery } from '../AutonomyService';
-import { scoreProposalPriority } from '../models/RoadmapProposal';
-import { CavemanCompressor } from '../CavemanCompressor';
-import { ObservabilityManager } from '../ObservabilityManager';
+import { AutonomyService, ProposalQuery } from '../AutonomyService.js';
+import { scoreProposalPriority } from '../models/RoadmapProposal.js';
+import { CavemanCompressor } from '../CavemanCompressor.js';
+import { ObservabilityManager } from '../ObservabilityManager.js';
 
 export function createProposalsRouter(service: AutonomyService): Router {
   const router = Router();
@@ -321,3 +321,4 @@ function computePhaseTimings(proposal: any): Record<string, number> {
 
   return timings;
 }
+

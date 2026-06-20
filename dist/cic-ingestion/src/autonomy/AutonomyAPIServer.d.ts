@@ -17,6 +17,7 @@ export declare class AutonomyAPIServer {
     private app;
     private service;
     private config;
+    private cicConfig;
     private server;
     private observability;
     constructor(config: AutonomyAPIServerConfig);

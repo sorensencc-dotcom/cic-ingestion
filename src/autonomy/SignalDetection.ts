@@ -7,7 +7,7 @@ import {
   TimelineEvent,
   DriftMetric,
   HealthMetric,
-} from '../ui/models/TimelineEvent';
+} from '../ui/models/TimelineEvent.js';
 import {
   AutonomySignal,
   DriftSignal,
@@ -17,7 +17,7 @@ import {
   SIGNAL_THRESHOLDS,
   classifySignalSeverity,
   isSignalValid,
-} from './models/AutonomySignal';
+} from './models/AutonomySignal.js';
 
 export interface SignalDetectionContext {
   events: TimelineEvent[];
@@ -413,3 +413,4 @@ export class SignalDetectionEngine {
     return Array.from(phases);
   }
 }
+

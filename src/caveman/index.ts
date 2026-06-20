@@ -3,19 +3,19 @@
  * Token compression + observability for CIC architecture
  */
 
-export { CavemanCompressor } from '../autonomy/CavemanCompressor';
+export { CavemanCompressor } from '../autonomy/CavemanCompressor.js';
 export {
   CavemanStatsV1,
   createCavemanStats,
   logCavemanStats,
   validateCavemanStats,
-} from './CavemanStats';
+} from './CavemanStats.js';
 export {
   CavemanBudget,
   CavemanBudgetRule,
   CavemanBudgetConfig,
   FOUNDRY_DEFAULT_BUDGET,
-} from './CavemanBudget';
+} from './CavemanBudget.js';
 export {
   Phase25To26CavemanAdapter,
   ConsolidatedKnowledgeObject,
@@ -23,10 +23,11 @@ export {
   TorqueNode,
   TorqueEdge,
   TorqueQueryIngestionBundle,
-} from './Phase25To26CavemanAdapter';
+} from './Phase25To26CavemanAdapter.js';
 export {
   WaylandCavemanIntegration,
   WaylandToolOutput,
   WaylandCavemanResponse,
   createWaylandCavemanIntegration,
-} from './WaylandCavemanIntegration';
+} from './WaylandCavemanIntegration.js';
+

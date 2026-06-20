@@ -1,1 +1,2 @@
-export { CacheMetricsExporter, PrometheusMetric } from './CacheMetricsExporter';
+export { CacheMetricsExporter, PrometheusMetric } from './CacheMetricsExporter.js';
+

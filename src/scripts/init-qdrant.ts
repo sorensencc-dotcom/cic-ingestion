@@ -60,3 +60,5 @@ main().catch((err) => {
   console.error("init-qdrant: error", err);
   process.exit(1);
 });
+
+

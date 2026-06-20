@@ -7,6 +7,7 @@ import { BaseAdapter } from '../BaseAdapter';
 import { SandboxHandle, ExecutionOptions } from '../../types';
 import { JSONSchema7 } from 'json-schema';
 import { ValidationUtils } from '../ValidationUtils';
+import { PuppeteerEngine } from '../../engines/puppeteer/PuppeteerEngine';
 
 export class BrowserNavigateAdapter extends BaseAdapter {
   constructor() {
@@ -39,7 +40,7 @@ export class BrowserNavigateAdapter extends BaseAdapter {
 
   /**
    * Navigate to URL in browser context
-   * Note: Requires puppeteer/playwright (stub for Phase 27)
+   * Uses shared Puppeteer engine for deterministic browser management
    */
   async execute(
     input: any,
@@ -64,22 +65,49 @@ export class BrowserNavigateAdapter extends BaseAdapter {
       throw new Error(`waitFor must be one of: ${validWaitOptions.join(', ')}`);
     }
 
+    const page = await PuppeteerEngine.newPage();
+    const startTime = Date.now();
+
     try {
-      // TODO: Integrate with Puppeteer/Playwright for actual navigation
-      // For Phase 27 skeleton, return stub response
-      const timestamp = new Date().toISOString();
-      const startTime = Date.now();
+      // Map waitFor to Puppeteer option
+      const waitUntilMap: Record<string, any> = {
+        'load': 'load',
+        'domcontentloaded': 'domcontentloaded',
+        'networkidle': 'networkidle2'
+      };
+
+      const response = await page.goto(url, {
+        waitUntil: waitUntilMap[waitFor],
+        timeout: Math.min(timeout, 15000)
+      });
+
+      const title = await page.title();
+      const finalUrl = page.url();
       const loadTime = Date.now() - startTime;
+      const timestamp = new Date().toISOString();
 
       return {
         success: true,
         url,
-        title: 'Page Title', // Stub
+        finalUrl,
+        status: response?.status() ?? null,
+        title,
         loadTime,
         timestamp
       };
     } catch (err: any) {
-      throw new Error(`Failed to navigate to ${url}: ${err.message}`);
+      const timestamp = new Date().toISOString();
+      const loadTime = Date.now() - startTime;
+
+      return {
+        success: false,
+        url,
+        error: err.message,
+        loadTime,
+        timestamp
+      };
+    } finally {
+      await PuppeteerEngine.closePage(page);
     }
   }
 }

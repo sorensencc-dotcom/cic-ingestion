@@ -221,3 +221,5 @@ export function calculateBatchStats(results: BatchAnalysisResult['results']): {
 
   return { hitRate, totalSavings, avgCostPerDoc };
 }
+
+

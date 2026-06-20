@@ -10,13 +10,13 @@ import {
   ExecutionContext,
   ExecutionMode,
   getExecutionPolicyEngine,
-} from '../ExecutionPolicy';
+} from '../ExecutionPolicy.js';
 import {
   getTaskMetadataStore,
-} from '../TaskMetadataStore';
+} from '../TaskMetadataStore.js';
 import {
   getExecutionPolicyInterceptor,
-} from '../ExecutionPolicyInterceptor';
+} from '../ExecutionPolicyInterceptor.js';
 
 export function createExecutionRouter(): Router {
   const router = express.Router();
@@ -248,3 +248,4 @@ export function createExecutionRouter(): Router {
 
   return router;
 }
+

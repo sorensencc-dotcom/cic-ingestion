@@ -6,8 +6,8 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { AutonomyPromptCacheAdapter } from '../AutonomyPromptCacheAdapter';
-import { CacheMetricsExporter } from '../../prompt-cache/metrics/CacheMetricsExporter';
+import { AutonomyPromptCacheAdapter } from '../AutonomyPromptCacheAdapter.js';
+import { CacheMetricsExporter } from '../../prompt-cache/metrics/CacheMetricsExporter.js';
 
 export function createCacheRouter(adapter: AutonomyPromptCacheAdapter): Router {
   const router = Router();
@@ -53,3 +53,4 @@ export function createCacheRouter(adapter: AutonomyPromptCacheAdapter): Router {
 
   return router;
 }
+

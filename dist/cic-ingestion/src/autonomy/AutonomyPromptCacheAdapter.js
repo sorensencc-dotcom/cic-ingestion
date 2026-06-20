@@ -11,9 +11,11 @@
  *   });
  */
 import { CICPromptCacheRouter } from '../prompt-cache/router';
+import { loadCacheConfig } from '../prompt-cache/config';
 export class AutonomyPromptCacheAdapter {
     constructor(registryDbPath) {
-        this.router = new CICPromptCacheRouter(registryDbPath);
+        const config = loadCacheConfig();
+        this.router = new CICPromptCacheRouter(config, registryDbPath);
     }
     async analyzeDocumentWithCache(req) {
         const { docId, docText, task, context } = req;

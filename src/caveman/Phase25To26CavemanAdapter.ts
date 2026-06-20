@@ -3,8 +3,8 @@
  * Wires Caveman compression into TorqueQuery ingestion pipeline
  */
 
-import { CavemanCompressor } from '../autonomy/CavemanCompressor';
-import { CavemanStatsV1, createCavemanStats } from './CavemanStats';
+import { CavemanCompressor } from '../autonomy/CavemanCompressor.js';
+import { CavemanStatsV1, createCavemanStats } from './CavemanStats.js';
 
 export interface ConsolidatedKnowledgeObject {
   id: string;
@@ -136,3 +136,4 @@ export class Phase25To26CavemanAdapter {
     return `0x${(hash >>> 0).toString(16).padStart(8, '0')}`;
   }
 }
+

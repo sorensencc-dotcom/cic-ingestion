@@ -9,18 +9,16 @@
  */
 
 import express, { Express, Request, Response, NextFunction } from 'express';
-import { AutonomyService, AutonomyServiceConfig } from './AutonomyService';
-import { createSignalsRouter } from './routes/signals';
-import { createProposalsRouter } from './routes/proposals';
-import { createCacheRouter } from './routes/cache';
-import { createExecutionRouter } from './routes/execution';
-// Memory router commented out for Docker isolation (rewrite-mcp not in context)
-// import { createMemoryRouter } from './routes/memory';
-// Governance router commented out for Docker isolation (rewrite-mcp not in context)
-// import { createGovernanceRouter } from '../governance/routes/governance';
-import { ObservabilityManager } from './ObservabilityManager';
+import { AutonomyService, AutonomyServiceConfig } from './AutonomyService.js';
+import { createSignalsRouter } from './routes/signals.js';
+import { createProposalsRouter } from './routes/proposals.js';
+import { createCacheRouter } from './routes/cache.js';
+import { createExecutionRouter } from './routes/execution.js';
+import { createMemoryRouter } from './routes/memory.js';
+import { createGovernanceRouter } from './routes/governance.js';
+import { ObservabilityManager } from './ObservabilityManager.js';
 import { wireVectorLayer } from '../vector/index.js';
-import cicConfig, { CICConfig } from '../config';
+import cicConfig, { CICConfig } from '../config/index.js';
 
 
 export interface AutonomyAPIServerConfig extends AutonomyServiceConfig {
@@ -141,16 +139,27 @@ export class AutonomyAPIServer {
           'POST /autonomy/execution/check': 'Pre-flight check if tool would be allowed',
           'GET /autonomy/execution/modes': 'List available execution modes and policies',
         },
+        memory: {
+          'POST /autonomy/memory/ingest': 'Ingest event into memory store',
+          'POST /autonomy/memory/ingest-batch': 'Ingest multiple events into memory store',
+          'GET /autonomy/memory/search': 'Search memory store',
+          'GET /autonomy/memory/by-type/:type': 'Query memory by event type',
+          'GET /autonomy/memory/by-agent/:agentId': 'Query memory by agent ID',
+          'GET /autonomy/memory/by-correlation/:correlationId': 'Query memory by correlation ID',
+        },
+        governance: {
+          'POST /autonomy/governance/votes': 'Submit proposal for council voting',
+          'POST /autonomy/governance/votes/:proposalId/vote': 'Record individual council vote',
+          'POST /autonomy/governance/decisions': 'Finalize governance decision',
+          'GET /autonomy/governance/log': 'Get governance decision log',
+          'GET /autonomy/governance/queue': 'Get pending approval queue',
+          'GET /autonomy/governance/proposal/:proposalId': 'Get specific proposal details',
+        },
         observability: {
           'GET /metrics': 'Prometheus format metrics',
           'GET /metrics/json': 'JSON format metrics',
         },
       };
-
-      // (Phase 23.2) Memory endpoints disabled for Docker isolation
-
-      // (Phase 24) Governance endpoints disabled for Docker isolation
-      // endpoints.governance = { ... };
 
       return res.json({
         service: 'CIC Autonomy API',
@@ -176,15 +185,19 @@ export class AutonomyAPIServer {
     const proposalsRouter = createProposalsRouter(this.service);
     const cacheRouter = createCacheRouter(this.service.getCacheAdapter());
     const executionRouter = createExecutionRouter();
+    const memoryRouter = createMemoryRouter({
+      memoryStoreUrl: process.env.MEMORY_STORE_URL,
+    });
+    const governanceRouter = createGovernanceRouter({
+      governanceControlPlaneUrl: process.env.GOVERNANCE_URL,
+    });
 
     this.app.use('/autonomy', signalsRouter);
     this.app.use('/autonomy', proposalsRouter);
     this.app.use('/autonomy', cacheRouter);
     this.app.use('/autonomy', executionRouter);
-
-    // (Phase 23.2) Memory routes disabled for Docker isolation
-
-    // (Phase 24) Governance routes disabled for Docker isolation
+    this.app.use('/autonomy', memoryRouter);
+    this.app.use('/autonomy', governanceRouter);
 
     // 404 handler
     this.app.use((req: Request, res: Response) => {
@@ -303,3 +316,5 @@ export async function startAutonomyAPIServer(
   await server.start();
   return server;
 }
+
+

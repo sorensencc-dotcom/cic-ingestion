@@ -5,7 +5,7 @@
  */
 
 import { Request, Response } from 'express';
-import { CavemanStatsV1 } from '../caveman/CavemanStats';
+import { CavemanStatsV1 } from '../caveman/CavemanStats.js';
 
 export interface LogEntry {
   timestamp: string;
@@ -309,3 +309,4 @@ export class ObservabilityManager {
     this.metrics.reset();
   }
 }
+

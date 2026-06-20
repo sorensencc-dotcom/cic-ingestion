@@ -4,8 +4,8 @@
  * Feeds memory-driven autonomy into the autonomous planner (Phase 25)
  */
 
-import { AutonomySignal } from '../models/AutonomySignal';
-import { RoadmapProposal } from '../models/RoadmapProposal';
+import { AutonomySignal } from '../models/AutonomySignal.js';
+import { RoadmapProposal } from '../models/RoadmapProposal.js';
 
 export interface PlannerGoal {
   id: string;
@@ -366,3 +366,4 @@ export class AutonomyToPlannerBridge {
     }
   }
 }
+

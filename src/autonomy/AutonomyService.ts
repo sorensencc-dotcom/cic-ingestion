@@ -3,13 +3,13 @@
  * Sits between API routes and business logic (Phase 23.7.3)
  */
 
-import { TimelineEvent, DriftMetric, HealthMetric } from '../ui/models/TimelineEvent';
-import { AutonomySignal } from './models/AutonomySignal';
-import { RoadmapProposal } from './models/RoadmapProposal';
-import { SignalDetectionEngine, SignalDetectionContext } from './SignalDetection';
-import { RoadmapProposalEngine, RoadmapContext } from './RoadmapProposalEngine';
-import { AutonomyPromptCacheAdapter } from './AutonomyPromptCacheAdapter';
-import { MemoryStoreAdapter } from './adapters/MemoryStoreAdapter';
+import { TimelineEvent, DriftMetric, HealthMetric } from '../ui/models/TimelineEvent.js';
+import { AutonomySignal } from './models/AutonomySignal.js';
+import { RoadmapProposal } from './models/RoadmapProposal.js';
+import { SignalDetectionEngine, SignalDetectionContext } from './SignalDetection.js';
+import { RoadmapProposalEngine, RoadmapContext } from './RoadmapProposalEngine.js';
+import { AutonomyPromptCacheAdapter } from './AutonomyPromptCacheAdapter.js';
+import { MemoryStoreAdapter } from './adapters/MemoryStoreAdapter.js';
 
 export interface AutonomyServiceConfig {
   memoryQueryApiUrl?: string;
@@ -565,3 +565,4 @@ export class AutonomyService {
     return response.json();
   }
 }
+

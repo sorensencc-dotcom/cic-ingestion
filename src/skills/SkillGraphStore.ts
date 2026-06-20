@@ -10,7 +10,7 @@ import {
   CapabilitySet,
   calculateGraphDensity,
   findConnectedComponents,
-} from './models/SkillGraph';
+} from './models/SkillGraph.js';
 
 export interface SkillGraphVersion {
   version: string;
@@ -381,3 +381,4 @@ export class SkillGraphStore {
     this.currentGraph.metadata.totalEdges = 0;
   }
 }
+

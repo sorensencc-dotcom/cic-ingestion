@@ -4,9 +4,9 @@
  * Compresses before returning to orchestrator
  */
 
-import { CavemanCompressor } from '../autonomy/CavemanCompressor';
-import { CavemanBudget, CavemanBudgetConfig } from './CavemanBudget';
-import { CavemanStatsV1, createCavemanStats, logCavemanStats } from './CavemanStats';
+import { CavemanCompressor } from '../autonomy/CavemanCompressor.js';
+import { CavemanBudget, CavemanBudgetConfig } from './CavemanBudget.js';
+import { CavemanStatsV1, createCavemanStats, logCavemanStats } from './CavemanStats.js';
 
 export interface WaylandToolOutput {
   tool_id: string;
@@ -198,3 +198,4 @@ export function createWaylandCavemanIntegration(
   const caveman = new CavemanCompressor();
   return new WaylandCavemanIntegration(caveman, budgetConfig, options);
 }
+
