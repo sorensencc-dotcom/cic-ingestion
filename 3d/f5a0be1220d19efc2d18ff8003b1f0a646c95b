@@ -1,0 +1,25 @@
+src/extractors/browser/RetryPolicy.ts
+  s_0c1eb73d5ecae9::t_9d2024a9cc2953 1-117
+src/extractors/browser/CloakBrowserAdapter.ts
+  s_0c1eb73d5ecae9::t_0fa6f35122641f 17
+  s_0c1eb73d5ecae9::t_0696afbbd3c727 64-67,69-143
+  s_0c1eb73d5ecae9::t_6c987de759e68d 36,40
+src/extractors/browser/RetryPolicy.test.ts
+  s_0c1eb73d5ecae9::t_ea9fecc4b48ec4 1-208
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "3df5a0be1220d19efc2d18ff8003b1f0a646c95b",
+  "prompts": {},
+  "sessions": {
+    "s_0c1eb73d5ecae9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9cdc4d5-4259-4d6a-aeb9-df0e83675fe4",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
