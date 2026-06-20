@@ -1,0 +1,77 @@
+src/aperture/adapters/file/FileWriteAdapter.ts
+  s_589de7a1dd585e::t_612120bbaaaa7c 1-101
+src/aperture/adapters/browser/BrowserScreenshotAdapter.ts
+  s_589de7a1dd585e::t_fc1adb8430850c 1-89
+src/aperture/policy/PolicyEngine.ts
+  s_485502deb60383::t_df86c2dcad28bb 165-166,190-191
+  s_485502deb60383::t_045eadc9fd5de7 11,14,17-28,31-32,35,54,58,66,70-78,81,113,157,208-222,226,228,230,236-254
+  s_485502deb60383::t_5a9d724f09b6e6 1-10,12-13,15-16,29-30,33-34,36-53,55-57,59-65,67-69,79-80,82-112,114-156,158-164,167-189,192-207,223-225,227,229,231-235,255-320
+src/aperture/adapters/browser/BrowserNavigateAdapter.ts
+  s_589de7a1dd585e::t_ecfabe79d49c0f 1-89
+src/aperture/adapters/http/HttpPostAdapter.ts
+  s_589de7a1dd585e::t_f0197363650ed2 1-110
+src/aperture/sandbox/SandboxRuntime.ts
+  s_485502deb60383::t_2f9dc4bd551253 1-5,8-23,25-82,87-125
+  s_485502deb60383::t_0c0f5448082e4d 83-86
+  s_485502deb60383::t_3bcf6716ee79ec 24
+  s_485502deb60383::t_0f5577dabe5f92 6-7
+src/aperture/index.ts
+  s_485502deb60383::t_a95801f074c339 1-8,11-12,15-16,19-20,23-24,37-54,56,61-68
+  s_589de7a1dd585e::t_c40dc5bde8cd4c 25-36
+  s_589de7a1dd585e::t_9b8ff481f727a1 9-10,13-14,17-18,21-22
+  s_589de7a1dd585e::t_37288437ca1e56 55,57-60
+src/aperture/adapters/file/FileReadAdapter.ts
+  s_589de7a1dd585e::t_10de2411616008 11
+  s_485502deb60383::t_e9e381240215e4 1-10,12-49,56-75
+  s_589de7a1dd585e::t_1eb59de5eaafec 50-55
+src/aperture/adapters/model/ModelGenerateAdapter.ts
+  s_589de7a1dd585e::t_682cd854b5838b 1-100
+src/aperture/orchestrator/ExecutionOrchestrator.ts
+  s_485502deb60383::t_f63b2c8afc7869 23,44-50,61,63-77,79-85,87-88,95-96,100-102,107-120,122-135,137-139,141-143,145-146,148-171,175-196,198-209,211-227,229-248,251-345,349,358-371,439-451
+  s_485502deb60383::t_66ac12520f7f80 1-22,24-43,51-60,62,78,86,89-94,97-99,103-106,121,136,140,144,147,172-174,197,210,228,249-250,346-348,350-357,372-438,452-453
+src/aperture/adapters/shell/ShellExecAdapter.ts
+  s_589de7a1dd585e::t_bb0a69669473b4 61
+  s_589de7a1dd585e::t_1a35ffa623a59b 53-57
+  s_485502deb60383::t_5ab13074ccb69e 1-10,12-52,58-60,62-87
+  s_589de7a1dd585e::t_c5cf82308bc22c 11
+src/aperture/adapters/http/HttpGetAdapter.ts
+  s_485502deb60383::t_ff869632942c31 1-9,11-50,56,63-65,67-87
+  s_589de7a1dd585e::t_fdf09a909d1d47 10
+  s_589de7a1dd585e::t_645ceb3636d4fc 51-55,57-62,66
+src/aperture/registry/AdapterRegistry.ts
+  s_485502deb60383::t_5febdacb507867 1-7,48-56,65,67-88,104-111,113-142,166-365
+  s_485502deb60383::t_1afdc440764a6d 8-47,57-64,66,89-103,112,143-165
+src/aperture/registry/AdapterRegistry.test.ts
+  s_485502deb60383::t_82f2d775981402 219,225,231
+  s_485502deb60383::t_16988747a2f72f 1-218,220-224,226-230,232-495
+src/aperture/types/index.ts
+  s_485502deb60383::t_62fcb522e99186 1-267
+src/aperture/adapters/BaseAdapter.ts
+  s_485502deb60383::t_55f5ab6c2882ee 1-76
+src/aperture/adapters/ValidationUtils.ts
+  s_589de7a1dd585e::t_d3a5a3fbfca529 1-176
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "fc7162ec6a691dad366b0f0cf1e9d246c763244a",
+  "prompts": {},
+  "sessions": {
+    "s_485502deb60383": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8fa59208-b2e4-4470-80fc-d13e061ed16d",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_589de7a1dd585e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2c116025-6ad6-4dbe-bd45-418bff3abaff",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
