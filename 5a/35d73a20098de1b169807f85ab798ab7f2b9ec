@@ -1,0 +1,26 @@
+src/extractors/sweeper/SweeperFallbackRouter.ts
+  s_0c1eb73d5ecae9::t_25ca537888d6b2 306-307,309-316,318-325
+  s_0c1eb73d5ecae9::t_ee26304178ad7c 1-305,308,317,326-418
+src/extractors/sweeper/SweeperFallbackRouter.test.ts
+  s_0c1eb73d5ecae9::t_b1d89b49b1940f 1-255
+src/extractors/browser/CloakBrowserAdapter.test.ts
+  s_0c1eb73d5ecae9::t_f13b7dbf9ae7b3 8
+  s_0c1eb73d5ecae9::t_58802028ddfd62 9-10
+  s_0c1eb73d5ecae9::t_aa126dd8dfc6ae 25-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "5a35d73a20098de1b169807f85ab798ab7f2b9ec",
+  "prompts": {},
+  "sessions": {
+    "s_0c1eb73d5ecae9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9cdc4d5-4259-4d6a-aeb9-df0e83675fe4",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
