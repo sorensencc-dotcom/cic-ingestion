@@ -14,6 +14,7 @@ import {
   BrowserError,
   BrowserErrorCode,
 } from './IBrowserEngine';
+import { RetryPolicy } from './RetryPolicy';
 
 interface CloakBrowserPage {
   goto(url: string, opts?: { timeout?: number }): Promise<void>;
@@ -32,9 +33,11 @@ export class CloakBrowserAdapter implements IBrowserEngine {
   private pages: Map<string, CloakBrowserPage> = new Map();
   private logCallbacks: ((log: BrowserLog) => void)[] = [];
   private sessionMetadata: Map<string, BrowserSession> = new Map();
+  private retryPolicy: RetryPolicy;
 
   constructor() {
     // CloakBrowser initialization deferred to first use
+    this.retryPolicy = new RetryPolicy({ maxRetries: 2, backoffMs: [250, 500] });
   }
 
   async open(
@@ -58,60 +61,86 @@ export class CloakBrowserAdapter implements IBrowserEngine {
     this.sessionMetadata.set(sessionId, session);
     this.emit('browser.open.start', sessionId, { url, timeout });
 
-    try {
-      // Lazy-load CloakBrowser on first use
-      if (!this.browser) {
-        this.browser = await this.initializeBrowser();
+    // Lazy-load CloakBrowser on first use
+    if (!this.browser) {
+      this.browser = await this.initializeBrowser();
+    }
+
+    let lastError: BrowserError | null = null;
+
+    while (true) {
+      try {
+        const page = await this.browser.newPage();
+        this.pages.set(sessionId, page);
+
+        // Navigate with timeout enforcement
+        const navPromise = page.goto(url, { timeout });
+        const timeoutPromise = new Promise<void>((_, reject) =>
+          setTimeout(
+            () =>
+              reject(
+                this.createBrowserError(
+                  BrowserErrorCode.BROWSER_TIMEOUT,
+                  `Navigation timeout after ${timeout}ms`,
+                  sessionId,
+                  timeout
+                )
+              ),
+            timeout
+          )
+        );
+
+        await Promise.race([navPromise, timeoutPromise]);
+
+        this.emit('browser.open.success', sessionId, {
+          url,
+          duration: Date.now() - session.startedAt,
+        });
+
+        this.retryPolicy.clearAttempts(sessionId);
+        return session;
+      } catch (error) {
+        const err = error as BrowserError & Error;
+        const code =
+          err.code ||
+          (err.message.includes('timeout') || err.message.includes('Timeout')
+            ? BrowserErrorCode.BROWSER_TIMEOUT
+            : BrowserErrorCode.BROWSER_NAV_FAIL);
+
+        lastError = this.createBrowserError(
+          code,
+          err.message,
+          sessionId,
+          Date.now() - session.startedAt
+        );
+
+        // Check if should retry
+        if (this.retryPolicy.shouldRetry(sessionId, code)) {
+          const backoff = this.retryPolicy.getBackoffMs(sessionId);
+          this.retryPolicy.recordAttempt(sessionId, code, err.message);
+
+          this.emit('browser.open.retry', sessionId, {
+            code,
+            message: err.message,
+            backoffMs: backoff,
+            attempts: this.retryPolicy.getAttempts(sessionId).length,
+          });
+
+          // Wait before retry
+          await new Promise((resolve) => setTimeout(resolve, backoff));
+          continue;
+        }
+
+        this.emit('browser.open.error', sessionId, {
+          code,
+          message: err.message,
+          duration: Date.now() - session.startedAt,
+          attempts: this.retryPolicy.getAttempts(sessionId).length,
+        });
+
+        this.retryPolicy.clearAttempts(sessionId);
+        throw lastError;
       }
-
-      const page = await this.browser.newPage();
-      this.pages.set(sessionId, page);
-
-      // Navigate with timeout enforcement
-      const navPromise = page.goto(url, { timeout });
-      const timeoutPromise = new Promise<void>((_, reject) =>
-        setTimeout(
-          () =>
-            reject(
-              this.createBrowserError(
-                BrowserErrorCode.BROWSER_TIMEOUT,
-                `Navigation timeout after ${timeout}ms`,
-                sessionId,
-                timeout
-              )
-            ),
-          timeout
-        )
-      );
-
-      await Promise.race([navPromise, timeoutPromise]);
-
-      this.emit('browser.open.success', sessionId, {
-        url,
-        duration: Date.now() - session.startedAt,
-      });
-
-      return session;
-    } catch (error) {
-      const err = error as Error;
-      const code =
-        err.message.includes('timeout') ||
-        err.message.includes('Timeout')
-          ? BrowserErrorCode.BROWSER_TIMEOUT
-          : BrowserErrorCode.BROWSER_NAV_FAIL;
-
-      this.emit('browser.open.error', sessionId, {
-        code,
-        message: err.message,
-        duration: Date.now() - session.startedAt,
-      });
-
-      throw this.createBrowserError(
-        code,
-        err.message,
-        sessionId,
-        Date.now() - session.startedAt
-      );
     }
   }
 
