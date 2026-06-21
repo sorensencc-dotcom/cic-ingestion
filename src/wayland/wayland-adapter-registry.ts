@@ -61,7 +61,7 @@ export class WaylandAdapterRegistry {
     }
 
     this.adapters.set(metadata.id, {
-      metadata: { ...metadata, status: 'registered' },
+      metadata: { ...metadata },
       handler,
     });
 
@@ -115,8 +115,16 @@ export class WaylandAdapterRegistry {
       const timeout = request.timeout || 30000;
       const response = await this.withTimeout(adapter.handler(request), timeout);
 
-      this.logOperation(request.adapterId, request.operation, true, Date.now() - startTime);
-      this.resetFailureCount(request.adapterId);
+      this.logOperation(request.adapterId, request.operation, response.success, Date.now() - startTime);
+
+      if (response.success) {
+        this.resetFailureCount(request.adapterId);
+      } else {
+        this.incrementFailureCount(request.adapterId);
+        if (this.getFailureCount(request.adapterId) >= this.failureThreshold) {
+          adapter.metadata.status = 'suspended';
+        }
+      }
 
       return response;
     } catch (err) {

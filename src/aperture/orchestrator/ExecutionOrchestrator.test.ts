@@ -38,46 +38,53 @@ class TestAdapter extends BaseAdapter {
  * Helper to register all standard adapters in registry for tests
  */
 const registerStandardAdapters = (registry: AdapterRegistry) => {
-  const adapters = [
-    {
-      id: 'http.get',
-      name: 'HTTP GET',
-      category: 'http',
-      inputSchema: { type: 'object', properties: { url: { type: 'string' } } },
-      policy: { cost: 5, maxExecutionMs: 30000, maxRetries: 1, deterministic: false }
-    },
-    {
-      id: 'shell.exec',
-      name: 'Shell Execute',
-      category: 'shell',
-      inputSchema: { type: 'object', properties: { command: { type: 'string' } } },
-      policy: { cost: 10, maxExecutionMs: 60000, maxRetries: 0, deterministic: false }
-    },
-    {
-      id: 'file.read',
-      name: 'File Read',
-      category: 'file',
-      inputSchema: { type: 'object', properties: { path: { type: 'string' } } },
-      policy: { cost: 2, maxExecutionMs: 10000, maxRetries: 1, deterministic: true }
-    },
-    {
-      id: 'file.write',
-      name: 'File Write',
-      category: 'file',
-      inputSchema: { type: 'object', properties: { path: { type: 'string' }, content: { type: 'string' } } },
-      policy: { cost: 2, maxExecutionMs: 10000, maxRetries: 1, deterministic: true }
-    }
-  ];
+  registry.register({
+    id: 'http.get',
+    name: 'HTTP GET',
+    description: 'HTTP GET',
+    category: 'http',
+    inputSchema: { type: 'object', properties: { url: { type: 'string' } } },
+    outputSchema: { type: 'object' },
+    policy: { cost: 5, maxExecutionMs: 30000, maxRetries: 1, deterministic: false },
+    accessControl: {},
+    implementation: { module: 'adapter.ts', version: '1.0.0' }
+  });
 
-  for (const adapter of adapters) {
-    registry.register({
-      ...adapter,
-      description: adapter.name,
-      outputSchema: { type: 'object' },
-      accessControl: {},
-      implementation: { module: 'adapter.ts', version: '1.0.0' }
-    });
-  }
+  registry.register({
+    id: 'shell.exec',
+    name: 'Shell Execute',
+    description: 'Shell Execute',
+    category: 'shell',
+    inputSchema: { type: 'object', properties: { command: { type: 'string' } } },
+    outputSchema: { type: 'object' },
+    policy: { cost: 10, maxExecutionMs: 60000, maxRetries: 0, deterministic: false },
+    accessControl: {},
+    implementation: { module: 'adapter.ts', version: '1.0.0' }
+  });
+
+  registry.register({
+    id: 'file.read',
+    name: 'File Read',
+    description: 'File Read',
+    category: 'file',
+    inputSchema: { type: 'object', properties: { path: { type: 'string' } } },
+    outputSchema: { type: 'object' },
+    policy: { cost: 2, maxExecutionMs: 10000, maxRetries: 1, deterministic: true },
+    accessControl: {},
+    implementation: { module: 'adapter.ts', version: '1.0.0' }
+  });
+
+  registry.register({
+    id: 'file.write',
+    name: 'File Write',
+    description: 'File Write',
+    category: 'file',
+    inputSchema: { type: 'object', properties: { path: { type: 'string' }, content: { type: 'string' } } },
+    outputSchema: { type: 'object' },
+    policy: { cost: 2, maxExecutionMs: 10000, maxRetries: 1, deterministic: true },
+    accessControl: {},
+    implementation: { module: 'adapter.ts', version: '1.0.0' }
+  });
 };
 
 describe('ExecutionOrchestrator', () => {
@@ -101,7 +108,7 @@ describe('ExecutionOrchestrator', () => {
       id: 'test.adapter',
       name: 'Test Adapter',
       description: 'Test adapter for unit tests',
-      category: 'test',
+      category: 'shell',
       inputSchema: { type: 'object', properties: { value: { type: 'string' } } },
       outputSchema: { type: 'object', properties: { result: { type: 'string' } } },
       policy: { cost: 1, maxExecutionMs: 5000, maxRetries: 1, deterministic: true },
@@ -112,24 +119,21 @@ describe('ExecutionOrchestrator', () => {
     // Register standard adapters
     registerStandardAdapters(registry);
 
-    // Register default policies for all agents
-    const agents = ['harvester', 'explorer', 'test-agent', 'slow-agent', 'limited-agent', 'approval-agent', 'retry-agent', 'strict-agent'];
-    for (const agent of agents) {
-      policyEngine.load({
-        name: `${agent}-policy`,
-        agent,
-        version: '1.0.0',
-        allow: ['*'],
-        limits: { max_calls: 1000, max_bytes: 10485760, max_concurrent: 10, max_depth: 5, rate_limit_qps: 100 }
-      });
-    }
-
-    // Special policies for specific test cases
+    // Load harvester policy - allows test adapters but denies shell.exec for auth tests
     policyEngine.load({
-      name: 'harvester-deny-shell',
+      name: 'harvester-policy',
       agent: 'harvester',
       version: '1.0.0',
       allow: ['test.adapter', 'http.get', 'file.read', 'file.write'],
+      limits: { max_calls: 1000, max_bytes: 10485760, max_concurrent: 10, max_depth: 5, rate_limit_qps: 100 }
+    });
+
+    // Load explorer policy - allows all adapters
+    policyEngine.load({
+      name: 'explorer-policy',
+      agent: 'explorer',
+      version: '1.0.0',
+      allow: ['*'],
       limits: { max_calls: 1000, max_bytes: 10485760, max_concurrent: 10, max_depth: 5, rate_limit_qps: 100 }
     });
   });
@@ -324,43 +328,30 @@ describe('ExecutionOrchestrator', () => {
 
   describe('execute() - timeout', () => {
     it('should timeout when adapter takes too long', async () => {
-      // Create slow adapter
-      orchestrator.registerAdapter(new TestAdapter(60000)); // 60 second delay
+      // Create slow adapter with 500ms delay
+      const slowAdapter = new TestAdapter(500);
+      orchestrator.registerAdapter(slowAdapter);
 
-      // Register with 100ms timeout
+      // Register slow adapter with 100ms timeout policy
       registry.register({
-        id: 'slow.adapter',
-        name: 'Slow',
-        description: 'Slow',
+        id: 'test.adapter',
+        name: 'Test Adapter',
+        description: 'Test adapter',
         category: 'shell',
-        inputSchema: {},
-        outputSchema: {},
+        inputSchema: { type: 'object', properties: { value: { type: 'string' } } },
+        outputSchema: { type: 'object' },
         policy: { cost: 1, maxExecutionMs: 100, maxRetries: 0, deterministic: false },
         accessControl: {},
-        implementation: { module: 'slow.ts', version: '1.0.0' }
-      });
-
-      policyEngine.load({
-        name: 'slow-policy',
-        agent: 'slow-agent',
-        version: '1.0.0',
-        allow: ['test.adapter'],
-        limits: {
-          max_calls: 50,
-          max_bytes: 5242880,
-          max_concurrent: 3,
-          max_depth: 4,
-          rate_limit_qps: 10
-        }
+        implementation: { module: 'test.ts', version: '1.0.0' }
       });
 
       const result = await orchestrator.execute('test.adapter', {}, {
         agent: 'harvester'
       });
 
-      // This should succeed (test adapter is fast)
-      expect(result.receipt.status).toBe('success');
-    }, 10000);
+      // Adapter should timeout (500ms execution > 100ms policy limit)
+      expect(result.receipt.status).toBe('timeout');
+    }, 2000);
   });
 
   describe('execute() - execution errors', () => {
