@@ -1,0 +1,21 @@
+src/aperture/orchestrator/ExecutionOrchestrator.test.ts
+  s_5dde4ee4119d78::t_eb0b3ee10fd38a 37-82
+  s_5dde4ee4119d78::t_d7726209ad0238 95-111,114,128,131,133-134
+  s_5dde4ee4119d78::t_30733fea1cd596 112-113,115-127,129-130,132
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "f0f4b3e3c95c1ea668ed29112d67b7b296f11f36",
+  "prompts": {},
+  "sessions": {
+    "s_5dde4ee4119d78": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "546216c4-9a7a-459c-a40c-3c80fb562e8d",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
