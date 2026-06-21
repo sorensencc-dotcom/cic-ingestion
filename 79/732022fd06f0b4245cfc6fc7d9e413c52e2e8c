@@ -1,0 +1,37 @@
+src/aperture/policy/PolicyEngine.ts
+  s_5dde4ee4119d78::t_e5613a5aa91803 229-230,233,236
+src/wayland/wayland-adapter-registry.ts
+  s_15888ac6989198::t_b1704d9899de15 64
+  s_15888ac6989198::t_5e90a088acb314 118-127
+src/wayland/wayland-security-policy.ts
+  s_15888ac6989198::t_6cc6055c2706de 74
+src/aperture/orchestrator/ExecutionOrchestrator.test.ts
+  s_5dde4ee4119d78::t_c9d74380f2df6f 111
+  s_5dde4ee4119d78::t_90a0ae06fc0131 331-333,335,337-339,341-342,345,352-354
+  s_5dde4ee4119d78::t_2d2098b002c79e 41-51,53-87
+  s_5dde4ee4119d78::t_c981c232898596 122,124,130-136
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "79732022fd06f0b4245cfc6fc7d9e413c52e2e8c",
+  "prompts": {},
+  "sessions": {
+    "s_15888ac6989198": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2135e328-9fde-4392-88ac-25b506a8a9e3",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_5dde4ee4119d78": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "546216c4-9a7a-459c-a40c-3c80fb562e8d",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
