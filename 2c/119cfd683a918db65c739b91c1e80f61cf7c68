@@ -1,0 +1,25 @@
+src/aperture/engines/anthropic/AnthropicClient.ts
+  s_400938326b575f::t_a245d62568c2b7 128,130,137,139
+  s_400938326b575f::t_50e52256cb88bd 7-9
+  s_400938326b575f::t_e73d78f1e46698 53-55,58-62,68-73,79-84,105,107,113-127,129,131-136,138,140-146,148-153
+src/validation/schemas.ts
+  s_400938326b575f::t_75a4cc68e95096 26
+  s_400938326b575f::t_9012fe98ed1de2 27-28
+  s_400938326b575f::t_92cea853d544b6 1-25,29-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "2c119cfd683a918db65c739b91c1e80f61cf7c68",
+  "prompts": {},
+  "sessions": {
+    "s_400938326b575f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e8d54bd4-ec03-4fe7-8b5a-afe383ef525b",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
