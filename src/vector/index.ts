@@ -31,18 +31,27 @@ export async function wireVectorLayer(app: any) {
     vectorSize: Number(process.env.QDRANT_VECTOR_SIZE || 1536),
   });
 
-  // Ensure collections exist
-  await layer.ensureCollections();
+  try {
+    // Ensure collections exist
+    await layer.ensureCollections();
 
-  // Attach API routes
-  const router = createVectorRouter(layer);
-  app.use("/", router);
+    // Attach API routes
+    const router = createVectorRouter(layer);
+    app.use("/", router);
 
-  // Start self-healing watchdog
-  const healer = new VectorSelfHealer(layer, 30000);
-  healer.start();
+    // Start self-healing watchdog
+    const healer = new VectorSelfHealer(layer, 30000);
+    healer.start();
 
-  return { layer, healer };
+    return { layer, healer };
+  } catch (err) {
+    // In development, log warning but continue without vector layer
+    if (process.env.NODE_ENV === "development") {
+      console.warn("⚠ Vector layer initialization failed (continuing in degraded mode):", (err as Error).message);
+      return { layer: null, healer: null };
+    }
+    throw err;
+  }
 }
 
 

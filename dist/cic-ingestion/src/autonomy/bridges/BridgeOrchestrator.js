@@ -3,9 +3,9 @@
  * Coordinates signal detection → governance routing → planner feedback → ARPS logging
  * Single integration point for autonomy → rest of CIC
  */
-import { AutonomyToPlannerBridge } from './AutonomyToPlannerBridge';
-import { AutonomyToARPSBridge } from './AutonomyToARPSBridge';
-import { AutonomyGovernanceBridge } from './AutonomyGovernanceBridge';
+import { AutonomyToPlannerBridge } from './AutonomyToPlannerBridge.js';
+import { AutonomyToARPSBridge } from './AutonomyToARPSBridge.js';
+import { AutonomyGovernanceBridge } from './AutonomyGovernanceBridge.js';
 export class BridgeOrchestrator {
     constructor(config) {
         this.config = {

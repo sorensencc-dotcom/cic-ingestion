@@ -26,14 +26,24 @@ export async function wireVectorLayer(app) {
         },
         vectorSize: Number(process.env.QDRANT_VECTOR_SIZE || 1536),
     });
-    // Ensure collections exist
-    await layer.ensureCollections();
-    // Attach API routes
-    const router = createVectorRouter(layer);
-    app.use("/", router);
-    // Start self-healing watchdog
-    const healer = new VectorSelfHealer(layer, 30000);
-    healer.start();
-    return { layer, healer };
+    try {
+        // Ensure collections exist
+        await layer.ensureCollections();
+        // Attach API routes
+        const router = createVectorRouter(layer);
+        app.use("/", router);
+        // Start self-healing watchdog
+        const healer = new VectorSelfHealer(layer, 30000);
+        healer.start();
+        return { layer, healer };
+    }
+    catch (err) {
+        // In development, log warning but continue without vector layer
+        if (process.env.NODE_ENV === "development") {
+            console.warn("⚠ Vector layer initialization failed (continuing in degraded mode):", err.message);
+            return { layer: null, healer: null };
+        }
+        throw err;
+    }
 }
 //# sourceMappingURL=index.js.map

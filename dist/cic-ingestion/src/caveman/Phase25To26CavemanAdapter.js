@@ -2,7 +2,7 @@
  * Phase 25 → Phase 26 Caveman Adapter
  * Wires Caveman compression into TorqueQuery ingestion pipeline
  */
-import { createCavemanStats } from './CavemanStats';
+import { createCavemanStats } from './CavemanStats.js';
 export class Phase25To26CavemanAdapter {
     constructor(caveman) {
         this.caveman = caveman;

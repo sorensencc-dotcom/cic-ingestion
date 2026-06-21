@@ -2,7 +2,7 @@
  * Signal detection engine for Memory-Driven Autonomy (Phase 23.7)
  * Detects drift, instability, regression, and opportunity signals from event history
  */
-import { SIGNAL_THRESHOLDS, classifySignalSeverity, isSignalValid, } from './models/AutonomySignal';
+import { SIGNAL_THRESHOLDS, classifySignalSeverity, isSignalValid, } from './models/AutonomySignal.js';
 export class SignalDetectionEngine {
     /**
      * Detect all signals from event history and metrics

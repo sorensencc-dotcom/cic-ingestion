@@ -9,7 +9,7 @@
  * - POST /memory/append — append event (internal use)
  */
 import { Router } from 'express';
-import { ObservabilityManager } from '../ObservabilityManager';
+import { ObservabilityManager } from '../ObservabilityManager.js';
 export function createMemoryRouter(config) {
     const router = Router();
     const observability = ObservabilityManager.getInstance();

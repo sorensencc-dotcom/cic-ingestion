@@ -2,10 +2,10 @@
  * Autonomy Service — orchestrates signal detection and proposal generation
  * Sits between API routes and business logic (Phase 23.7.3)
  */
-import { SignalDetectionEngine } from './SignalDetection';
-import { RoadmapProposalEngine } from './RoadmapProposalEngine';
-import { AutonomyPromptCacheAdapter } from './AutonomyPromptCacheAdapter';
-import { MemoryStoreAdapter } from './adapters/MemoryStoreAdapter';
+import { SignalDetectionEngine } from './SignalDetection.js';
+import { RoadmapProposalEngine } from './RoadmapProposalEngine.js';
+import { AutonomyPromptCacheAdapter } from './AutonomyPromptCacheAdapter.js';
+import { MemoryStoreAdapter } from './adapters/MemoryStoreAdapter.js';
 /**
  * In-memory store for signals and proposals (in production, use database)
  */

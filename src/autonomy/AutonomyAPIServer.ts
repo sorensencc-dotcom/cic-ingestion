@@ -237,8 +237,12 @@ export class AutonomyAPIServer {
     try {
       await wireVectorLayer(this.app);
     } catch (err) {
-      console.error('Failed to wire VectorLayer:', err);
-      throw err;
+      if (process.env.NODE_ENV === 'development') {
+        console.warn('⚠ Failed to wire VectorLayer in dev mode (continuing):', (err as Error).message);
+      } else {
+        console.error('Failed to wire VectorLayer:', err);
+        throw err;
+      }
     }
 
     return new Promise((resolve, reject) => {

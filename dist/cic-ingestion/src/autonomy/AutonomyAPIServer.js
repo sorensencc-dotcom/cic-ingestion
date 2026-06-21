@@ -8,15 +8,15 @@
  * - PUT /autonomy/proposals/:id — update proposal status
  */
 import express from 'express';
-import { AutonomyService } from './AutonomyService';
-import { createSignalsRouter } from './routes/signals';
-import { createProposalsRouter } from './routes/proposals';
-import { createCacheRouter } from './routes/cache';
-import { createMemoryRouter } from './routes/memory';
-import { createGovernanceRouter } from '../governance/routes/governance';
-import { ObservabilityManager } from './ObservabilityManager';
+import { AutonomyService } from './AutonomyService.js';
+import { createSignalsRouter } from './routes/signals.js';
+import { createProposalsRouter } from './routes/proposals.js';
+import { createCacheRouter } from './routes/cache.js';
+import { createMemoryRouter } from './routes/memory.js';
+import { createGovernanceRouter } from '../governance/routes/governance.js';
+import { ObservabilityManager } from './ObservabilityManager.js';
 import { wireVectorLayer } from '../vector/index.js';
-import cicConfig from '../config';
+import cicConfig from '../config/index.js';
 export class AutonomyAPIServer {
     constructor(config) {
         this.server = null;

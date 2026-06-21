@@ -256,10 +256,11 @@ export function createV1Registry(): AdapterRegistry {
       type: 'object',
       properties: {
         path: { type: 'string' },
-        data: { type: 'string' },
-        mode: { type: 'string', enum: ['w', 'a'] }
+        content: { type: 'string' },
+        encoding: { type: 'string', enum: ['utf8', 'binary'] },
+        mode: { type: 'number' }
       },
-      required: ['path', 'data']
+      required: ['path', 'content']
     },
     outputSchema: {
       type: 'object',

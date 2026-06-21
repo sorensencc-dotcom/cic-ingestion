@@ -3,7 +3,7 @@
  * Routes proposals to Phase 24 Council for voting
  * Integrates memory-driven autonomy with governance (Phase 24)
  */
-import { requiresGovernanceApproval, scoreProposalPriority } from '../models/RoadmapProposal';
+import { requiresGovernanceApproval, scoreProposalPriority } from '../models/RoadmapProposal.js';
 export class AutonomyGovernanceBridge {
     constructor(config) {
         this.config = config;

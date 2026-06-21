@@ -1,0 +1,1 @@
+{"version":3,"file":"governance.d.ts","sourceRoot":"","sources":["../../../../../src/autonomy/routes/governance.ts"],"names":[],"mappings":"AAAA;;;;GAIG;AAEH,OAAO,EAAE,MAAM,EAAmC,MAAM,SAAS,CAAC;AAElE,MAAM,WAAW,sBAAsB;IACrC,yBAAyB,CAAC,EAAE,MAAM,CAAC;CACpC;AAED,wBAAgB,sBAAsB,CAAC,MAAM,CAAC,EAAE,sBAAsB,GAAG,MAAM,CAyK9E"}

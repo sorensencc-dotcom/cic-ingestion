@@ -2,7 +2,7 @@
  * Skill Graph Store (Phase 24.2)
  * Persistent capability graph with versioning and history
  */
-import { calculateGraphDensity, findConnectedComponents, } from './models/SkillGraph';
+import { calculateGraphDensity, findConnectedComponents, } from './models/SkillGraph.js';
 /**
  * In-memory skill graph store with versioning
  */

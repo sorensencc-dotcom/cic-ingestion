@@ -10,8 +10,8 @@
  *     task: 'extract_findings',
  *   });
  */
-import { CICPromptCacheRouter } from '../prompt-cache/router';
-import { loadCacheConfig } from '../prompt-cache/config';
+import { CICPromptCacheRouter } from '../prompt-cache/router.js';
+import { loadCacheConfig } from '../prompt-cache/config.js';
 export class AutonomyPromptCacheAdapter {
     constructor(registryDbPath) {
         const config = loadCacheConfig();

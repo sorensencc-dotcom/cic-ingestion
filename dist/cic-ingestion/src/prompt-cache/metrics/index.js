@@ -1,2 +1,2 @@
-export { CacheMetricsExporter } from './CacheMetricsExporter';
+export { CacheMetricsExporter } from './CacheMetricsExporter.js';
 //# sourceMappingURL=index.js.map

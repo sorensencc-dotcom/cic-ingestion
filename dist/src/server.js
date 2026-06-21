@@ -24,8 +24,13 @@ async function main() {
         console.log(`[${new Date().toISOString()}] ✓ Server running successfully`);
     }
     catch (err) {
-        console.error(`[${new Date().toISOString()}] ✗ Server startup failed:`, err);
-        process.exit(1);
+        if (process.env.NODE_ENV === 'development') {
+            console.warn(`[${new Date().toISOString()}] ⚠ Server startup warning (dev mode):`, err.message);
+        }
+        else {
+            console.error(`[${new Date().toISOString()}] ✗ Server startup failed:`, err);
+            process.exit(1);
+        }
     }
 }
 main();

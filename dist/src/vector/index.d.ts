@@ -13,5 +13,8 @@ import { VectorSelfHealer } from "./vectorSelfHealing.js";
 export declare function wireVectorLayer(app: any): Promise<{
     layer: VectorLayer;
     healer: VectorSelfHealer;
+} | {
+    layer: null;
+    healer: null;
 }>;
 //# sourceMappingURL=index.d.ts.map

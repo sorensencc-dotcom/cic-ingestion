@@ -13,10 +13,10 @@
  * - POST /evolution/full-cycle — run full evolution cycle
  */
 import { Router } from 'express';
-import { GovernanceCouncil } from '../../../../services/cic-governance/src/services/GovernanceCouncil';
-import { GovernanceEvolutionEngine } from '../../../../services/cic-governance/src/services/GovernanceEvolutionEngine';
-import { VaultClient } from '../../../../services/cic-governance/src/clients/VaultClient';
-import { MemoryQueryClient } from '../../../../services/cic-governance/src/clients/MemoryQueryClient';
+import { GovernanceCouncil } from '../../../../services/cic-governance/src/services/GovernanceCouncil.js';
+import { GovernanceEvolutionEngine } from '../../../../services/cic-governance/src/services/GovernanceEvolutionEngine.js';
+import { VaultClient } from '../../../../services/cic-governance/src/clients/VaultClient.js';
+import { MemoryQueryClient } from '../../../../services/cic-governance/src/clients/MemoryQueryClient.js';
 export function createGovernanceRouter() {
     const router = Router();
     // Initialize clients

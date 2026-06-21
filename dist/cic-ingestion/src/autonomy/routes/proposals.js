@@ -5,9 +5,9 @@
  * PUT /autonomy/proposals/:id — update proposal status
  */
 import { Router } from 'express';
-import { scoreProposalPriority } from '../models/RoadmapProposal';
-import { CavemanCompressor } from '../CavemanCompressor';
-import { ObservabilityManager } from '../ObservabilityManager';
+import { scoreProposalPriority } from '../models/RoadmapProposal.js';
+import { CavemanCompressor } from '../CavemanCompressor.js';
+import { ObservabilityManager } from '../ObservabilityManager.js';
 export function createProposalsRouter(service) {
     const router = Router();
     const caveman = new CavemanCompressor();

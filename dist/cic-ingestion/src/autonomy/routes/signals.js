@@ -4,8 +4,8 @@
  * GET /autonomy/signals — query signals
  */
 import { Router } from 'express';
-import { CavemanCompressor } from '../CavemanCompressor';
-import { ObservabilityManager } from '../ObservabilityManager';
+import { CavemanCompressor } from '../CavemanCompressor.js';
+import { ObservabilityManager } from '../ObservabilityManager.js';
 export function createSignalsRouter(service) {
     const router = Router();
     const caveman = new CavemanCompressor();

@@ -9,9 +9,9 @@
   },
   "scripts": {
     "build": "tsc",
-    "start": "node dist/cic-ingestion/src/autonomy/AutonomyAPIServer.js",
+    "start": "node dist/cic-ingestion/src/server.js",
     "start:dev": "tsc 2>/dev/null || true; node dist/cic-ingestion/src/orchestrator/index.js",
-    "dev": "tsc && node dist/cic-ingestion/src/autonomy/AutonomyAPIServer.js",
+    "dev": "tsc && node dist/cic-ingestion/src/server.js",
     "test": "node scripts/test-setup.js && npx jest",
     "test:watch": "node scripts/test-setup.js && npx jest --watch",
     "test:coverage": "node scripts/test-setup.js && npx jest --coverage",
@@ -22,6 +22,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "0.33.0",
     "ajv": "^8.12.0",
+    "axios": "^1.18.0",
     "better-sqlite3": "^12.10.1",
     "cloakbrowser": "^0.3.32",
     "commander": "^11.1.0",

@@ -2,7 +2,7 @@
  * Roadmap proposal engine for Memory-Driven Autonomy (Phase 23.7)
  * Converts autonomy signals into actionable roadmap proposals
  */
-import { requiresGovernanceApproval, } from './models/RoadmapProposal';
+import { requiresGovernanceApproval, } from './models/RoadmapProposal.js';
 export class RoadmapProposalEngine {
     /**
      * Generate proposals from autonomy signals

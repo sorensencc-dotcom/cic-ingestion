@@ -1,9 +1,9 @@
 // filename: workflow-integration.ts
 // Wayland Workflow Integration Example
 // Shows how to invoke workflows via Wayland adapters
-import { createDefaultRegistry } from './wayland-adapter-registry';
-import { createDefaultSecurityPolicy } from './wayland-security-policy';
-import { WorkflowRunner, dailyIngestReasoningWorkflow, } from './workflow';
+import { createDefaultRegistry } from './wayland-adapter-registry.js';
+import { createDefaultSecurityPolicy } from './wayland-security-policy.js';
+import { WorkflowRunner, dailyIngestReasoningWorkflow, } from './workflow.js';
 // Example: Run daily ingest reasoning workflow
 export async function runDailyIngestReasoning(logger) {
     const registry = createDefaultRegistry();

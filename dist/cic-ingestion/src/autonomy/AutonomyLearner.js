@@ -3,7 +3,7 @@
  * Learns from proposal outcomes to improve signal detection accuracy
  * Decays old signals automatically
  */
-import { SIGNAL_THRESHOLDS } from './models/AutonomySignal';
+import { SIGNAL_THRESHOLDS } from './models/AutonomySignal.js';
 /**
  * In-memory store for learning data
  */

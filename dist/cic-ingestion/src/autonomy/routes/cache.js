@@ -5,7 +5,7 @@
  * GET /autonomy/cache/status — get human-readable status
  */
 import { Router } from 'express';
-import { CacheMetricsExporter } from '../../prompt-cache/metrics/CacheMetricsExporter';
+import { CacheMetricsExporter } from '../../prompt-cache/metrics/CacheMetricsExporter.js';
 export function createCacheRouter(adapter) {
     const router = Router();
     // Get aggregate cache statistics

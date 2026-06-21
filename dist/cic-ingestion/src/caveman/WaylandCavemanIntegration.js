@@ -3,9 +3,9 @@
  * Post-processor for all Wayland tool outputs
  * Compresses before returning to orchestrator
  */
-import { CavemanCompressor } from '../autonomy/CavemanCompressor';
-import { CavemanBudget } from './CavemanBudget';
-import { createCavemanStats, logCavemanStats } from './CavemanStats';
+import { CavemanCompressor } from '../autonomy/CavemanCompressor.js';
+import { CavemanBudget } from './CavemanBudget.js';
+import { createCavemanStats, logCavemanStats } from './CavemanStats.js';
 export class WaylandCavemanIntegration {
     constructor(caveman, budgetConfig, options) {
         this.caveman = caveman;

@@ -4,12 +4,12 @@ import { jsx as _jsx, jsxs as _jsxs } from "react/jsx-runtime";
  * Main container for timeline, drift overlays, health indicators, and correlation tracing
  */
 import { useState, useEffect } from 'react';
-import { TimelineView } from './TimelineView';
-import { DriftOverlay } from './DriftOverlay';
-import { HealthIndicators } from './HealthIndicators';
-import { CorrelationTracer } from './CorrelationTracer';
-import { FilterPanel } from './FilterPanel';
-import { ExplorerClient } from '../queries/ExplorerQueries';
+import { TimelineView } from './TimelineView.js';
+import { DriftOverlay } from './DriftOverlay.js';
+import { HealthIndicators } from './HealthIndicators.js';
+import { CorrelationTracer } from './CorrelationTracer.js';
+import { FilterPanel } from './FilterPanel.js';
+import { ExplorerClient } from '../queries/ExplorerQueries.js';
 export const ExplorerLayout = ({ apiBaseUrl, pollInterval = 5000, }) => {
     const [state, setState] = useState({
         events: [],
