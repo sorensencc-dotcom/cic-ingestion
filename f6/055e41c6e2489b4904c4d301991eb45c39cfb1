@@ -1,0 +1,39 @@
+dist/src/wayland/wayland-adapter-registry.js
+  s_4f062793887b82::t_e17494385e8d47 19,62-71
+dist/src/aperture/policy/PolicyEngine.js
+  s_4f062793887b82::t_e17494385e8d47 195-196,199,202
+src/vector/index.ts
+  s_4f062793887b82::t_e619fd83814cd7 17-19
+  s_4f062793887b82::t_5468c7b38ba39b 51
+src/aperture/__tests__/SandboxIsolation.test.ts
+  s_6ef2b6f78787b3::t_fa7c74673f841f 1-581
+src/aperture/adapters/__tests__/HttpGetAdapter.functional.test.ts
+  s_6ef2b6f78787b3::t_922880fe36db9d 7,12,16-22
+  s_6ef2b6f78787b3::t_12a621c3032bfa 1-6,8-11,13-15,23-473
+dist/src/wayland/wayland-security-policy.js
+  s_4f062793887b82::t_e17494385e8d47 40
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "f6055e41c6e2489b4904c4d301991eb45c39cfb1",
+  "prompts": {},
+  "sessions": {
+    "s_4f062793887b82": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "571257d8-49f5-465c-b27c-7e3d7b447a93",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_6ef2b6f78787b3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "44d04c66-7391-4cea-84e6-34a9e52c3faa",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
