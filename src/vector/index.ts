@@ -14,7 +14,9 @@ import { createVectorRouter } from "./vectorRoutes.js";
 import { VectorSelfHealer } from "./vectorSelfHealing.js";
 
 export async function wireVectorLayer(app: any) {
-  if (!process.env.QDRANT_URL && process.env.NODE_ENV !== "development") {
+  const isDev = process.env.NODE_ENV === "development" || !process.env.NODE_ENV;
+
+  if (!process.env.QDRANT_URL && !isDev) {
     throw new Error("QDRANT_URL is required in non-development environments");
   }
 
@@ -46,7 +48,7 @@ export async function wireVectorLayer(app: any) {
     return { layer, healer };
   } catch (err) {
     // In development, log warning but continue without vector layer
-    if (process.env.NODE_ENV === "development") {
+    if (isDev) {
       console.warn("⚠ Vector layer initialization failed (continuing in degraded mode):", (err as Error).message);
       return { layer: null, healer: null };
     }

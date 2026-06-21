@@ -192,13 +192,14 @@ export class PolicyEngine {
      * Get current policy for agent
      */
     getPolicyForAgent(agent) {
-        // Find the most recent policy for this agent
+        // Find the most recent (last loaded) policy for this agent
+        let lastPolicy = null;
         for (const [, policy] of this.policies) {
             if (policy.agent === agent) {
-                return policy;
+                lastPolicy = policy;
             }
         }
-        return null;
+        return lastPolicy;
     }
     /**
      * Check if adapter requires specific domain

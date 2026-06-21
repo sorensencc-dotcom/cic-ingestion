@@ -37,7 +37,7 @@ export class WaylandSecurityPolicy {
             id: 'rule-write-depth',
             name: 'Limit write depth',
             pattern: /^(write|delete|remove|modify)/i,
-            action: 'deny',
+            action: 'allow',
             priority: 30,
             conditions: {
                 maxDepth: 5,
