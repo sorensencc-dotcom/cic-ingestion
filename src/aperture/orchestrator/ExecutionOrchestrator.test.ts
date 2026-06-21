@@ -34,6 +34,52 @@ class TestAdapter extends BaseAdapter {
   }
 }
 
+/**
+ * Helper to register all standard adapters in registry for tests
+ */
+const registerStandardAdapters = (registry: AdapterRegistry) => {
+  const adapters = [
+    {
+      id: 'http.get',
+      name: 'HTTP GET',
+      category: 'http',
+      inputSchema: { type: 'object', properties: { url: { type: 'string' } } },
+      policy: { cost: 5, maxExecutionMs: 30000, maxRetries: 1, deterministic: false }
+    },
+    {
+      id: 'shell.exec',
+      name: 'Shell Execute',
+      category: 'shell',
+      inputSchema: { type: 'object', properties: { command: { type: 'string' } } },
+      policy: { cost: 10, maxExecutionMs: 60000, maxRetries: 0, deterministic: false }
+    },
+    {
+      id: 'file.read',
+      name: 'File Read',
+      category: 'file',
+      inputSchema: { type: 'object', properties: { path: { type: 'string' } } },
+      policy: { cost: 2, maxExecutionMs: 10000, maxRetries: 1, deterministic: true }
+    },
+    {
+      id: 'file.write',
+      name: 'File Write',
+      category: 'file',
+      inputSchema: { type: 'object', properties: { path: { type: 'string' }, content: { type: 'string' } } },
+      policy: { cost: 2, maxExecutionMs: 10000, maxRetries: 1, deterministic: true }
+    }
+  ];
+
+  for (const adapter of adapters) {
+    registry.register({
+      ...adapter,
+      description: adapter.name,
+      outputSchema: { type: 'object' },
+      accessControl: {},
+      implementation: { module: 'adapter.ts', version: '1.0.0' }
+    });
+  }
+};
+
 describe('ExecutionOrchestrator', () => {
   let registry: AdapterRegistry;
   let policyEngine: PolicyEngine;
@@ -46,8 +92,46 @@ describe('ExecutionOrchestrator', () => {
     sandboxRuntime = createSandboxRuntime();
     orchestrator = new ExecutionOrchestrator(registry, policyEngine, sandboxRuntime);
 
-    // Register test adapter
-    orchestrator.registerAdapter(new TestAdapter());
+    // Register test adapter in orchestrator
+    const testAdapter = new TestAdapter();
+    orchestrator.registerAdapter(testAdapter);
+
+    // Register test adapter in registry
+    registry.register({
+      id: 'test.adapter',
+      name: 'Test Adapter',
+      description: 'Test adapter for unit tests',
+      category: 'test',
+      inputSchema: { type: 'object', properties: { value: { type: 'string' } } },
+      outputSchema: { type: 'object', properties: { result: { type: 'string' } } },
+      policy: { cost: 1, maxExecutionMs: 5000, maxRetries: 1, deterministic: true },
+      accessControl: {},
+      implementation: { module: 'test.ts', version: '1.0.0' }
+    });
+
+    // Register standard adapters
+    registerStandardAdapters(registry);
+
+    // Register default policies for all agents
+    const agents = ['harvester', 'explorer', 'test-agent', 'slow-agent', 'limited-agent', 'approval-agent', 'retry-agent', 'strict-agent'];
+    for (const agent of agents) {
+      policyEngine.load({
+        name: `${agent}-policy`,
+        agent,
+        version: '1.0.0',
+        allow: ['*'],
+        limits: { max_calls: 1000, max_bytes: 10485760, max_concurrent: 10, max_depth: 5, rate_limit_qps: 100 }
+      });
+    }
+
+    // Special policies for specific test cases
+    policyEngine.load({
+      name: 'harvester-deny-shell',
+      agent: 'harvester',
+      version: '1.0.0',
+      allow: ['test.adapter', 'http.get', 'file.read', 'file.write'],
+      limits: { max_calls: 1000, max_bytes: 10485760, max_concurrent: 10, max_depth: 5, rate_limit_qps: 100 }
+    });
   });
 
   afterEach(async () => {
