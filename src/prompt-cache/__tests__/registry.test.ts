@@ -183,13 +183,10 @@ describe('CacheRegistry', () => {
       const hash = 'hash1';
       registry.registerDoc('doc1', hash, 2000);
 
-      // Get initial last access
-      let adapter = registry.getAdapter?.(hash);
-
       // Log access
       registry.logAccess('doc1', hash, true, 1500, 100);
 
-      // Verify timestamp updated (if getAdapter method exposed)
+      // Verify still registered
       expect(registry.isRegistered(hash)).toBe(true);
     });
 
@@ -238,8 +235,9 @@ describe('CacheRegistry', () => {
       }
 
       const metrics = registry.getMetrics('hash1');
-      expect(metrics?.totalOperations).toBe(100);
-      expect(metrics?.successRate).toBeCloseTo(50, 0);
+      const totalOps = metrics!.cache_hits + metrics!.cache_misses;
+      expect(totalOps).toBe(100);
+      expect(metrics?.hit_rate_percent).toBeCloseTo(50, 0);
     });
 
     it('handles multiple document registrations and accesses', () => {
@@ -255,8 +253,9 @@ describe('CacheRegistry', () => {
 
       const summary = registry.summary();
       expect(summary.eligible_docs).toBe(10);
-      expect(summary.total_cache_hits).toBe(25);
-      expect(summary.total_cache_misses).toBe(25);
+      // 10 docs * 5 accesses = 50 total; j % 2 === 0 gives hits on j=0,2,4 (3 per doc) = 30 hits
+      expect(summary.total_cache_hits).toBe(30);
+      expect(summary.total_cache_misses).toBe(20);
     });
   });
 
