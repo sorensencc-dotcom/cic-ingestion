@@ -1,0 +1,42 @@
+src/aperture/registry/AdapterRegistry.ts
+  s_4f062793887b82::t_7078a0be56b37c 44
+tsconfig.json
+  s_4f062793887b82::t_59150a090e0f10 23
+src/aperture/adapters/browser/BrowserScreenshotAdapter.ts
+  s_400938326b575f::t_b2d47e3ba26de1 51,55-60,66-71,76-81,85-90,109-115,117-124,127,129-147,149-154
+  s_400938326b575f::t_bf1b6ceadad829 11-13
+  s_400938326b575f::t_e3a9885f0f1206 48-49
+src/aperture/adapters/browser/BrowserNavigateAdapter.ts
+  s_400938326b575f::t_cc9186f903d1fc 50-51
+  s_400938326b575f::t_580b860d2c6641 11-13
+  s_400938326b575f::t_ce1d666547bbfe 53,57-62,68-73,79-84,104-105,107,109-131,133-138
+src/aperture/adapters/model/ModelGenerateAdapter.ts
+  s_400938326b575f::t_79fa3088405943 12
+  s_400938326b575f::t_a7810160eee79e 122-123,131-137,140-144,146-159,163,166-168
+  s_400938326b575f::t_f5d0412482473a 11,13
+  s_400938326b575f::t_88d927992a1c6e 58-59
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "b477aaf46d577ba0f26e2da21dbbcab167bc1ebc",
+  "prompts": {},
+  "sessions": {
+    "s_400938326b575f": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e8d54bd4-ec03-4fe7-8b5a-afe383ef525b",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_4f062793887b82": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "571257d8-49f5-465c-b27c-7e3d7b447a93",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
