@@ -1,0 +1,21 @@
+src/prompt-cache/__tests__/registry.test.ts
+  s_15888ac6989198::t_6395d871eb4d4c 238-240
+  s_15888ac6989198::t_c819d89372f2aa 256-258
+  s_15888ac6989198::t_727aa12a7f860e 189
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "df2e6a24c1c5b97a53289f296d7ae52763a0c81d",
+  "prompts": {},
+  "sessions": {
+    "s_15888ac6989198": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2135e328-9fde-4392-88ac-25b506a8a9e3",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
