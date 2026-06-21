@@ -79,11 +79,19 @@ export class SandboxRuntime {
     }
 
     try {
+      // Debug: Log cleanup
+      if (process.env.DEBUG_ADAPTER) {
+        console.log(`[SandboxRuntime] Cleaning up sandbox ${sandboxId}`);
+        console.log(`[SandboxRuntime] Removing tmpdir: ${handle.tmpdir}`);
+      }
+
       // Remove ephemeral tmpdir
       try {
         await fsAsync.rm(handle.tmpdir, { recursive: true, force: true });
       } catch (err) {
-        // Ignore errors if directory doesn't exist
+        if (process.env.DEBUG_ADAPTER) {
+          console.log(`[SandboxRuntime] Cleanup error (ignored): ${(err as any).message}`);
+        }
       }
 
       // TODO: Revoke scoped credentials

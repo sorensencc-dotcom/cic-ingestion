@@ -52,6 +52,13 @@ export class FileWriteAdapter extends BaseAdapter {
         }
         const safePath = path.join(sandbox.tmpdir, filePath);
         try {
+            // Debug: Log sandbox and target paths
+            if (process.env.DEBUG_ADAPTER) {
+                console.log(`[FileWriteAdapter] Sandbox tmpdir: ${sandbox.tmpdir}`);
+                console.log(`[FileWriteAdapter] Input path: ${filePath}`);
+                console.log(`[FileWriteAdapter] Safe path: ${safePath}`);
+                console.log(`[FileWriteAdapter] Sandbox id: ${sandbox.id}`);
+            }
             // Check if file exists
             const exists = await fs.pathExists(safePath);
             // Ensure parent directory exists
@@ -62,6 +69,13 @@ export class FileWriteAdapter extends BaseAdapter {
             // Set mode if specified
             if (mode) {
                 await fs.chmod(safePath, mode);
+            }
+            // Debug: Verify file was written
+            if (process.env.DEBUG_ADAPTER) {
+                const verifyExists = await fs.pathExists(safePath);
+                const stats = verifyExists ? await fs.stat(safePath) : null;
+                console.log(`[FileWriteAdapter] File exists after write: ${verifyExists}`);
+                console.log(`[FileWriteAdapter] File size: ${stats?.size || 'N/A'}`);
             }
             return {
                 success: true,

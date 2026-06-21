@@ -3,15 +3,15 @@
   "version": "0.1.0",
   "description": "CIC Autonomy & Memory Ingestion Engine with Caveman token compression",
   "type": "module",
-  "main": "dist/cic-ingestion/src/autonomy/AutonomyAPIServer.js",
+  "main": "dist/src/autonomy/AutonomyAPIServer.js",
   "bin": {
-    "cic": "dist/cic-ingestion/src/cli/index.js"
+    "cic": "dist/src/cli/index.js"
   },
   "scripts": {
     "build": "tsc",
-    "start": "node dist/cic-ingestion/src/server.js",
-    "start:dev": "tsc 2>/dev/null || true; node dist/cic-ingestion/src/orchestrator/index.js",
-    "dev": "tsc && node dist/cic-ingestion/src/server.js",
+    "start": "node dist/src/server.js",
+    "start:dev": "tsc 2>/dev/null || true; node dist/src/orchestrator/index.js",
+    "dev": "tsc && node dist/src/server.js",
     "test": "node scripts/test-setup.js && npx jest",
     "test:watch": "node scripts/test-setup.js && npx jest --watch",
     "test:coverage": "node scripts/test-setup.js && npx jest --coverage",
