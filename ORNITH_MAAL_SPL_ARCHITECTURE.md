@@ -50,7 +50,7 @@ Key properties:
 
 **Problem:** Synchronous writes to PostgreSQL block CIC execution.
 
-**Solution:** Event streaming + background ledger writer.
+**Solution:** Event streaming + background ledger writer with backpressure awareness.
 
 ```
 CIC execution (hot path: routing + model calls)
@@ -61,12 +61,20 @@ Emit structured events:
   - CostEvent (agent cost, model cost, fallback cost)
     ↓
 In-process ring buffer (Phase 1, <1000 events/sec)
-or Redis stream (Phase 2+, if scaling beyond 5000 events/sec)
+    - Monitor high-water mark (80% capacity)
+    - Set LEDGER_DEGRADED flag if buffer saturates
+    - Drop non-critical metrics (CostEvent) if overflow imminent
     ↓
 Background ledger writer (non-blocking, ~1s lag)
     ↓
 PostgreSQL (eventual consistency OK for governance)
 ```
+
+**Backpressure guardrail:** When buffer crosses 80%:
+- Set LEDGER_DEGRADED flag
+- EvolutionLoop ignores training data from degraded window
+- SPLTrainingLoop down-weights or skips trajectories from degraded periods
+- Prevents silent training on partial or biased data
 
 **Constraint:** EvolutionLoop operates on "last N minutes" of data, not real-time.
 
@@ -78,7 +86,7 @@ PostgreSQL (eventual consistency OK for governance)
 
 **Problem:** High-dimensional raw context causes GRPO instability and poor interpretability.
 
-**Solution:** Compress upstream signals into discrete features.
+**Solution:** Compress upstream signals into discrete, versioned features.
 
 ```
 Upstream (SkillGraph, repo metadata, task context)
@@ -87,21 +95,30 @@ Derive discrete features:
   - task_class: enum [code_fix, spec_gen, data_enrich, multi_repo_refactor, ...]
   - complexity_bucket: enum [low, medium, high, very_high]
   - modality: enum [code, code+image, text, multi_modal]
-  - schema_signature: enum [single_file, multi_file, multi_repo, image_input]
+  - schema_signature: hash(tool_surface + MCP_version) → enum [single_file, multi_file, multi_repo, image_input]
   - token_count_bucket: enum [<1K, 1-10K, 10-100K, >100K]
+  - S_t_schema_version: int (bumped when feature schema changes)
     ↓
-SPL policy sees only: S_t = [task_class, complexity_bucket, modality, schema_signature, token_count_bucket]
+SPL policy sees: S_t = [task_class, complexity_bucket, modality, schema_signature, token_count_bucket, S_t_schema_version]
 ```
 
-**Benefit:** Small, discrete state space; GRPO converges faster; policy behavior interpretable.
+**Feature evolution (versioning):**
+- Maintain S_t_schema_version alongside feature vector
+- When bucket boundaries change or features are added/removed, bump version
+- SPLTrainingLoop can:
+  - Train per-version (isolated policy versions)
+  - Explicitly map old versions to new ones (cross-version compatibility)
+- Keeps discrete state space evolution-aware, not frozen
+
+**Benefit:** Small, discrete state space; GRPO converges faster; feature evolution traceable and trainable.
 
 ---
 
 ### 3.3 Offline Simulation Harness (Validate before live integration)
 
-**Problem:** Reward-shaping bugs discovered in live CIC pipeline are expensive.
+**Problem:** Reward-shaping bugs discovered in live CIC pipeline are expensive. SPL inference latency could break hot path.
 
-**Solution:** Validate GRPO in isolation with synthetic data.
+**Solution:** Validate GRPO in isolation with synthetic data. Bound SPL inference latency with deterministic fallback.
 
 ```
 Phase 2 parallel work:
@@ -111,18 +128,35 @@ Phase 2 parallel work:
      - Control distributions: correctness, cost, drift, overrides
   
   2. Train SPLPolicy offline
-     - Check convergence, stability, sensitivity
-     - Calibrate reward function
+     - assert policy_converges_within_10k_steps()
+     - assert drift_score_decreases_monotonically()
+     - assert cost_constraints_respected()
+     - assert policy_remains_stable_when_reward_weights_shift_10_percent()
   
   3. Validate policy behavior
      - Does it learn to prefer low-drift scaffolds?
      - Does it respect cost constraints?
      - Does it converge on task_class-specific strategies?
   
-  Outcome: Ship SPL with proven-stable training loop
+  4. Latency profiling
+     - Measure SPL.proposeScaffold() latency (target: <50ms)
+     - If exceeds 50ms, MAAL fallback to static routing
+  
+  Outcome: Ship SPL with proven-stable training loop + bounded latency
 ```
 
-**Benefit:** White-paper rigor; catch RL bugs before touching live system.
+**SPL inference latency guardrail (Phase 1/2):**
+- Optional in early phases (can disable SPL entirely, MAAL routes statically)
+- Hard cap: 50ms per scaffold proposal
+- If inference exceeds cap, MAAL deterministically falls back to static routing
+- Prevents latency cascade; always has escape hatch
+
+**Reward weight sensitivity check (Phase 2):**
+- assert policy_remains_stable_when_reward_weights_shift_10_percent()
+- Ensure policy isn't hypersensitive to small weight changes
+- Validates robustness for production deployment
+
+**Benefit:** White-paper rigor; catch RL bugs before touching live system; deterministic latency guarantees.
 
 ---
 
