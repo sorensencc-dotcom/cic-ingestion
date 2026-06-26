@@ -44,7 +44,89 @@ Key properties:
 
 ---
 
-## 3. 5-Layer Architecture
+## 3. Strategic Architectural Refinements
+
+### 3.1 Async Event Ledgers (Decouple audit I/O from hot path)
+
+**Problem:** Synchronous writes to PostgreSQL block CIC execution.
+
+**Solution:** Event streaming + background ledger writer.
+
+```
+CIC execution (hot path: routing + model calls)
+    ↓
+Emit structured events:
+  - RoutingDecisionEvent (fingerprint, regime, constraints, outcome)
+  - AuditEvent (correctness, drift, hallucination)
+  - CostEvent (agent cost, model cost, fallback cost)
+    ↓
+In-process ring buffer (Phase 1, <1000 events/sec)
+or Redis stream (Phase 2+, if scaling beyond 5000 events/sec)
+    ↓
+Background ledger writer (non-blocking, ~1s lag)
+    ↓
+PostgreSQL (eventual consistency OK for governance)
+```
+
+**Constraint:** EvolutionLoop operates on "last N minutes" of data, not real-time.
+
+**Benefit:** CIC latency = routing + model calls, not I/O.
+
+---
+
+### 3.2 Discrete S_t Feature Space (Stabilize GRPO)
+
+**Problem:** High-dimensional raw context causes GRPO instability and poor interpretability.
+
+**Solution:** Compress upstream signals into discrete features.
+
+```
+Upstream (SkillGraph, repo metadata, task context)
+    ↓
+Derive discrete features:
+  - task_class: enum [code_fix, spec_gen, data_enrich, multi_repo_refactor, ...]
+  - complexity_bucket: enum [low, medium, high, very_high]
+  - modality: enum [code, code+image, text, multi_modal]
+  - schema_signature: enum [single_file, multi_file, multi_repo, image_input]
+  - token_count_bucket: enum [<1K, 1-10K, 10-100K, >100K]
+    ↓
+SPL policy sees only: S_t = [task_class, complexity_bucket, modality, schema_signature, token_count_bucket]
+```
+
+**Benefit:** Small, discrete state space; GRPO converges faster; policy behavior interpretable.
+
+---
+
+### 3.3 Offline Simulation Harness (Validate before live integration)
+
+**Problem:** Reward-shaping bugs discovered in live CIC pipeline are expensive.
+
+**Solution:** Validate GRPO in isolation with synthetic data.
+
+```
+Phase 2 parallel work:
+  1. Generate ~10,000 synthetic trajectories
+     - Each: (S_t, A_t, V_t, X_t, R_t)
+     - Vary reward weights (α, β, γ, δ, ε)
+     - Control distributions: correctness, cost, drift, overrides
+  
+  2. Train SPLPolicy offline
+     - Check convergence, stability, sensitivity
+     - Calibrate reward function
+  
+  3. Validate policy behavior
+     - Does it learn to prefer low-drift scaffolds?
+     - Does it respect cost constraints?
+     - Does it converge on task_class-specific strategies?
+  
+  Outcome: Ship SPL with proven-stable training loop
+```
+
+**Benefit:** White-paper rigor; catch RL bugs before touching live system.
+
+---
+
+## 4. 5-Layer Architecture
 
 ### Layer 0: Trust & Governance (cic-os/services/cic-governance)
 
