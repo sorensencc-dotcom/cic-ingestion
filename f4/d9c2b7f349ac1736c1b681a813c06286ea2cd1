@@ -1,0 +1,174 @@
+src/aperture/sandbox/SandboxRuntime.isolation.test.ts
+  s_46387db08b7581::t_d9b0b7f35c8a9f 1-43,45-241
+  s_364b84448a6a24::t_aac11ed41b23b6 44
+Dockerfile.aperture
+  s_46387db08b7581::t_34f26dbdd47a46 1-51
+src/utils/logger.ts
+  s_c94c9880cc28e6::t_9d1e19b749de9d 1-74
+src/index.ts
+  s_c94c9880cc28e6::t_404a5db67eb48d 1-13
+src/adapters/BaseAdapter.ts
+  s_c94c9880cc28e6::t_878458abb0349d 1-55
+PHASE_27.env.example
+  s_c94c9880cc28e6::t_bc8845704baee5 1-45
+src/services/AdapterIntegrationService.ts
+  s_c94c9880cc28e6::t_76c07903d07bb0 1-154
+src/wayland/__tests__/wayland-security-policy.test.ts
+  s_364b84448a6a24::t_a05ffb684bfa30 13
+src/wayland/__tests__/wayland-adapter-registry.test.ts
+  s_364b84448a6a24::t_e7046097d1bd62 13
+  s_364b84448a6a24::t_e70cefeb55654e 143-144
+src/aperture/adapters/BaseAdapter.ts
+  s_46387db08b7581::t_1d96f2e9bd56ff 6,10
+  s_46387db08b7581::t_2e8e9b822de869 48-58
+  s_46387db08b7581::t_b1ac1a8d5f788a 85-96
+  s_46387db08b7581::t_45f1afee9ee487 11
+src/extractors/browser/CloakBrowserAdapter.ts
+  s_46387db08b7581::t_43ff6d52422673 306
+PHASE_27_README.md
+  s_c94c9880cc28e6::t_10f3be3ab7db8d 1-372
+src/autonomy/__tests__/phase-23-2-integration.test.ts
+  s_364b84448a6a24::t_5d9c6097314d19 19
+src/tests/spa-detector.test.ts
+  s_c94c9880cc28e6::t_8b6d38af9b3979 1-221
+src/aperture/adapters/__tests__/BaseAdapter.validation.test.ts
+  s_46387db08b7581::t_3d5d4a74d7b46a 1-106
+src/vector/__tests__/goldenQueries.test.ts
+  s_364b84448a6a24::t_486e62e1b05145 6
+src/webhooks/SLOViolationWebhook.ts
+  s_c94c9880cc28e6::t_afdcce1d918d3a 1-19,22-28,31-42,44-46,49-57,59,62-73,75,78-79,81-82,86-87,89-90,94-96,98-99,101-104,108,111-112,114-115,118-119,122-128,130-132,135,138-140,144-150,153-175,178-180,183-184,187-197,199-203,205-206,208-210,213-239,243-244,246-247
+  s_51c9e7affe4228::t_57ec4e07831ec8 185-186
+  s_c94c9880cc28e6::t_a36a07f216137e 47
+  s_c94c9880cc28e6::t_507edad7b681e3 74
+  s_c94c9880cc28e6::t_234f0a20f5dce4 91
+  s_c94c9880cc28e6::t_b0920e2ac4a667 113
+  s_c94c9880cc28e6::t_d46f127ceb14a1 120-121
+  s_c94c9880cc28e6::t_261b37b3cfec4d 129
+  s_c94c9880cc28e6::t_fbcb12e4d624b1 141-143
+  s_c94c9880cc28e6::t_84702bf0df5d4b 151-152
+  s_c94c9880cc28e6::t_0b3804de82716b 181
+  s_c94c9880cc28e6::t_b5142e28635549 198
+  s_c94c9880cc28e6::t_ef3a8dda00e9dc 204
+  s_c94c9880cc28e6::t_7dc4ea480c28bc 207
+  s_c94c9880cc28e6::t_abe63d4f5b323a 240-242
+  s_51c9e7affe4228::t_849854075bf449 84
+src/autonomy/AutonomyAPIServer.ts
+  s_feb29f5c1d3af4::t_c7bc13db217b33 116-117
+  s_feb29f5c1d3af4::t_4d00efbf71cee0 2-3,6-8,10,13-14,22,25,36,39-42,52,54-55,62,64-81,87,89-90,95,103-104,106-107,126-127,159
+src/extractors/sweeper/SweeperFallbackRouter.test.ts
+  s_364b84448a6a24::t_1c1bf69a2ee29f 14
+src/prompt-cache/router.ts
+  s_364b84448a6a24::t_dd4449e9e8b1a1 3,6-11,14-15,20-29,34,38-44
+PHASE_27_INTEGRATION.md
+  s_c94c9880cc28e6::t_6629c1b2077c10 1-718
+src/cli/__tests__/cic-cli-cache.test.ts
+  s_364b84448a6a24::t_17bd2ab9dc20e3 10
+src/adapters/familysearch/schema.ts
+  s_c94c9880cc28e6::t_8b385772f6450c 1-70
+src/detectors/VerticalDriftDetector.ts
+  s_c94c9880cc28e6::t_a19ab67b2b4538 1-95
+src/autonomy/FireDrillManager.ts
+  s_feb29f5c1d3af4::t_e451dec83c1792 7-9
+  s_feb29f5c1d3af4::t_1f7fa2b35a1375 1-6,10-51,53-92
+  s_feb29f5c1d3af4::t_834ee9ff1d2031 52
+src/utils/validation.ts
+  s_c94c9880cc28e6::t_dce545343e060a 1-149
+src/tests/drift-detector.test.ts
+  s_c94c9880cc28e6::t_953cdeb4bb21c5 1-187
+src/aperture/sandbox/SandboxRuntime.ts
+  s_46387db08b7581::t_74e3c7d30a94ec 13-43,46-51,63-117,129,161-211,221-222,230-265,275-284,287,295-296
+src/detectors/SpaHydrationDetector.ts
+  s_c94c9880cc28e6::t_2b54f6d37baade 1-57
+src/tests/adapter-integration.test.ts
+  s_c94c9880cc28e6::t_e270e194fe2dc8 1-197
+src/services/WarmPoolManager.ts
+  s_c94c9880cc28e6::t_145b468ffd3588 1-166
+src/adapters/familysearch/FamilySearchAdapter.ts
+  s_c94c9880cc28e6::t_e7b2f76992169a 1-127
+tests/phase-26-integration.test.ts
+  s_364b84448a6a24::t_f40d7794ac1ad5 8
+src/adapters/AdapterRegistry.ts
+  s_c94c9880cc28e6::t_99698b1ffc4ebf 1-33
+src/routes/execute.ts
+  s_c94c9880cc28e6::t_a5bb635aa491a9 1-84
+src/config/ConfigValidator.ts
+  s_91bb0beee11b1e::t_62456dd7f4d735 8,12-18
+src/prompt-cache/metrics/CacheMetricsExporter.ts
+  s_364b84448a6a24::t_1bc7af92adc2a0 2-3,6-12,14-20,24-25,27-34,37-38,40-43,45-47,49-51,53-55,57-59,61-64
+src/autonomy/routes/firedrills.ts
+  s_feb29f5c1d3af4::t_7431009718e9e7 1-161
+src/autonomy/routes/__tests__/firedrills-integration.test.ts
+  s_feb29f5c1d3af4::t_302acb10a34bd4 1-63
+src/vector/__tests__/torqueQueryRegression.test.ts
+  s_364b84448a6a24::t_e3d63b192c14a8 36
+scripts/code-review.js
+  s_10803700c7fcba::t_3d0ebdbea65d5b 1-2,4-6,9-25,27-36,38-47,51-103,105-106,108,110-114,116-143,146-147,149-152,154,156-161,163-164,166-171,173-179,182-184,187-190,193,197-199
+scripts/generate-docs.js
+  s_10803700c7fcba::t_e404a4d7d27b28 1-2,4-6,9-12,14-16,18-22,24-28,30-32,34-36,38-41,43-45,47-53,56-57,62,64-68,72-82,84-124,129,131-134,138-166,170-175,178,180-187,189-193,195-215,217-219
+scripts/shared-utils.js
+  s_10803700c7fcba::t_cfd5f444a810d2 1-2,4-5,8-10,12-30,32,34-41,43-45,47-60,62,64,67-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "f4d9c2b7f349ac1736c1b681a813c06286ea2cd1",
+  "prompts": {},
+  "sessions": {
+    "s_10803700c7fcba": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "45ab3f3c-7556-4cff-a7e7-250f36c3a430",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_364b84448a6a24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "39348d4a-ea3b-4770-9a70-03a4d04006b7",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_46387db08b7581": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2595e5c1-e91c-4649-bb40-64c2c2b1249e",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_51c9e7affe4228": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "219d540c-0752-4eda-b6b9-e88059db870f",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_91bb0beee11b1e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c0614379-e130-49de-9c7f-737fa4242e58",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_c94c9880cc28e6": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "43b76c2f-253a-4322-9348-05b84ffe0098",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_feb29f5c1d3af4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9dfe3b0d-2f7d-4534-94eb-6eee4265d042",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
