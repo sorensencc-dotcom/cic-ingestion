@@ -303,7 +303,7 @@ export class CloakBrowserAdapter implements IBrowserEngine {
     // For now, return a mock that can be replaced
     try {
       const cloakBrowser = await import('cloakbrowser');
-      return await cloakBrowser.launch({ headless: true });
+      return (await cloakBrowser.launch({ headless: true })) as unknown as CloakBrowserInstance;
     } catch (error) {
       throw new Error(
         'CloakBrowser not installed. Run: npm install cloakbrowser'
