@@ -1,7 +1,0 @@
-[2026-06-13T15:24:52.573Z] start: host=claude-code, reason=session_end, project=C:/dev/cic-ingestion
-[2026-06-13T15:24:52.642Z] journal: 3 entries across 3 sessions
-[2026-06-13T15:24:52.707Z] tier-promotion: db open skipped (Cannot find package 'better-sqlite3' imported from C:\Users\soren\.ijfw\mcp-server\src\memory\fts5.js)
-[2026-06-13T15:24:52.769Z] wiki-compile: db open skipped (Cannot find package 'better-sqlite3' imported from C:\Users\soren\.ijfw\mcp-server\src\memory\fts5.js)
-[2026-06-13T15:24:52.802Z] profile_derive: no signals -> no-op
-[2026-06-13T15:24:52.836Z] mark-completed: ok
-[2026-06-13T15:24:52.851Z] end: completed=5 failed=0

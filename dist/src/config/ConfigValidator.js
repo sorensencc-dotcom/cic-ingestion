@@ -6,8 +6,14 @@ import Ajv from 'ajv';
 import { readFileSync } from 'fs';
 import { join } from 'path';
 const ajv = new Ajv({ allErrors: true });
-// Load schema at module initialization
-const schemaPath = join(process.cwd(), 'config/schema.json');
+// Load schema at module initialization - try cic-ingestion/config first, then fall back
+let schemaPath = join(process.cwd(), 'cic-ingestion/config/schema.json');
+try {
+    readFileSync(schemaPath, 'utf8');
+}
+catch {
+    schemaPath = join(process.cwd(), 'config/schema.json');
+}
 const schemaContent = readFileSync(schemaPath, 'utf8');
 const schema = JSON.parse(schemaContent);
 const validate = ajv.compile(schema);

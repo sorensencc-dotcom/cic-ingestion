@@ -1,0 +1,51 @@
+# Phase 27.3: Aperture Execution Engine
+# Policy registry + sandbox runtime + adapter orchestration
+# Production-ready multi-stage Node.js build
+
+FROM node:20-alpine AS builder
+
+WORKDIR /app
+
+# Install build tools for native modules
+RUN apk add --no-cache python3 make g++ gcc
+
+# Copy deps lock files
+COPY cic-ingestion/package*.json ./
+COPY tsconfig.json ./
+
+# Install all deps (including devDeps for build)
+RUN npm install
+
+# Copy source
+COPY cic-ingestion/src ./src
+
+# Build TypeScript
+RUN npm run build
+
+# Runtime stage
+FROM node:20-alpine
+
+WORKDIR /app
+
+LABEL phase="27.3"
+LABEL component="aperture-execution-engine"
+
+# Install runtime deps (bash for healthcheck, curl for debugging)
+RUN apk add --no-cache bash curl
+
+# Copy package files and pre-built node_modules from builder
+COPY cic-ingestion/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+
+# Copy built assets from builder
+COPY --from=builder /app/dist ./dist
+
+# Expose aperture port
+EXPOSE 3117
+
+# Health check: Aperture policy registry health endpoint
+HEALTHCHECK --interval=10s --timeout=5s --retries=3 --start-period=15s \
+  CMD curl -f http://localhost:3117/health || exit 1
+
+# Start aperture server (expects dist/src/aperture/server.js)
+CMD ["node", "dist/src/aperture/server.js"]

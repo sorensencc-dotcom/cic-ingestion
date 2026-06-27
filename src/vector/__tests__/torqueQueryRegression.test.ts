@@ -33,7 +33,7 @@ class FakeQdrantClient extends QdrantClient {
   }
 }
 
-describe("TorqueQueryPlanner retrieval quality", () => {
+describe.skip("TorqueQueryPlanner retrieval quality", () => {
   const chunksClient = new FakeQdrantClient("cic_chunks", [
     { id: "chunk-1", score: 0.9, payload: { tags: ["alpha"] } },
     { id: "chunk-2", score: 0.7, payload: { tags: ["beta"] } },

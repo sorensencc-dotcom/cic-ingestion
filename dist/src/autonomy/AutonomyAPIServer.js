@@ -15,8 +15,10 @@ import { createCacheRouter } from './routes/cache.js';
 import { createExecutionRouter } from './routes/execution.js';
 import { createMemoryRouter } from './routes/memory.js';
 import { createGovernanceRouter } from './routes/governance.js';
+import { createConsoleRouter } from './routes/console.js';
 import { ObservabilityManager } from './ObservabilityManager.js';
 import { wireVectorLayer } from '../vector/index.js';
+import { TorqueQueryClient } from '../services/torquequery/TorqueQueryClient.js';
 import cicConfig from '../config/index.js';
 export class AutonomyAPIServer {
     constructor(config) {
@@ -166,12 +168,17 @@ export class AutonomyAPIServer {
         const governanceRouter = createGovernanceRouter({
             governanceControlPlaneUrl: process.env.GOVERNANCE_URL,
         });
+        const torqueQuery = new TorqueQueryClient({
+            url: process.env.TORQUE_QUERY_URL || 'http://localhost:3110',
+        });
+        const consoleRouter = createConsoleRouter(this.service, torqueQuery);
         this.app.use('/autonomy', signalsRouter);
         this.app.use('/autonomy', proposalsRouter);
         this.app.use('/autonomy', cacheRouter);
         this.app.use('/autonomy', executionRouter);
         this.app.use('/autonomy', memoryRouter);
         this.app.use('/autonomy', governanceRouter);
+        this.app.use('/', consoleRouter);
         // 404 handler
         this.app.use((req, res) => {
             return res.status(404).json({

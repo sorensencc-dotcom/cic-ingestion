@@ -1,0 +1,130 @@
+name: Phase 1 Contract Gate
+
+on:
+  push:
+    branches: [phase-1-maal-foundation]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  phase-1-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Validate Phase 1 File Contract
+        run: |
+          #!/bin/bash
+          set -e
+
+          ALLOWED_FILES=(
+            "cic-os/src/core/ledger/EventStream.ts"
+            "cic-os/src/core/ledger/BackgroundWriter.ts"
+            "cic-os/src/core/ledger/LedgerEvent.ts"
+            "cic-os/src/core/maal/TaskFingerprint.ts"
+            "cic-os/src/core/maal/RoutingRegimeSelector.ts"
+            "cic-os/src/core/maal/ConstraintEngine.ts"
+            "cic-os/src/core/maal/FallbackGraphValidator.ts"
+            "cic-os/src/core/maal/MAALRouter.ts"
+            "cic-os/src/core/maal/MAALRoutingOutput.ts"
+            "cic-ingestion/src/orchestrator/BridgeOrchestrator.ts"
+            "postgres/ledgers/routing_history.sql"
+            "postgres/ledgers/drift_ledger.sql"
+            "postgres/ledgers/model_performance_ledger.sql"
+            "postgres/ledgers/cost_ledger.sql"
+          )
+
+          ACTUAL_FILES=$(git diff --name-only HEAD~1 HEAD | grep -E "^(cic-os|cic-ingestion|postgres)" || true)
+
+          DRIFT=0
+          for file in $ACTUAL_FILES; do
+            if [[ ! " ${ALLOWED_FILES[@]} " =~ " ${file} " ]]; then
+              echo "❌ DRIFT DETECTED: $file not in Phase 1 contract"
+              DRIFT=1
+            fi
+          done
+
+          if [ $DRIFT -eq 1 ]; then
+            exit 1
+          fi
+
+          echo "✓ Phase 1 File Contract validated"
+
+      - name: Reject SPL Code
+        run: |
+          #!/bin/bash
+          set -e
+
+          # Read shared keyword list
+          FORBIDDEN_KEYWORDS=$(cat .github/phase-1-keywords.txt | grep -v "^#" | tr '\n' '|' | sed 's/|$//')
+
+          if grep -rE "$FORBIDDEN_KEYWORDS" cic-os/src/core cic-ingestion/src/orchestrator 2>/dev/null; then
+            echo "❌ FORBIDDEN: Found SPL/Phase 2/3 keywords in Phase 1 code"
+            exit 1
+          fi
+
+          echo "✓ No SPL/Phase 2/3 keywords detected"
+
+      - name: Validate TypeScript Interfaces Only
+        run: |
+          #!/bin/bash
+          set -e
+
+          TS_FILES=$(find cic-os/src/core cic-ingestion/src/orchestrator -name "*.ts" 2>/dev/null || true)
+
+          for file in $TS_FILES; do
+            # Reject method bodies: function keyword + open brace + close brace
+            if grep -qE "function\s*\w+\s*\(.*\)\s*\{|=>\s*\{" "$file" 2>/dev/null; then
+              # Allow if only type definitions (interface, type, class with no body)
+              if grep -qE "function\s*\w+\s*\([^)]*\)\s*\{[^}]*\}" "$file" 2>/dev/null; then
+                echo "❌ IMPLEMENTATION DETECTED in $file (method body found)"
+                exit 1
+              fi
+            fi
+          done
+
+          echo "✓ All TypeScript files are interface-only"
+
+      - name: Validate SQL Schemas
+        run: |
+          #!/bin/bash
+          set -e
+
+          SQL_FILES=$(find postgres/ledgers -name "*.sql" 2>/dev/null || true)
+
+          for file in $SQL_FILES; do
+            if ! grep -q "CREATE TABLE" "$file"; then
+              echo "❌ SQL file missing CREATE TABLE: $file"
+              exit 1
+            fi
+
+            if grep -qE "INSERT|UPDATE|DELETE|CREATE INDEX" "$file"; then
+              echo "❌ SQL file contains non-DDL statements: $file"
+              exit 1
+            fi
+          done
+
+          echo "✓ All SQL files are schema-only"
+
+      - name: Reject Extra Directories
+        run: |
+          #!/bin/bash
+          set -e
+
+          ACTUAL_DIRS=$(find cic-os/src/core cic-ingestion/src/orchestrator postgres/ledgers -type d 2>/dev/null | sort)
+
+          FORBIDDEN_DIRS=("utils" "helpers" "factories" "mappers" "types" "adapters" "service" "learning" "simulator" "policy")
+
+          for dir in $ACTUAL_DIRS; do
+            for forbidden in "${FORBIDDEN_DIRS[@]}"; do
+              if [[ "$dir" == *"$forbidden"* ]]; then
+                echo "❌ FORBIDDEN DIRECTORY: $dir"
+                exit 1
+              fi
+            done
+          done
+
+          echo "✓ No forbidden directories detected"
+
+      - name: Report Status
+        run: echo "✅ Phase 1 Contract Gate: PASS"
