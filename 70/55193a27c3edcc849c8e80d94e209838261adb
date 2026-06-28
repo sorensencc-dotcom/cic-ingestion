@@ -1,0 +1,93 @@
+src/learning/LedgerEventConsumer.ts
+  s_9db7ff8307af04::t_19bd8fde9b2bff 1-11
+src/lib/report/renderReportHtml.ts
+  s_b7660d9c740629::t_35259d8edda9b1 1-280
+src/orchestrator/routingCostSignals.ts
+  s_b7660d9c740629::t_77a2ba4394b2b6 1-66
+src/lib/report/CicCostComputeReport.ts
+  s_b7660d9c740629::t_19ddb7879545a8 1-97
+postgres/ledgers/usage_cost_ledger.sql
+  s_b7660d9c740629::t_e857eed25a0943 1-24
+src/lib/charts/CostCharts.ts
+  s_b7660d9c740629::t_046beca870f992 1-206
+src/lib/cost/GpuAmortization.ts
+  s_b7660d9c740629::t_1b5d3d60a4978f 1-42
+src/learning/OfflineLearningService.ts
+  s_9db7ff8307af04::t_2b1e273f1cc0f2 1-14
+src/lib/cost/modelPricing.ts
+  s_b7660d9c740629::t_87661dd78801ca 1-20
+src/lib/report/htmlToPdf.ts
+  s_b7660d9c740629::t_4bbe8b101a24f0 1-97
+src/lib/usage/UsageLedger.ts
+  s_b7660d9c740629::t_104c232c819543 1-136
+bin/cic-report.ts
+  s_b7660d9c740629::t_2c956b1eecbc12 1-131
+src/autonomy/AutonomyAPIServer.ts
+  s_b7660d9c740629::t_844b295f1bc48d 24
+  s_b7660d9c740629::t_c8ac387b710773 10-11
+  s_b7660d9c740629::t_4b3fa72b3ce078 140-179
+  s_b7660d9c740629::t_add8780e744650 183-185
+  s_b7660d9c740629::t_54196814caa907 209-213
+  s_b7660d9c740629::t_5b016acf1e77ff 7
+  s_b7660d9c740629::t_771f3cbec36926 89-112
+src/aperture/engines/anthropic/AnthropicClient.ts
+  s_b7660d9c740629::t_bc2d3599e2c170 7-8
+  s_b7660d9c740629::t_ec9110a166a6b5 22-28
+  s_b7660d9c740629::t_0500beefdc0d28 98-116,119-120,129-130,132-133
+reports/cicCostComputePdf.ts
+  s_b7660d9c740629::t_171379cda9ae3a 1-61
+src/orchestrator/BridgeOrchestrator.ts
+  s_df549475f43289::t_3f857b29ef3937 5-16,22-35
+  s_9db7ff8307af04::t_c21c60e0c75b17 1,17-19,134
+  s_df549475f43289::t_e4d70f32a6b27c 2-4,20-21,36-39,41-42,49-54,56-133
+  s_df549475f43289::t_d3ed3ec9bd099e 40,43-48
+  s_df549475f43289::t_e1d5074b135c53 55
+src/orchestrator/__tests__/routingCostSignals.test.ts
+  s_b7660d9c740629::t_32a39b9e3a4ce7 1-211
+dashboards/CostComputePanel.tsx
+  s_b7660d9c740629::t_d80969c0d8f654 1-210
+src/lib/skills/cicCostComputeSkill.ts
+  s_b7660d9c740629::t_62c147ae3563c0 1-102
+postgres/ledgers/cost_ledger.sql
+  s_9db7ff8307af04::t_b2005a88d6991c 1-9
+postgres/ledgers/drift_ledger.sql
+  s_9db7ff8307af04::t_c9904bab917f48 1-8
+postgres/ledgers/model_performance_ledger.sql
+  s_9db7ff8307af04::t_6e631b42dd6856 1-9
+postgres/ledgers/routing_history.sql
+  s_9db7ff8307af04::t_ad1e283abcfc5d 1-7
+src/aperture/adapters/model/ModelGenerateAdapter.ts
+  s_b7660d9c740629::t_426450e97e3f9d 126-127
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "7055193a27c3edcc849c8e80d94e209838261adb",
+  "prompts": {},
+  "sessions": {
+    "s_9db7ff8307af04": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7868a049-3774-41db-ade2-dd9374785bc7",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_b7660d9c740629": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4e52b6c-1f36-461e-aa68-6808865d1038",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_df549475f43289": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1c70b11c-7bba-4ddd-aa14-30560e2aa6d8",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
