@@ -123,7 +123,8 @@ export class ModelGenerateAdapter extends BaseAdapter {
         prompt,
         maxTokens,
         systemPrompt,
-        temperature
+        temperature,
+        meta: input.meta
       });
 
       // Validate output size

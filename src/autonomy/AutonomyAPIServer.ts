@@ -4,8 +4,11 @@
  */
 
 import express, { Express, Request, Response, NextFunction } from "express";
+import cron from "node-cron";
 import { createExecutionRouter } from "./routes/execution.js";
 import { createFireDrillRouter } from "./routes/firedrills.js";
+import { UsageLedger } from "../lib/usage/UsageLedger.js";
+import { generateCicCostComputeReport } from "../lib/report/CicCostComputeReport.js";
 
 export interface AutonomyAPIServerConfig {
   port?: number;
@@ -18,6 +21,7 @@ export class AutonomyAPIServer {
   private app: Express;
   private config: AutonomyAPIServerConfig;
   private server: any = null;
+  private cronJobs: cron.ScheduledTask[] = [];
 
   constructor(config: AutonomyAPIServerConfig = {}) {
     this.config = {
@@ -82,6 +86,30 @@ export class AutonomyAPIServer {
       });
     });
 
+    // Cost tracking routes
+    this.app.get("/api/usage-summary", (req: Request, res: Response) => {
+      return res.json(UsageLedger.getDailySummary());
+    });
+
+    this.app.get("/api/agent-burn", (req: Request, res: Response) => {
+      const report = generateCicCostComputeReport();
+      return res.json(report.agents.burn);
+    });
+
+    this.app.get("/api/local-roi", (req: Request, res: Response) => {
+      const report = generateCicCostComputeReport();
+      return res.json(report.local);
+    });
+
+    this.app.get("/api/usage-summary-env", (req: Request, res: Response) => {
+      const report = generateCicCostComputeReport();
+      return res.json({
+        dev: report.env?.daily?.dev,
+        prod: report.env?.daily?.prod,
+        budget: report.budget,
+      });
+    });
+
     // Mount routers
     const executionRouter = createExecutionRouter();
     const fireDrillRouter = createFireDrillRouter();
@@ -109,9 +137,52 @@ export class AutonomyAPIServer {
     });
   }
 
+  private setupCronSchedules(): void {
+    if (process.env.CIC_PDF_REPORTS_ENABLED !== 'true') {
+      return; // Disabled by default
+    }
+
+    try {
+      // Dynamic import for generatePdfReport
+      const importPdfReports = async () => {
+        const { generatePdfReport } = await import("../reports/cicCostComputePdf.js");
+        return generatePdfReport;
+      };
+
+      // Daily PDF report at midnight (0 0 * * *)
+      const dailyJob = cron.schedule('0 0 * * *', async () => {
+        try {
+          const { generatePdfReport } = await importPdfReports();
+          await generatePdfReport('daily');
+        } catch (err) {
+          console.error("[CRON] Daily PDF generation failed:", err);
+        }
+      });
+      this.cronJobs.push(dailyJob);
+      console.log("[CRON] Scheduled daily PDF report at midnight");
+
+      // Weekly PDF report every Monday at midnight (0 0 * * 1)
+      const weeklyJob = cron.schedule('0 0 * * 1', async () => {
+        try {
+          const { generatePdfReport } = await importPdfReports();
+          await generatePdfReport('weekly');
+        } catch (err) {
+          console.error("[CRON] Weekly PDF generation failed:", err);
+        }
+      });
+      this.cronJobs.push(weeklyJob);
+      console.log("[CRON] Scheduled weekly PDF report for Mondays at midnight");
+    } catch (err) {
+      console.error("[CRON] Failed to setup schedules:", err);
+    }
+  }
+
   async start(): Promise<void> {
     return new Promise((resolve, reject) => {
       try {
+        // Setup cron jobs before starting server
+        this.setupCronSchedules();
+
         this.server = this.app.listen(
           this.config.port!,
           this.config.host!,
@@ -135,6 +206,11 @@ export class AutonomyAPIServer {
 
   async stop(): Promise<void> {
     return new Promise((resolve, reject) => {
+      // Stop all cron jobs
+      this.cronJobs.forEach(job => job.stop());
+      this.cronJobs = [];
+      console.log(`[${new Date().toISOString()}] Cron jobs stopped`);
+
       if (!this.server) {
         resolve();
         return;
