@@ -1,0 +1,29 @@
+src/core/maal/canary/CanaryGateOrchestrator.ts
+  s_df325cb5e578a3::t_9fd0c881c5cc12 3-4,8-10,30-38,40-46,49,51,53-125,129-135,148-150,154-189,192-201,208-210
+  s_df325cb5e578a3::t_7cf2e77111f215 211
+src/core/maal/codesign/ProposalValidationEngineImpl.ts
+  s_df325cb5e578a3::t_f00e1481dabcac 3,15,20-22,50,57,61-81,88-102,109-131,139-182
+src/core/maal/codesign/ProposalParser.ts
+  s_df325cb5e578a3::t_046ca167931539 4,7,19-29,34-50,52-53,56-76,85-209,220-226
+  s_df325cb5e578a3::t_bbe3b7463c2d12 227
+src/core/maal/canary/CanaryCohortController.ts
+  s_df325cb5e578a3::t_e7d6543377687a 3,17-23,26-33,37,39,41,43-45,48-66,68-83,86-93,95-104,108-109,112,114,116,122-127,131-135
+src/core/maal/governance/GovernanceReview.ts
+  s_df325cb5e578a3::t_9e0628922289b1 3-4,7,24-29,38-39,41-42,44,48,53-81,84-86,89-122
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "c28243c182d8c72be36fc317d44a6802bb5509f6",
+  "prompts": {},
+  "sessions": {
+    "s_df325cb5e578a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc9121f3-3563-4a3a-a4cc-390fec0b79ab",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
