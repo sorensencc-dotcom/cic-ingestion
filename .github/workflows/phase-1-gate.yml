@@ -21,23 +21,23 @@ jobs:
           set -e
 
           ALLOWED_FILES=(
-            "cic-os/src/core/ledger/EventStream.ts"
-            "cic-os/src/core/ledger/BackgroundWriter.ts"
-            "cic-os/src/core/ledger/LedgerEvent.ts"
-            "cic-os/src/core/maal/TaskFingerprint.ts"
-            "cic-os/src/core/maal/RoutingRegimeSelector.ts"
-            "cic-os/src/core/maal/ConstraintEngine.ts"
-            "cic-os/src/core/maal/FallbackGraphValidator.ts"
-            "cic-os/src/core/maal/MAALRouter.ts"
-            "cic-os/src/core/maal/MAALRoutingOutput.ts"
-            "cic-ingestion/src/orchestrator/BridgeOrchestrator.ts"
+            "src/core/ledger/EventStream.ts"
+            "src/core/ledger/BackgroundWriter.ts"
+            "src/core/ledger/LedgerEvent.ts"
+            "src/core/maal/TaskFingerprint.ts"
+            "src/core/maal/RoutingRegimeSelector.ts"
+            "src/core/maal/ConstraintEngine.ts"
+            "src/core/maal/FallbackGraphValidator.ts"
+            "src/core/maal/MAALRouter.ts"
+            "src/core/maal/MAALRoutingOutput.ts"
+            "src/orchestrator/BridgeOrchestrator.ts"
             "postgres/ledgers/routing_history.sql"
             "postgres/ledgers/drift_ledger.sql"
             "postgres/ledgers/model_performance_ledger.sql"
             "postgres/ledgers/cost_ledger.sql"
           )
 
-          ACTUAL_FILES=$(git diff --name-only HEAD~1 HEAD | grep -E "^(cic-os|cic-ingestion|postgres)" || true)
+          ACTUAL_FILES=$(git diff --name-only HEAD~1 HEAD | grep -E "^(src|postgres)" || true)
 
           DRIFT=0
           for file in $ACTUAL_FILES; do
@@ -61,7 +61,7 @@ jobs:
           # Read shared keyword list
           FORBIDDEN_KEYWORDS=$(cat .github/phase-1-keywords.txt | grep -v "^#" | tr '\n' '|' | sed 's/|$//')
 
-          if grep -rE "$FORBIDDEN_KEYWORDS" cic-os/src/core cic-ingestion/src/orchestrator 2>/dev/null; then
+          if grep -rE "$FORBIDDEN_KEYWORDS" src/core src/orchestrator 2>/dev/null; then
             echo "❌ FORBIDDEN: Found SPL/Phase 2/3 keywords in Phase 1 code"
             exit 1
           fi
@@ -73,7 +73,7 @@ jobs:
           #!/bin/bash
           set -e
 
-          TS_FILES=$(find cic-os/src/core cic-ingestion/src/orchestrator -name "*.ts" 2>/dev/null || true)
+          TS_FILES=$(find src/core src/orchestrator -name "*.ts" 2>/dev/null || true)
 
           for file in $TS_FILES; do
             # Reject method bodies: function keyword + open brace + close brace
@@ -114,7 +114,7 @@ jobs:
           #!/bin/bash
           set -e
 
-          ACTUAL_DIRS=$(find cic-os/src/core cic-ingestion/src/orchestrator postgres/ledgers -type d 2>/dev/null | sort)
+          ACTUAL_DIRS=$(find src/core src/orchestrator postgres/ledgers -type d 2>/dev/null | sort)
 
           FORBIDDEN_DIRS=("utils" "helpers" "factories" "mappers" "types" "adapters" "service" "learning" "simulator" "policy")
 
@@ -131,8 +131,3 @@ jobs:
 
       - name: Report Status
         run: echo "✅ Phase 1 Contract Gate: PASS"
-
-
-
-
-
