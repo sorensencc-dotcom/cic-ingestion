@@ -1,0 +1,39 @@
+docs/cic/PHASE-1_ARCHITECTURE.md
+  s_e9508a1ab58572::t_8e5bd280e2bc87 1-216
+docs/cic/PHASE-1_MAAL_CORE.md
+  s_e9508a1ab58572::t_45701d9eb0e249 1-248
+docs/cic/PHASE-1_OVERVIEW.md
+  s_e9508a1ab58572::t_30a1560ed6dcd9 1-118
+docs/cic/SANDBOX-3_ALERTING.md
+  s_e9508a1ab58572::t_932ea0911b801e 1-15
+docs/cic/SANDBOX-3_DEPLOYMENT.md
+  s_e9508a1ab58572::t_95014c8b173f1f 1-16
+docs/cic/SANDBOX-3_FIRECRACKER_NODEPOOL.md
+  s_e9508a1ab58572::t_c8dfcb4c39668b 1-15
+docs/cic/SANDBOX-3_INCIDENT_RESPONSE.md
+  s_e9508a1ab58572::t_975465ef88d2af 1-16
+docs/cic/SANDBOX-3_K8S.md
+  s_e9508a1ab58572::t_11bf847900506d 1-16
+docs/cic/SANDBOX-3_MONITORING.md
+  s_e9508a1ab58572::t_edfbba46290143 1-15
+docs/cic/SANDBOX-3_ONNX_SIDECAR.md
+  s_e9508a1ab58572::t_74df84dccd2b9e 1-15
+docs/cic/SANDBOX-3_NETWORK_TRACE.md
+  s_e9508a1ab58572::t_41e26c40563cad 1-74
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "14acecae9293066cc46913f35f16826fb47ae875",
+  "prompts": {},
+  "sessions": {
+    "s_e9508a1ab58572": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ff02a811-586c-4a20-a727-6f2ce26060d7",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
