@@ -1,0 +1,83 @@
+postgres/phase4/canary_gate_results.sql
+  s_df325cb5e578a3::t_e4db2037c6d75a 1-23
+postgres/phase4/fallback_graph_proposals.sql
+  s_df325cb5e578a3::t_0efea04eb34567 1-22
+src/core/maal/canary/CanaryTelemetry.ts
+  s_df325cb5e578a3::t_630b7c6be89c1b 1-61
+src/core/maal/canary/CanaryError.ts
+  s_df325cb5e578a3::t_346e35263177fe 1-18
+postgres/phase4/simulator_drift_reports.sql
+  s_df325cb5e578a3::t_80308751b3a9c8 1-18
+src/core/maal/governance/GovernanceReview.ts
+  s_df325cb5e578a3::t_14387794018196 1-53
+postgres/phase4/governance_approvals.sql
+  s_df325cb5e578a3::t_ee796f85e74842 1-22
+postgres/phase4/canary_growth_configs.sql
+  s_df325cb5e578a3::t_6a73e53192b2fa 1-22
+tests/phase4/test_governance.ts
+  s_df325cb5e578a3::t_47e8b44aaf45ba 1-25
+src/core/maal/support/Result.ts
+  s_df325cb5e578a3::t_a1ba5e998bb7bb 1-58
+src/core/maal/codesign/ProposalTypes.ts
+  s_df325cb5e578a3::t_ea9e82e07a0b03 1-96
+src/core/maal/governance/GovernanceCaps.ts
+  s_df325cb5e578a3::t_6115116d66fc16 1-33
+tests/phase4/test_canary_execution.ts
+  s_df325cb5e578a3::t_542cc7c87bd084 1-25
+src/core/maal/canary/CanaryAssignment.ts
+  s_df325cb5e578a3::t_03c839de94fd64 1-41
+src/core/maal/support/ValidationResult.ts
+  s_df325cb5e578a3::t_3308de391fd0b4 1-45
+src/core/maal/codesign/GlobalRoutingBounds.ts
+  s_df325cb5e578a3::t_16a67108204ff5 1-19
+src/core/maal/index.ts
+  s_df325cb5e578a3::t_d0ff4d571773b0 1-39
+src/core/maal/codesign/Proposal.ts
+  s_df325cb5e578a3::t_5647293dc8d4d6 1-43
+src/core/maal/governance/GovernanceDecisions.ts
+  s_df325cb5e578a3::t_f5c356f74ce46f 1-34
+tests/phase4/test_immutability.ts
+  s_df325cb5e578a3::t_41401aca0ff89b 1-16
+src/core/maal/codesign/ProposalValidationEngineImpl.ts
+  s_df325cb5e578a3::t_5ce274de1a1dc5 1-79
+tests/phase4/test_promotion.ts
+  s_df325cb5e578a3::t_5de07f61e7db70 1-20
+src/core/maal/support/ImmutabilityGuard.ts
+  s_df325cb5e578a3::t_fd602b526db6ce 1-58
+src/core/maal/codesign/ProposalValidationEngine.ts
+  s_df325cb5e578a3::t_e27cdef67b0d37 1-19
+src/core/maal/codesign/ProposalParser.ts
+  s_df325cb5e578a3::t_0e67969bf6a301 1-54
+postgres/phase4/reward_adjustment_proposals.sql
+  s_df325cb5e578a3::t_e781759777e465 1-24
+src/core/maal/canary/CanaryCohortController.ts
+  s_df325cb5e578a3::t_e2add5c90cb30f 1-60
+tests/phase4/test_validation_engine.ts
+  s_df325cb5e578a3::t_031055ee2f26c8 1-30
+src/core/maal/canary/CanaryGateOrchestrator.ts
+  s_df325cb5e578a3::t_96aca39a8da478 1-74
+tests/phase4/test_dsl_validity.ts
+  s_df325cb5e578a3::t_d5245fe4573bb3 1-30
+postgres/phase4/regime_proposals.sql
+  s_df325cb5e578a3::t_c73d2b71c9284f 1-26
+src/core/maal/canary/CanaryGrowthConfig.ts
+  s_df325cb5e578a3::t_9d7a8e5e613e20 1-46
+postgres/phase4/constraint_proposals.sql
+  s_df325cb5e578a3::t_96b61930c1299b 1-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "aa2c019d38ba12df712da21192759421611ddcce",
+  "prompts": {},
+  "sessions": {
+    "s_df325cb5e578a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc9121f3-3563-4a3a-a4cc-390fec0b79ab",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
