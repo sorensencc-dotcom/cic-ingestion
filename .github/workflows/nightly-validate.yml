@@ -1,0 +1,27 @@
+name: Nightly Validator
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Run validator
+        run: |
+          if [ -f setup/validate.sh ]; then
+            sh setup/validate.sh
+          else
+            echo "setup/validate.sh not found"
+            exit 1
+          fi
+      - name: Upload results
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: nightly-validation-${{ github.run_id }}
+          path: .
+
