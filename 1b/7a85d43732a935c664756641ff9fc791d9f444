@@ -1,0 +1,19 @@
+.github/workflows/phase-1-gate.yml
+  s_916c7aa6afc922::t_a315253c5044a1 21-30,37,61,73,114,130
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.4",
+  "base_commit_sha": "1b7a85d43732a935c664756641ff9fc791d9f444",
+  "prompts": {},
+  "sessions": {
+    "s_916c7aa6afc922": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b385e798-8381-4888-86c2-8a6602925a7b",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
