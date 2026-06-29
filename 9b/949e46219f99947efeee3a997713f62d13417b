@@ -1,0 +1,21 @@
+src/core/maal/CI_GATE_RULES.md
+  s_df325cb5e578a3::t_d1ea9f19bbe64f 1-165
+src/core/maal/LINT_RULES.md
+  s_df325cb5e578a3::t_bcd709cd76bb08 1-341
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "9b949e46219f99947efeee3a997713f62d13417b",
+  "prompts": {},
+  "sessions": {
+    "s_df325cb5e578a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc9121f3-3563-4a3a-a4cc-390fec0b79ab",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
