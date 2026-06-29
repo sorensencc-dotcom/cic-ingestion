@@ -1,0 +1,35 @@
+postgres/phase4/009_canary_state_history.sql
+  s_36fb254a0cc773::t_866782374f6ca6 1-33
+postgres/phase4/015_sandbox_drift_log.sql
+  s_36fb254a0cc773::t_9135d6e9917f36 1-28
+postgres/phase4/016_lineage_events.sql
+  s_36fb254a0cc773::t_ad138881ab8e25 1-32
+postgres/phase4/017_lineage_edges.sql
+  s_36fb254a0cc773::t_f947ed49cc75a5 1-28
+postgres/phase4/013_governance_risk_log.sql
+  s_36fb254a0cc773::t_2616a3a073e54e 1-29
+postgres/phase4/011_governance_retry_log.sql
+  s_36fb254a0cc773::t_89f6448e614341 1-26
+postgres/phase4/012_governance_promotion_log.sql
+  s_36fb254a0cc773::t_2cde1b6ca8f9bb 1-28
+postgres/phase4/014_governance_threshold_log.sql
+  s_36fb254a0cc773::t_41976c1146cd92 1-28
+postgres/phase4/010_governance_violation_log.sql
+  s_36fb254a0cc773::t_773fe4f86644c7 1-31
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.4",
+  "base_commit_sha": "4eafaf399136f024d110fc5b05c2dbd35a927be1",
+  "prompts": {},
+  "sessions": {
+    "s_36fb254a0cc773": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "65474609-ed90-4416-b93e-eda46cfea5ab",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
