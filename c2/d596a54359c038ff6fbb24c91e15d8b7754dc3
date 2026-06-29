@@ -1,0 +1,19 @@
+.github/workflows/dashboard.yml
+  s_e9508a1ab58572::t_320f4989b8fd5a 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "c2d596a54359c038ff6fbb24c91e15d8b7754dc3",
+  "prompts": {},
+  "sessions": {
+    "s_e9508a1ab58572": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ff02a811-586c-4a20-a727-6f2ce26060d7",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
