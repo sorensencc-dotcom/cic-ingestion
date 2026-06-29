@@ -3,8 +3,11 @@
  * Abstract base for all adapter implementations
  */
 
+import Ajv from 'ajv';
 import { JSONSchema7 } from 'json-schema';
 import { Adapter, SandboxHandle, ExecutionOptions } from '../types';
+
+const ajv = new Ajv({ allErrors: true });
 
 export abstract class BaseAdapter implements Adapter {
   protected id: string;
@@ -42,8 +45,17 @@ export abstract class BaseAdapter implements Adapter {
    * Validate input against schema
    */
   validate(input: any): { valid: boolean; errors?: string[] } {
-    // TODO: Implement JSON Schema validation
-    // For now, return valid
+    if (!this.inputSchema) {
+      return { valid: true };
+    }
+    const validate = ajv.compile(this.inputSchema);
+    const valid = validate(input) as boolean;
+    if (!valid) {
+      const errors = (validate.errors ?? []).map(
+        (e) => `${e.instancePath || '(root)'} ${e.message}`
+      );
+      return { valid: false, errors };
+    }
     return { valid: true };
   }
 
@@ -70,7 +82,17 @@ export abstract class BaseAdapter implements Adapter {
    * Helper: Validate output against schema
    */
   protected validateOutput(output: any): boolean {
-    // TODO: Implement JSON Schema validation
-    return true;
+    if (!this.outputSchema) {
+      return true;
+    }
+    const validate = ajv.compile(this.outputSchema);
+    const valid = validate(output) as boolean;
+    if (!valid) {
+      const messages = (validate.errors ?? []).map(
+        (e) => `${e.instancePath || '(root)'} ${e.message}`
+      );
+      console.error('[BaseAdapter] Output schema validation failed:', messages);
+    }
+    return valid;
   }
 }

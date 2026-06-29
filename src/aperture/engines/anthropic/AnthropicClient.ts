@@ -4,6 +4,8 @@
  */
 
 import { Anthropic } from '@anthropic-ai/sdk';
+import { UsageLedger } from '../../usage/UsageLedger.js';
+import { computeCost } from '../../cost/modelPricing.js';
 
 const ALLOWED_MODELS = [
   'claude-3-opus-20240229',
@@ -17,6 +19,13 @@ export interface AnthropicGenerateInput {
   maxTokens: number;
   systemPrompt?: string;
   temperature?: number;
+  meta?: {
+    source?: string;
+    stage?: string;
+    agent?: string;
+    jobId?: string;
+    local?: boolean;
+  };
 }
 
 export interface AnthropicGenerateOutput {
@@ -86,10 +95,29 @@ export class AnthropicClient {
       const textContent = response.content.find(c => c.type === 'text');
       const text = textContent && 'text' in textContent ? textContent.text : '';
 
+      const inputTokens = response.usage?.input_tokens ?? 0;
+      const outputTokens = response.usage?.output_tokens ?? 0;
+
+      // Log usage to ledger
+      UsageLedger.log({
+        ts: new Date().toISOString(),
+        model: input.model,
+        tokensIn: inputTokens,
+        tokensOut: outputTokens,
+        totalTokens: inputTokens + outputTokens,
+        cost: computeCost(input.model, inputTokens, outputTokens),
+        source: input.meta?.source ?? 'cic-unknown',
+        stage: input.meta?.stage ?? 'UNKNOWN',
+        agent: input.meta?.agent ?? 'unknown',
+        jobId: input.meta?.jobId,
+        local: input.meta?.local ?? false,
+        env: (process.env.CIC_ENV as 'dev' | 'prod' | undefined) ?? 'prod',
+      });
+
       return {
         text,
-        inputTokens: response.usage?.input_tokens ?? null,
-        outputTokens: response.usage?.output_tokens ?? null,
+        inputTokens,
+        outputTokens,
         stopReason: response.stop_reason ?? null
       };
     } catch (err: any) {
@@ -98,19 +126,10 @@ export class AnthropicClient {
   }
 
   /**
-   * Estimate cost of generation (input only, for pre-flight)
+   * Estimate cost of generation (for pre-flight)
+   * Uses unified pricing table with both input and output
    */
-  static estimateCost(inputTokens: number, model: string): number {
-    // Rates per 1M tokens (as of Phase 27)
-    const rates: Record<string, { input: number; output: number }> = {
-      'claude-3-opus-20240229': { input: 15.0, output: 75.0 },
-      'claude-3-sonnet-20240229': { input: 3.0, output: 15.0 },
-      'claude-3-haiku-20240307': { input: 0.25, output: 1.25 }
-    };
-
-    const rate = rates[model];
-    if (!rate) return 0;
-
-    return (inputTokens / 1_000_000) * rate.input;
+  static estimateCost(inputTokens: number, model: string, outputTokens = 0): number {
+    return computeCost(model, inputTokens, outputTokens);
   }
 }

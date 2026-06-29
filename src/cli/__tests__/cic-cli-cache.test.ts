@@ -7,7 +7,7 @@ jest.mock('readline');
 
 describe('Cache CLI Commands', () => {
   beforeEach(() => {
-    const mockRouter = new CICPromptCacheRouter() as jest.Mocked<CICPromptCacheRouter>;
+    const mockRouter = new CICPromptCacheRouter({}) as jest.Mocked<CICPromptCacheRouter>;
 
     (CICPromptCacheRouter as jest.MockedClass<typeof CICPromptCacheRouter>).mockImplementation(() => mockRouter);
   });

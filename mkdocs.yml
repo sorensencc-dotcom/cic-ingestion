@@ -1,0 +1,91 @@
+site_name: CIC Build Automation
+site_description: Build automation, scheduling, and roadmap management for CIC phases
+theme:
+  name: material
+  palette:
+    scheme: slate
+    primary: indigo
+    accent: amber
+  features:
+    - navigation.instant
+    - navigation.top
+    - toc.integrate
+    - search.suggest
+
+nav:
+  - CIC:
+      - System: cic/CIC_SYSTEM.md
+      - Project State: cic/CIC_PROJECT_STATE.md
+
+      - Phase 1 MAAL:
+          - Overview: cic/PHASE-1_OVERVIEW.md
+          - Architecture: cic/PHASE-1_ARCHITECTURE.md
+          - MAAL Core: cic/PHASE-1_MAAL_CORE.md
+          - Ledger Substrate: cic/PHASE-1_LEDGER_SUBSTRATE.md
+          - BridgeOrchestrator: cic/PHASE-1_BRIDGE_ORCHESTRATOR.md
+          - File Contract: cic/PHASE-1_FILE_CONTRACT.md
+          - Implementation Order: cic/PHASE-1_IMPLEMENTATION_ORDER.md
+          - Testing: cic/PHASE-1_TESTING.md
+
+      - Phase 2 SPL/RL:
+          - Overview: cic/PHASE-2_OVERVIEW.md
+          - Architecture: cic/PHASE-2_ARCHITECTURE.md
+          - State Space: cic/PHASE-2_STATE_SPACE.md
+          - Action Space: cic/PHASE-2_ACTION_SPACE.md
+          - Reward Function: cic/PHASE-2_REWARD_FUNCTION.md
+          - Episode & Trajectory: cic/PHASE-2_EPISODE_TRAJECTORY.md
+          - Policy Learner: cic/PHASE-2_POLICY_LEARNER.md
+          - Simulation Engine: cic/PHASE-2_SIMULATION_ENGINE.md
+          - Training Loop: cic/PHASE-2_TRAINING_LOOP.md
+          - Integration: cic/PHASE-2_INTEGRATION.md
+          - Testing: cic/PHASE-2_TESTING.md
+
+      - Sandbox‑3:
+          - Overview: cic/SANDBOX-3_OVERVIEW.md
+          - Architecture: cic/SANDBOX-3_ARCHITECTURE.md
+          - Runtime: cic/SANDBOX-3_RUNTIME.md
+          - Harness v3: cic/SANDBOX-3_HARNESS_V3.md
+
+          - Execution & Isolation:
+              - Firecracker: cic/SANDBOX-3_FIRECRACKER.md
+              - VM Snapshotting: cic/SANDBOX-3_VM_SNAPSHOTTING.md
+              - Determinism: cic/SANDBOX-3_DETERMINISM.md
+
+          - Telemetry & Observability:
+              - Tracing Overview: cic/SANDBOX-3_TRACING.md
+              - Network Trace: cic/SANDBOX-3_NETWORK_TRACE.md
+              - Syscall Trace: cic/SANDBOX-3_SYSCALL_TRACE.md
+              - Latency & SLO: cic/SANDBOX-3_LATENCY.md
+              - Reproducibility: cic/SANDBOX-3_REPRODUCIBILITY.md
+              - Stability v3: cic/SANDBOX-3_STABILITY_V3.md
+
+          - Routing & MAAL:
+              - Routing v3: cic/SANDBOX-3_ROUTING_V3.md
+              - MAAL Integration: cic/SANDBOX-3_MAAL_INTEGRATION.md
+
+          - Deployment & Ops:
+              - Deployment: cic/SANDBOX-3_DEPLOYMENT.md
+              - Kubernetes: cic/SANDBOX-3_K8S.md
+              - Firecracker Nodepool: cic/SANDBOX-3_FIRECRACKER_NODEPOOL.md
+              - ONNX Sidecar: cic/SANDBOX-3_ONNX_SIDECAR.md
+
+          - Monitoring & Alerting:
+              - Monitoring: cic/SANDBOX-3_MONITORING.md
+              - Alerting: cic/SANDBOX-3_ALERTING.md
+              - Incident Response: cic/SANDBOX-3_INCIDENT_RESPONSE.md
+
+  - Rewrite Labs:
+      - System: rewrite/REWRITE_LABS_SYSTEM.md
+
+plugins:
+  - search
+  - minify:
+      minify_html: true
+
+markdown_extensions:
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.tabbed
+  - tables
+  - attr_list
+  - md_in_html

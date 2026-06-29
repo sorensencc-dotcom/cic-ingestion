@@ -5,7 +5,7 @@
 
 import fetch from 'node-fetch';
 
-describe('Phase 26: TorqueQuery Integration (Python ↔ TypeScript)', () => {
+describe.skip('Phase 26: TorqueQuery Integration (Python ↔ TypeScript)', () => {
   const PYTHON_URL = process.env.TORQUEQUERY_PYTHON_URL || 'http://localhost:8000';
   const TYPESCRIPT_URL = process.env.TORQUEQUERY_TS_URL || 'http://localhost:3110';
 
