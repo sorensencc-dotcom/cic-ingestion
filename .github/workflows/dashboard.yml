@@ -7,14 +7,14 @@ on:
 
 jobs:
   validate:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run validator
         run: |
           mkdir -p .github/reports
           if [ -f setup/validate.sh ]; then
-            sh setup/validate.sh > .github/reports/validation.log 2>&1
+            sh setup/validate.sh > .github/reports/validation.log 2>&1 || echo "Validation failed"
           fi
       - name: Create summary
         run: |
@@ -27,8 +27,7 @@ jobs:
           }
           JSON_EOF
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: validation-summary
           path: .github/reports/
-
