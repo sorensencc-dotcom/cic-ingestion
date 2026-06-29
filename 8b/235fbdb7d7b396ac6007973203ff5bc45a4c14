@@ -1,0 +1,31 @@
+tests/phase4/test_dsl_validity.ts
+  s_df325cb5e578a3::t_bfff67cd054d10 2-3,6-30,33-41,44-58,61-76,79-87
+tests/phase4/test_integration.ts
+  s_df325cb5e578a3::t_90bc4d35427760 1-144
+tests/phase4/test_immutability.ts
+  s_df325cb5e578a3::t_ebc526c2258f22 2-3,6-33,36-61
+tests/phase4/test_promotion.ts
+  s_df325cb5e578a3::t_9b77baf3661736 2-3,6-48,51-70,73-109
+tests/phase4/test_canary_execution.ts
+  s_df325cb5e578a3::t_cb7dbc41681d58 2-3,6-36,39-55,58-84,87-112
+tests/phase4/test_validation_engine.ts
+  s_df325cb5e578a3::t_4750485dad58cf 2-3,6-32,35-54,57-74,77-94,97-117
+tests/phase4/test_governance.ts
+  s_df325cb5e578a3::t_7ab4fdd242fff9 2-3,6-49,52-83,86-117,120-157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "8b235fbdb7d7b396ac6007973203ff5bc45a4c14",
+  "prompts": {},
+  "sessions": {
+    "s_df325cb5e578a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc9121f3-3563-4a3a-a4cc-390fec0b79ab",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
