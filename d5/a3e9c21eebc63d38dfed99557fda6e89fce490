@@ -1,0 +1,111 @@
+src/autonomy/AutonomyAPIServer.ts
+  s_3fadcb5ead162e::t_493361dff96d13 2-3,6-11,13,16-17,24,26,29,40,43-46,56,58-59,65-86,89-91,94-97,99-101,104-105,107-109,115,117-118,123,131-132,134-135,140-144,146-174,176,178,180,183-185,187-188,197-198,209-213,235
+.github/workflows/dashboard.yml
+  s_df325cb5e578a3::t_1204c5849002c4 33
+PHASE_4_COMPLETION.md
+  s_df325cb5e578a3::t_1592f0080aee15 1,3-5,9-56,58-66,68,70-78,80,82-86,88-128,130-132,134-138,140,143,145-153,156-198,200-205,208,210-221,223,225-234,236,240,242,244-246,248,250-252,254,256-258,260,262-265,267-272,274,276-278,282-296,298,300,302-309,311,313,315-324,328,330,332,336-338
+src/aperture/adapters/BaseAdapter.ts
+  s_0b0f97b34d8d3c::t_564998e56cab4e 6,10-11,48-58,85-96
+src/aperture/adapters/model/ModelGenerateAdapter.ts
+  s_b7660d9c740629::t_5ebcc89f3847a0 126-127
+src/aperture/engines/anthropic/AnthropicClient.ts
+  s_b7660d9c740629::t_8ecfb98109c81f 7-8,22-28,98-116,119-120,129-130,132-133
+src/aperture/sandbox/SandboxRuntime.ts
+  s_074422f5967f21::t_a817c10895a883 13-43,46-51,63-117,129,161-211,221-222,230-265,275-284,287,295-296
+src/autonomy/__tests__/phase-23-2-integration.test.ts
+  s_364b84448a6a24::t_ffcad8b8b4403e 19
+src/cli/__tests__/cic-cli-cache.test.ts
+  s_364b84448a6a24::t_5378356c5ca78f 10
+src/config/ConfigValidator.ts
+  s_91bb0beee11b1e::t_9a22b18ccdc3cc 8,12-18
+src/extractors/browser/CloakBrowserAdapter.ts
+  s_46387db08b7581::t_38a3c1b276c32b 306
+src/extractors/sweeper/SweeperFallbackRouter.test.ts
+  s_364b84448a6a24::t_734dd88214e969 14
+src/prompt-cache/metrics/CacheMetricsExporter.ts
+  s_364b84448a6a24::t_92e7c905730807 2-3,6-12,14-20,24-25,27-34,37-38,40-43,45-47,49-51,53-55,57-59,61-64
+src/prompt-cache/router.ts
+  s_364b84448a6a24::t_4154b40a39294e 3,6-11,14-15,20-29,34,38-44
+src/vector/__tests__/goldenQueries.test.ts
+  s_364b84448a6a24::t_e5b3c11c931689 6
+src/vector/__tests__/torqueQueryRegression.test.ts
+  s_364b84448a6a24::t_b4e7f778646588 36
+src/wayland/__tests__/wayland-adapter-registry.test.ts
+  s_364b84448a6a24::t_648a3aea03ea98 13,143-144
+src/wayland/__tests__/wayland-security-policy.test.ts
+  s_364b84448a6a24::t_47f8443b86e527 13
+tests/phase-26-integration.test.ts
+  s_364b84448a6a24::t_fa59c063c543dc 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.3",
+  "base_commit_sha": "d5a3e9c21eebc63d38dfed99557fda6e89fce490",
+  "prompts": {},
+  "sessions": {
+    "s_074422f5967f21": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a4416148fa85889b2",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_0b0f97b34d8d3c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ac162a1f49db70174",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_364b84448a6a24": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "39348d4a-ea3b-4770-9a70-03a4d04006b7",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_3fadcb5ead162e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "621b2118-696d-495a-a804-a2683ba9c11c",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_46387db08b7581": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2595e5c1-e91c-4649-bb40-64c2c2b1249e",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_91bb0beee11b1e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c0614379-e130-49de-9c7f-737fa4242e58",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_b7660d9c740629": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4e52b6c-1f36-461e-aa68-6808865d1038",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_df325cb5e578a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc9121f3-3563-4a3a-a4cc-390fec0b79ab",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
