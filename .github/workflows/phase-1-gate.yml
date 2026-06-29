@@ -2,7 +2,7 @@ name: Phase 1 Contract Gate
 
 on:
   push:
-    branches: [phase-1-maal-foundation]
+    branches: [phase-1-maal-foundation, master]
   pull_request:
     branches: [main, master]
 
