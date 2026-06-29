@@ -37,3 +37,15 @@ export { CanaryCohortController, CohortMetrics } from './canary/CanaryCohortCont
 export { CanaryTelemetryPoint, CanaryTelemetryCollector } from './canary/CanaryTelemetry';
 export { CanaryError, CANARY_ERRORS } from './canary/CanaryError';
 export { CanaryGateOrchestrator, CanaryGateOrchestrationResult, CanaryGateOrchestrationError } from './canary/CanaryGateOrchestrator';
+
+// Integration
+export {
+  BridgeOrchestrator,
+  SubmitProposalError,
+  ValidateProposalError,
+  GovernanceReviewError,
+  ExecuteCanaryError,
+  PromoteOrRollbackError,
+  GovernanceDecision,
+  PromotionDecision,
+} from './BridgeOrchestrator';
