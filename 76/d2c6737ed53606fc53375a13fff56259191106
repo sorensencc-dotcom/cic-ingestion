@@ -1,0 +1,40 @@
+src/ingestion/jobs/docsManagerIntegration.test.ts
+  s_df2e6afa516d1b::t_13df9216cca6e6 1-172
+src/ingestion/jobs/docsManagerJob.test.ts
+  s_df2e6afa516d1b::t_0adf21100c21c9 443
+  s_df2e6afa516d1b::t_28b348f5f6a0f0 393,404
+  s_df2e6afa516d1b::t_e0468cbf1fc6ea 369,380
+  s_df2e6afa516d1b::t_89402a7b784c23 1-368,370-379,381-392,394-403,405-442,444-562
+src/ingestion/jobs/docsManagerJob.ts
+  s_df2e6afa516d1b::t_e73236c8c4a4fa 227-229
+  s_df2e6afa516d1b::t_3cdd71cdaf737d 1-2,5-226,230-379
+  s_df2e6afa516d1b::t_2f86645439799f 3-4
+src/ingestion/daemon.ts
+  s_df2e6afa516d1b::t_77f6940496626f 13
+  s_df2e6afa516d1b::t_30981121b33421 163
+  s_df2e6afa516d1b::t_d5b63c16899b90 162,164
+src/ingestion/jobs/docsManagerEmitter.test.ts
+  s_df2e6afa516d1b::t_8fe3012dc4ca71 17-22,24-25,28-32
+  s_df2e6afa516d1b::t_5aa5dc2a338056 1
+  s_df2e6afa516d1b::t_222adc15b60901 33
+  s_df2e6afa516d1b::t_e6508d928212c4 23,26-27
+  s_df2e6afa516d1b::t_620896865ae187 2-4,14-16
+  s_df2e6afa516d1b::t_2569315d59a31e 34-36
+  s_df2e6afa516d1b::t_f676ec39487cdf 5-13,37-336
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "76d2c6737ed53606fc53375a13fff56259191106",
+  "prompts": {},
+  "sessions": {
+    "s_df2e6afa516d1b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a2e1852-b897-4d5c-bdd0-12ea7d0cb831",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
