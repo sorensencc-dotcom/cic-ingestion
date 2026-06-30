@@ -10,6 +10,7 @@ import { clientSessionExtractor } from "../extractors/clientSessionExtractor.js"
 import { processClientSession } from "../harness/replayHarness.js";
 import { decayDriftScores } from "../drift/driftEngine.js";
 import { verifyAuditChain } from "../../../governance/audit-policy.js";
+import { runDocsManagerIngestionJob } from "./jobs/docsManagerJob.js";
 
 export class IngestionDaemon {
   private intervalId: NodeJS.Timeout | null = null;
@@ -157,6 +158,9 @@ export class IngestionDaemon {
           cycleTotalTokens += entry.response.usage.total_tokens;
         }
       }
+
+      // Ingest docs-manager events (independent stream)
+      runDocsManagerIngestionJob(state as any);
 
       // Update SLA Metrics
       const backlog = totalLines - this.processedLines.size;
