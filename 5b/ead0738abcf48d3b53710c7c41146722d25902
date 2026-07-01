@@ -1,0 +1,21 @@
+src/autonomy/routes/console.ts
+  s_df2e6afa516d1b::t_8919818686b579 370-386,399
+  s_df2e6afa516d1b::t_ec2166ff624671 364
+  s_df2e6afa516d1b::t_10894133a9efc7 24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "5bead0738abcf48d3b53710c7c41146722d25902",
+  "prompts": {},
+  "sessions": {
+    "s_df2e6afa516d1b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a2e1852-b897-4d5c-bdd0-12ea7d0cb831",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
