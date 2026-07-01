@@ -21,6 +21,7 @@ import { Router, Request, Response } from 'express';
 import { AutonomyService } from '../AutonomyService.js';
 import { TorqueQueryClient } from '../../services/torquequery/TorqueQueryClient.js';
 import { ObservabilityManager } from '../ObservabilityManager.js';
+import { getDocsManagerMetrics } from '../ingestion/jobs/docsManagerJob.js';
 import {
   mapTorqueHealthToConsole,
   mapTorquePipelinesToConsole,
@@ -360,11 +361,28 @@ export function createConsoleRouter(
 
   /**
    * GET /console/metrics
-   * System metrics from TorqueQuery
+   * System metrics from TorqueQuery + docs-manager ingestion metrics
    */
   router.get('/console/metrics', async (req: Request, res: Response) => {
     try {
       const metrics = await torqueQuery.queryMetrics();
+
+      // Get docs-manager metrics from ingestion state
+      let docsManager: any = null;
+      try {
+        const state = (service as any).getState?.() || (service as any).state || {};
+        const docsManagerMetrics = getDocsManagerMetrics(state);
+        docsManager = {
+          drift: docsManagerMetrics.drift,
+          auditCount: docsManagerMetrics.audits.length,
+          lastSync: docsManagerMetrics.lastSync,
+          eventsProcessed: docsManagerMetrics.eventsProcessed,
+          eventsSkipped: docsManagerMetrics.eventsSkipped,
+          audits: docsManagerMetrics.audits.slice(-10), // Last 10 for dashboard
+        };
+      } catch (dmErr: any) {
+        console.warn('Failed to fetch docs-manager metrics:', dmErr?.message);
+      }
 
       return res.json({
         status: 'ok',
@@ -378,6 +396,7 @@ export function createConsoleRouter(
           requestsPerSecond: metrics.requestsPerSecond,
           errorRate: metrics.errorRate,
           avgLatencyMs: metrics.avgLatencyMs,
+          ...(docsManager && { docsManager }),
         },
         timestamp: new Date().toISOString(),
       });
