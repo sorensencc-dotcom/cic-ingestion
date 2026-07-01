@@ -1,0 +1,22 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: cic-api-gateway
+spec:
+  rules:
+    - http:
+        paths:
+          - path: /api/cic/
+            pathType: Prefix
+            backend:
+              service:
+                name: cic-api
+                port:
+                  number: 8080
+          - path: /dashboard/
+            pathType: Prefix
+            backend:
+              service:
+                name: cic-dashboard
+                port:
+                  number: 3000

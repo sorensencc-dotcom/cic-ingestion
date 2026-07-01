@@ -9,6 +9,14 @@ import { CanaryAssignmentEngine } from './CanaryAssignment';
 import { CanaryCohortController } from './CanaryCohortController';
 import { CanaryTelemetryCollector, CanaryTelemetryPoint } from './CanaryTelemetry';
 import { Result, Ok, Err } from '../support/Result';
+import { GovernanceCaps, MetricThresholds, DEFAULT_GOVERNANCE_CAPS, DEFAULT_METRIC_THRESHOLDS } from '../governance/GovernanceCaps';
+
+interface GovernanceContextCache {
+  timestamp: number;
+  caps: GovernanceCaps;
+  thresholds: MetricThresholds;
+  approvalEligibility: Record<string, boolean>;
+}
 
 export interface CanaryGateOrchestrationResult {
   readonly proposalId: string;
@@ -44,12 +52,47 @@ export class CanaryGateOrchestrator {
   private rollbackRetryCount: number = 0;
   private maxRollbackRetries: number = 3;
 
+  // Governance context cache (500ms TTL)
+  private governanceContextCache: GovernanceContextCache | null = null;
+  private readonly GOVERNANCE_CACHE_TTL = 500;
+
+  /**
+   * Load or retrieve cached governance context (500ms TTL).
+   * Caches governance caps, metric thresholds, and approval eligibility.
+   */
+  private async getGovernanceContext(): Promise<GovernanceContextCache> {
+    const now = Date.now();
+
+    // Check cache validity (500ms TTL)
+    if (this.governanceContextCache && (now - this.governanceContextCache.timestamp) < this.GOVERNANCE_CACHE_TTL) {
+      return this.governanceContextCache;
+    }
+
+    // Cache miss: load fresh governance context
+    // In real implementation, would fetch from database/governance service
+    const context: GovernanceContextCache = {
+      timestamp: now,
+      caps: DEFAULT_GOVERNANCE_CAPS,
+      thresholds: DEFAULT_METRIC_THRESHOLDS,
+      approvalEligibility: {
+        structural: true,  // Assume single approver is eligible
+        minor: true,       // Auto-approve minor changes
+      },
+    };
+
+    this.governanceContextCache = context;
+    return context;
+  }
+
   /**
    * Execute full canary lifecycle: assign → observe → promote/rollback.
    * Skeleton: placeholder metrics generation for now.
    */
   async execute(proposal: Proposal): Promise<Result<CanaryGateOrchestrationResult, CanaryGateOrchestrationError>> {
     try {
+      // Fetch governance context (cached 500ms)
+      const govContext = await this.getGovernanceContext();
+
       // Step 1: Start with 1% cohort
       let cohortSize = 1;
 
@@ -78,18 +121,17 @@ export class CanaryGateOrchestrator {
 
       this.telemetryCollector.recordPoint(telemetryPoint);
 
-      // Step 3-4: Decide growth or rollback
-      // TODO: In real implementation, this would be an async loop with observation windows
+      // Step 3-4: Decide growth or rollback using cached governance thresholds
       const growthConfig = {
         cohortCapPercent: 50,
         growthCurve: 'linear' as const,
         observationWindowMs: 300000,
         metricsCheckIntervalMs: 60000,
         thresholds: {
-          maxCostDelta: 0.1,
-          maxLatencyDelta: 0.15,
-          minSuccessRate: 0.95,
-          maxDriftScore: 0.2,
+          maxCostDelta: govContext.thresholds.costDeltaThreshold,
+          maxLatencyDelta: govContext.thresholds.latencyDeltaThreshold,
+          minSuccessRate: 1 - govContext.thresholds.correctnessDeltaThreshold,
+          maxDriftScore: govContext.thresholds.driftThreshold,
         },
       };
 

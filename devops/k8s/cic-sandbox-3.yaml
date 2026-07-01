@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cic-api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: cic-api
+  template:
+    metadata:
+      labels:
+        app: cic-api
+    spec:
+      containers:
+        - name: cic-api
+          image: cic-api:latest
+          ports:
+            - containerPort: 8080
+          env:
+            - name: POSTGRES_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cic-postgres-secret
+                  key: url
+          volumeMounts:
+            - name: onnx-models
+              mountPath: /models
+      volumes:
+        - name: onnx-models
+          emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cic-harness
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: cic-harness
+  template:
+    metadata:
+      labels:
+        app: cic-harness
+    spec:
+      containers:
+        - name: cic-harness
+          image: cic-harness:latest
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: kernel
+              mountPath: /kernel
+            - name: rootfs
+              mountPath: /rootfs
+      volumes:
+        - name: kernel
+          hostPath:
+            path: /var/firecracker/kernel
+        - name: rootfs
+          hostPath:
+            path: /var/firecracker/rootfs

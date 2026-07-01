@@ -16,6 +16,23 @@ export interface HydrationState {
   hitRate: number;
 }
 
+// Phase 5: Execution orchestrator warm pool
+export interface WarmExecutorContainer {
+  id: string;
+  toolId: string;
+  startedAt: number;
+  lastUsed: number;
+  isHealthy: boolean;
+  execCount: number;
+}
+
+export interface ExecutorPoolStats {
+  totalContainers: number;
+  activeContainers: number;
+  avgStartupTime: number;
+  containerHitRate: number;
+}
+
 export class WarmPoolManager {
   private pool = new Map<string, WarmPoolEntry>();
   private stats = {
@@ -23,6 +40,17 @@ export class WarmPoolManager {
     misses: 0,
     evictions: 0,
   };
+
+  // Phase 5: Execution orchestrator warm pool
+  private executorPool = new Map<string, WarmExecutorContainer>();
+  private executorStats = {
+    totalStartupTime: 0,
+    totalStartups: 0,
+    containerReuseCount: 0,
+  };
+  private readonly WARM_POOL_SIZE = 5; // Maintain 5 warm containers
+  private readonly CONTAINER_TTL = 600000; // 10 minutes
+  private readonly TRUSTED_TOOLS = new Set(['read', 'write', 'grep', 'execute_bash']); // Fast-path eligible
 
   private readonly defaultTTL = 3600000; // 1 hour
   private readonly maxPoolSize = 1000;
@@ -83,6 +111,77 @@ export class WarmPoolManager {
     return Promise.all(inputs.map((i) => this.hydrate(i)));
   }
 
+  /**
+   * Phase 5: Get warm executor container for tool.
+   * Reuse from pool if available, otherwise create new (cold start 1500ms → warm 200ms).
+   */
+  getWarmExecutor(toolId: string): WarmExecutorContainer {
+    const now = Date.now();
+
+    // Check for available warm container for this tool
+    for (const [, container] of this.executorPool) {
+      if (container.toolId === toolId && container.isHealthy) {
+        // Reuse warm container
+        container.lastUsed = now;
+        container.execCount++;
+        this.executorStats.containerReuseCount++;
+        return container;
+      }
+    }
+
+    // No warm container: create new (cold start)
+    const newContainer: WarmExecutorContainer = {
+      id: `executor-${Date.now()}-${Math.random()}`,
+      toolId,
+      startedAt: now,
+      lastUsed: now,
+      isHealthy: true,
+      execCount: 1,
+    };
+
+    // Add to pool if space available
+    if (this.executorPool.size < this.WARM_POOL_SIZE) {
+      this.executorPool.set(newContainer.id, newContainer);
+    }
+
+    return newContainer;
+  }
+
+  /**
+   * Check if tool is eligible for fast-path (trusted tools only).
+   * Fast-path skips full initialization, uses direct invocation.
+   */
+  isTrustedTool(toolId: string): boolean {
+    return this.TRUSTED_TOOLS.has(toolId);
+  }
+
+  /**
+   * Record executor startup time for warm pool optimization.
+   */
+  recordExecutorStartup(toolId: string, startupTime: number): void {
+    this.executorStats.totalStartupTime += startupTime;
+    this.executorStats.totalStartups++;
+  }
+
+  /**
+   * Get executor pool statistics.
+   */
+  getExecutorPoolStats(): ExecutorPoolStats {
+    const healthyContainers = Array.from(this.executorPool.values()).filter(c => c.isHealthy).length;
+    const avgStartupTime = this.executorStats.totalStartups > 0
+      ? this.executorStats.totalStartupTime / this.executorStats.totalStartups
+      : 0;
+
+    return {
+      totalContainers: this.executorPool.size,
+      activeContainers: healthyContainers,
+      avgStartupTime,
+      containerHitRate: this.executorStats.totalStartups > 0
+        ? this.executorStats.containerReuseCount / (this.executorStats.containerReuseCount + this.executorStats.totalStartups)
+        : 0,
+    };
+  }
+
   private async buildWarmState(input: AdapterInput): Promise<any> {
     return {
       embeddings: [],
@@ -133,6 +232,7 @@ export class WarmPoolManager {
       const now = Date.now();
       let evicted = 0;
 
+      // Clean hydration pool
       for (const [k, v] of this.pool) {
         if (now - v.timestamp > v.ttl) {
           this.pool.delete(k);
@@ -148,6 +248,14 @@ export class WarmPoolManager {
 
         for (let i = 0; i < entriesToRemove; i++) {
           this.pool.delete(sorted[i].key);
+          evicted++;
+        }
+      }
+
+      // Clean executor pool (Phase 5)
+      for (const [id, container] of this.executorPool) {
+        if (now - container.lastUsed > this.CONTAINER_TTL) {
+          this.executorPool.delete(id);
           evicted++;
         }
       }

@@ -1,0 +1,47 @@
+groups:
+  - name: sandbox-3-alerts
+    rules:
+
+      - alert: DriftHigh
+        expr: cic_drift_score > 0.75
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Drift score exceeded threshold"
+          description: "Drift score is {{ $value }}"
+
+      - alert: DriftSpike
+        expr: rate(cic_drift_score[2m]) > 0.15
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Sudden drift spike detected"
+          description: "Drift changed rapidly"
+
+      - alert: ReproducibilityLow
+        expr: sandbox3_reproducibility_score < 0.7
+        for: 10m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Reproducibility degraded"
+          description: "Reproducibility score is {{ $value }}"
+
+      - alert: FirecrackerBootSlow
+        expr: sandbox3_firecracker_boot_ms_bucket{le="500"} == 0
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Firecracker boot time elevated"
+          description: "Boot time exceeded 500ms"
+
+      - alert: SnapshotFailure
+        expr: increase(sandbox3_snapshot_errors_total[5m]) > 0
+        labels:
+          severity: critical
+        annotations:
+          summary: "Snapshot restore failure"
+          description: "Snapshot restore errors detected"

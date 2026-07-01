@@ -1,0 +1,24 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: onnx-sidecar
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: onnx-sidecar
+  template:
+    metadata:
+      labels:
+        app: onnx-sidecar
+    spec:
+      containers:
+        - name: onnx-sidecar
+          image: alpine:latest
+          command: ["sleep", "infinity"]
+          volumeMounts:
+            - name: onnx-models
+              mountPath: /models
+      volumes:
+        - name: onnx-models
+          emptyDir: {}

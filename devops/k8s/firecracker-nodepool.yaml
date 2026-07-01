@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: Node
+metadata:
+  name: firecracker-node-template
+  labels:
+    sandbox: firecracker
+    vm-capable: "true"
+  taints:
+    - key: sandbox
+      value: firecracker
+      effect: NoSchedule
+---
+apiVersion: apps/v1
+kind: DaemonSet
+metadata:
+  name: firecracker-host
+spec:
+  selector:
+    matchLabels:
+      app: firecracker-host
+  template:
+    metadata:
+      labels:
+        app: firecracker-host
+    spec:
+      containers:
+        - name: firecracker
+          image: firecracker-host:latest
+          securityContext:
+            privileged: true
+          volumeMounts:
+            - name: kvm
+              mountPath: /dev/kvm
+            - name: kernel
+              mountPath: /var/firecracker/kernel
+            - name: rootfs
+              mountPath: /var/firecracker/rootfs
+      volumes:
+        - name: kvm
+          hostPath:
+            path: /dev/kvm
+        - name: kernel
+          hostPath:
+            path: /var/firecracker/kernel
+        - name: rootfs
+          hostPath:
+            path: /var/firecracker/rootfs

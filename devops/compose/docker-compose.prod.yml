@@ -1,0 +1,47 @@
+version: "3.9"
+
+services:
+  cic-api:
+    image: cic-api:latest
+    restart: always
+    environment:
+      NODE_ENV: production
+      POSTGRES_URL: ${POSTGRES_URL}
+    ports:
+      - "8080:8080"
+    depends_on:
+      - postgres
+      - onnx-models
+    volumes:
+      - onnx_models:/models
+
+  cic-harness:
+    image: cic-harness:latest
+    privileged: true
+    restart: always
+    volumes:
+      - /dev/kvm:/dev/kvm
+      - firecracker_kernel:/kernel
+      - firecracker_rootfs:/rootfs
+
+  postgres:
+    image: postgres:15
+    restart: always
+    environment:
+      POSTGRES_USER: cic_admin
+      POSTGRES_PASSWORD: cic_password
+      POSTGRES_DB: cicdb
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  onnx-models:
+    image: alpine:latest
+    command: ["sleep", "infinity"]
+    volumes:
+      - onnx_models:/models
+
+volumes:
+  pgdata:
+  onnx_models:
+  firecracker_kernel:
+  firecracker_rootfs:

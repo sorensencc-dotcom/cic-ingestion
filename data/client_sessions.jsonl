@@ -1,0 +1,3 @@
+{"sessionId":"sess-001","clientId":"client-app-1","timestamp":1782789578000,"action":"login","metadata":{"userAgent":"Mozilla/5.0","ipAddress":"192.168.1.1"}}
+{"sessionId":"sess-002","clientId":"client-app-1","timestamp":1782789578100,"action":"query"CORRUPT_LINE_THIS_BREAKS_JSON
+{"sessionId":"sess-003","clientId":"client-app-2","timestamp":1782789578200,"action":"logout","metadata":{"duration":3600}}

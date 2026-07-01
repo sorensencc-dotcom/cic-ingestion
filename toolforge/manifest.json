@@ -1,0 +1,70 @@
+{
+  "version": "1.0.0",
+  "generated": "2026-06-28T16:30:00Z",
+  "tools": [
+    {
+      "name": "multiRepoRoadmapSync",
+      "category": "sync-tools",
+      "path": "C:/dev/toolforge/sync-tools/multiRepoRoadmapSync",
+      "description": "Unified drift detector + roadmap updater for sorensencc-dotcom repos.",
+      "entrypoint": "run.ps1",
+      "status": "active",
+      "version": "0.1.0",
+      "owner": "soren",
+      "tags": ["sync", "automation", "multi-repo"],
+      "dependencies": ["Node.js 20+", "PowerShell 7+"],
+      "schedule": "Daily 09:00 UTC",
+      "lastRun": "2026-06-28T09:15:00Z",
+      "nextRun": "2026-06-29T09:00:00Z"
+    },
+    {
+      "name": "toolforgeManifestSync",
+      "category": "daemons",
+      "path": "C:/dev/toolforge/daemons/toolforge-manifest-sync",
+      "description": "Background daemon that syncs toolforge manifest index.",
+      "entrypoint": "toolforge-manifest-sync.ps1",
+      "status": "active",
+      "version": "0.1.0",
+      "owner": "soren",
+      "tags": ["daemon", "metadata"],
+      "dependencies": ["PowerShell 7+"],
+      "schedule": "Every 15 minutes"
+    },
+    {
+      "name": "toolforgeDocsSync",
+      "category": "daemons",
+      "path": "C:/dev/toolforge/daemons/toolforge-docs-sync",
+      "description": "Background daemon that regenerates tool documentation.",
+      "entrypoint": "toolforge-docs-sync.ps1",
+      "status": "active",
+      "version": "0.1.0",
+      "owner": "soren",
+      "tags": ["daemon", "documentation"],
+      "dependencies": ["PowerShell 7+"]
+    },
+    {
+      "name": "toolforgeIndexSync",
+      "category": "daemons",
+      "path": "C:/dev/toolforge/daemons/toolforge-index-sync",
+      "description": "Background daemon that updates tool index (INDEX.md).",
+      "entrypoint": "toolforge-index-sync.ps1",
+      "status": "active",
+      "version": "0.1.0",
+      "owner": "soren",
+      "tags": ["daemon", "metadata"],
+      "dependencies": ["PowerShell 7+"]
+    },
+    {
+      "name": "setupTaskScheduler",
+      "category": "utilities",
+      "path": "C:/dev/toolforge/utilities/setup-task-scheduler",
+      "description": "Windows Task Scheduler registration for toolforge daemons and sync-tools.",
+      "entrypoint": "setup-task-scheduler.ps1",
+      "status": "active",
+      "version": "1.0.0",
+      "owner": "soren",
+      "tags": ["setup", "scheduling", "windows"],
+      "dependencies": ["PowerShell 7+", "Administrator privileges"]
+    }
+  ]
+}

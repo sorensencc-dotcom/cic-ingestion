@@ -1,0 +1,33 @@
+{
+  "title": "Sandbox-3 Overview",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "CIC API Latency",
+      "targets": [
+        { "expr": "cic_api_latency_ms_bucket" }
+      ]
+    },
+    {
+      "type": "gauge",
+      "title": "Drift Score",
+      "targets": [
+        { "expr": "cic_drift_score" }
+      ]
+    },
+    {
+      "type": "gauge",
+      "title": "Reproducibility",
+      "targets": [
+        { "expr": "sandbox3_reproducibility_score" }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Firecracker Boot Time",
+      "targets": [
+        { "expr": "sandbox3_firecracker_boot_ms_bucket" }
+      ]
+    }
+  ]
+}
