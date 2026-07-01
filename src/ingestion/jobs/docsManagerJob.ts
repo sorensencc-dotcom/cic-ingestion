@@ -88,6 +88,16 @@ interface DocsManagerState {
   eventsSkipped: number;
 }
 
+interface SegmentIndex {
+  segments: Array<{
+    file: string;
+    minSequenceId: number;
+    maxSequenceId: number;
+    eventCount: number;
+  }>;
+  lastUpdated: number;
+}
+
 const STATE_FILE = path.join(
   process.cwd(),
   "cic-ingestion",
@@ -100,6 +110,13 @@ const JSONL_PATH = path.join(
   "cic-ingestion",
   "logs",
   "docs_manager.jsonl"
+);
+
+const LOGS_DIR = path.dirname(JSONL_PATH);
+
+const SEGMENT_INDEX_PATH = path.join(
+  path.dirname(STATE_FILE),
+  "docs_manager_index.json"
 );
 
 function loadState(): DocsManagerState {
@@ -132,6 +149,35 @@ function saveState(state: DocsManagerState): void {
   } catch (err) {
     console.error(`Failed to save docs_manager state: ${err}`);
   }
+}
+
+function loadSegmentIndex(): SegmentIndex {
+  try {
+    if (fs.existsSync(SEGMENT_INDEX_PATH)) {
+      const content = fs.readFileSync(SEGMENT_INDEX_PATH, "utf8");
+      return JSON.parse(content);
+    }
+  } catch (err) {
+    console.warn(`Failed to load segment index: ${err}`);
+  }
+
+  return { segments: [], lastUpdated: Date.now() };
+}
+
+function getSegmentsToRead(lastSeenSequenceId: number): string[] {
+  const index = loadSegmentIndex();
+
+  // If no index exists, fall back to monolithic JSONL
+  if (index.segments.length === 0) {
+    if (fs.existsSync(JSONL_PATH)) {
+      return [JSONL_PATH];
+    }
+    return [];
+  }
+
+  return index.segments
+    .filter(seg => seg.maxSequenceId > lastSeenSequenceId)
+    .map(seg => path.join(LOGS_DIR, seg.file));
 }
 
 // === Validation ===
@@ -282,59 +328,73 @@ function processEvent(event: DocsManagerEvent, cicState: CICState): void {
 // === Main Job ===
 
 export function runDocsManagerIngestionJob(cicState: CICState): void {
-  if (!fs.existsSync(JSONL_PATH)) {
-    return;
-  }
-
   const state = loadState();
   let processed = 0;
   let skipped = 0;
 
   try {
-    const content = fs.readFileSync(JSONL_PATH, "utf8");
-    const lines = content.trim().split("\n");
+    // Get list of segments to read based on lastSeenSequenceId
+    const filesToRead = getSegmentsToRead(state.lastSeenSequenceId);
 
-    for (const line of lines) {
-      if (!line.trim()) continue;
+    if (filesToRead.length === 0) {
+      return;
+    }
 
-      // Parse JSON
-      let event: any;
+    for (const filePath of filesToRead) {
+      if (!fs.existsSync(filePath)) {
+        console.warn(`[DocsManager] Segment not found: ${filePath}`);
+        continue;
+      }
+
       try {
-        event = JSON.parse(line);
+        const content = fs.readFileSync(filePath, "utf8");
+        const lines = content.trim().split("\n");
+
+        for (const line of lines) {
+          if (!line.trim()) continue;
+
+          // Parse JSON
+          let event: any;
+          try {
+            event = JSON.parse(line);
+          } catch (err) {
+            skipped++;
+            console.warn(`[DocsManager] Malformed JSONL line, skipping: ${line.slice(0, 80)}...`);
+            continue;
+          }
+
+          // Validate
+          const validation = validateEvent(event);
+          if (!validation.valid) {
+            skipped++;
+            console.warn(
+              `[DocsManager] Invalid event (sequenceId ${event.sequenceId}): ${validation.error}`
+            );
+            continue;
+          }
+
+          // Skip if already processed
+          if (event.sequenceId <= state.lastSeenSequenceId) {
+            skipped++;
+            console.debug(`[DocsManager] Duplicate sequenceId ${event.sequenceId}, skipping`);
+            continue;
+          }
+
+          // Process
+          try {
+            processEvent(event, cicState);
+            state.lastSeenSequenceId = event.sequenceId;
+            state.lastProcessedTimestamp = event.timestamp;
+            processed++;
+          } catch (err) {
+            skipped++;
+            console.error(
+              `[DocsManager] Failed to process event (sequenceId ${event.sequenceId}): ${err}`
+            );
+          }
+        }
       } catch (err) {
-        skipped++;
-        console.warn(`[DocsManager] Malformed JSONL line, skipping: ${line.slice(0, 80)}...`);
-        continue;
-      }
-
-      // Validate
-      const validation = validateEvent(event);
-      if (!validation.valid) {
-        skipped++;
-        console.warn(
-          `[DocsManager] Invalid event (sequenceId ${event.sequenceId}): ${validation.error}`
-        );
-        continue;
-      }
-
-      // Skip if already processed
-      if (event.sequenceId <= state.lastSeenSequenceId) {
-        skipped++;
-        console.debug(`[DocsManager] Duplicate sequenceId ${event.sequenceId}, skipping`);
-        continue;
-      }
-
-      // Process
-      try {
-        processEvent(event, cicState);
-        state.lastSeenSequenceId = event.sequenceId;
-        state.lastProcessedTimestamp = event.timestamp;
-        processed++;
-      } catch (err) {
-        skipped++;
-        console.error(
-          `[DocsManager] Failed to process event (sequenceId ${event.sequenceId}): ${err}`
-        );
+        console.error(`[DocsManager] Failed to read segment ${filePath}: ${err}`);
       }
     }
 

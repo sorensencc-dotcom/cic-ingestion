@@ -31,12 +31,21 @@ import {
   mapTorqueAgentDetailToConsole,
 } from './mappers/consoleMappers.js';
 
+interface MetricsCache {
+  timestamp: number;
+  data: any;
+}
+
 export function createConsoleRouter(
   service: AutonomyService,
   torqueQuery: TorqueQueryClient,
 ): Router {
   const router = Router();
   const observability = ObservabilityManager.getInstance();
+
+  // Micro-cache for metrics endpoint (10ms TTL)
+  let metricsCache: MetricsCache | null = null;
+  const METRICS_CACHE_TTL = 10;
 
   /**
    * GET /console/health
@@ -362,9 +371,17 @@ export function createConsoleRouter(
   /**
    * GET /console/metrics
    * System metrics from TorqueQuery + docs-manager ingestion metrics
+   * Cached with 10ms TTL to reduce load on TorqueQuery during dashboard polling
    */
   router.get('/console/metrics', async (req: Request, res: Response) => {
     try {
+      const now = Date.now();
+
+      // Check cache first (10ms TTL)
+      if (metricsCache && (now - metricsCache.timestamp) < METRICS_CACHE_TTL) {
+        return res.json(metricsCache.data);
+      }
+
       const metrics = await torqueQuery.queryMetrics();
 
       // Get docs-manager metrics from ingestion state
@@ -384,7 +401,7 @@ export function createConsoleRouter(
         console.warn('Failed to fetch docs-manager metrics:', dmErr?.message);
       }
 
-      return res.json({
+      const responsePayload = {
         status: 'ok',
         data: {
           timestamp: new Date().toISOString(),
@@ -399,7 +416,15 @@ export function createConsoleRouter(
           ...(docsManager && { docsManager }),
         },
         timestamp: new Date().toISOString(),
-      });
+      };
+
+      // Update cache
+      metricsCache = {
+        timestamp: now,
+        data: responsePayload,
+      };
+
+      return res.json(responsePayload);
     } catch (err: any) {
       console.error('GET /console/metrics error:', err);
       return res.status(502).json({
