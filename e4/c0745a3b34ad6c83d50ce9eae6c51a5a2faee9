@@ -1,0 +1,192 @@
+src/harness/firecracker-stability-validator.ts
+  s_dd6ba8541d96e2::t_65a746e12cbd70 1-40
+src/core/maal/canary/CanaryGateOrchestrator.ts
+  s_df2e6afa516d1b::t_87833a94d59963 12
+  s_df2e6afa516d1b::t_9b654d203676fc 13
+  s_df2e6afa516d1b::t_4c91b3e92929dd 14-19
+  s_df2e6afa516d1b::t_6857be5b953db9 55-86,93-95,124,131-134
+tests/routing/fallback-graph.test.ts
+  s_dd6ba8541d96e2::t_23bc06d13c0d2c 1-8
+src/services/WarmPoolManager.ts
+  s_df2e6afa516d1b::t_2cde74f7c5da7e 29-35,44-54
+  s_df2e6afa516d1b::t_bf97e885dc4ac5 19-28
+  s_df2e6afa516d1b::t_6df72c95437ccb 114-184,235,255-262
+src/harness/onnx-latency-profile.ts
+  s_dd6ba8541d96e2::t_d837dbb4557554 1-23
+tests/maal/constraint-engine.test.ts
+  s_dd6ba8541d96e2::t_19f01992d9ee06 1-9
+src/harness/stability-check.ts
+  s_dd6ba8541d96e2::t_b33aa99796e663 1-19
+src/harness/routing-determinism-validator.ts
+  s_dd6ba8541d96e2::t_bac92c07a40ce2 1-40
+tests/sandbox-3/onnx-inference.test.ts
+  s_dd6ba8541d96e2::t_87b2fba08d899a 1-9
+tests/routing/regime-selector.test.ts
+  s_dd6ba8541d96e2::t_754028bbf7148f 1-8
+src/harness/repro-check.ts
+  s_dd6ba8541d96e2::t_e288d8cefd5bfa 1-126
+src/harness/drift-regression-check.ts
+  s_dd6ba8541d96e2::t_e924ee683f174d 1-12
+tests/sandbox-3/firecracker-boot.test.ts
+  s_dd6ba8541d96e2::t_9d5c8b781a4594 1-8
+ARCHITECTURE.md
+  s_221e0e15286437::t_c173477040653e 1-184
+src/services/torquequery/TorqueQueryClient.ts
+  s_df2e6afa516d1b::t_055d39c559409e 34-96
+  s_df2e6afa516d1b::t_bc5a2ddb749e80 181-211
+  s_df2e6afa516d1b::t_392193ef71aebe 4,7-16,25-27
+data/client_sessions.jsonl
+  s_61d272931279ac::t_0e9e2c9d15a7ae 1-3
+src/harness/seed-injector.ts
+  s_dd6ba8541d96e2::t_fa0e87ca91d0fa 1-41
+src/harness/routing-latency-profile.ts
+  s_dd6ba8541d96e2::t_0b5c47670f47fe 1-23
+tests/harness/snapshot-restore.test.ts
+  s_dd6ba8541d96e2::t_2c725e818a67da 1-8
+src/harness/latency-envelope-validator.ts
+  s_dd6ba8541d96e2::t_f6bcb7928ccb12 1-14
+src/harness/snapshot-hash-verifier.ts
+  s_dd6ba8541d96e2::t_294de33a06915b 1-137
+tests/harness/fs-hash.test.ts
+  s_dd6ba8541d96e2::t_033fc93228c09f 1-9
+tests/maal/routing-regimes.test.ts
+  s_dd6ba8541d96e2::t_fd3764f5acce55 1-10
+src/harness/onnx-determinism-validator.ts
+  s_dd6ba8541d96e2::t_70b6ad807b8528 1-44
+tests/sandbox-3/snapshot-repro.test.ts
+  s_dd6ba8541d96e2::t_c58921d62090e5 1-8
+docs/cic/CIC_MASTER_INDEX.md
+  s_df325cb5e578a3::t_be132981e289af 1-117
+src/extractors/clientSessionExtractor.ts
+  s_36fb254a0cc773::t_3972512fbb9ce6 1-28
+src/harvester/index.ts
+  s_36fb254a0cc773::t_681915d18f48cd 1-9
+src/ingestion/queue/index.ts
+  s_36fb254a0cc773::t_337ca80a932c65 1-32
+CONTRIBUTING.md
+  s_df325cb5e578a3::t_c4aa085588043a 1-290
+monitoring/collectors/firecracker-collector.ts
+  s_df325cb5e578a3::t_5fda09fae01630 1-11
+monitoring/grafana/dashboards/sandbox-3.json
+  s_df325cb5e578a3::t_c88a470d88a017 1-33
+monitoring/incidents/slo-playbooks.md
+  s_dd6ba8541d96e2::t_8bddfb59bc7964 1-129
+monitoring/prometheus/sandbox-3-metrics.ts
+  s_df325cb5e578a3::t_75e1306ef37f42 1-17
+src/harness/firecracker-latency-profile.ts
+  s_dd6ba8541d96e2::t_949a86a4ed6db3 1-21
+OPERATIONS.md
+  s_dd6ba8541d96e2::t_452f74737ace2f 1-270
+ROADMAP.md
+  s_dd6ba8541d96e2::t_a0c9abba68f00e 1-107
+SECURITY.md
+  s_dd6ba8541d96e2::t_db101a25af5da5 1-50
+devops/automation/ci/pipeline.yml
+  s_dd6ba8541d96e2::t_bd5b61de1e01bc 1-76
+devops/automation/scripts/deploy.sh
+  s_dd6ba8541d96e2::t_acb0a57595299a 1-39
+devops/automation/scripts/monitor.sh
+  s_dd6ba8541d96e2::t_99b86ac353da7e 1-24
+devops/automation/scripts/rollback.sh
+  s_dd6ba8541d96e2::t_31bdb5e870160c 1-25
+devops/automation/terraform/main.tf
+  s_dd6ba8541d96e2::t_a83a90839fe197 1-138
+devops/compose/docker-compose.prod.yml
+  s_dd6ba8541d96e2::t_378815bb0ece7f 1-47
+devops/k8s/cic-api-gateway.yaml
+  s_dd6ba8541d96e2::t_af7659bdc5d4e3 1-22
+devops/k8s/cic-sandbox-3.yaml
+  s_dd6ba8541d96e2::t_cec6b443a0badd 1-63
+devops/k8s/firecracker-nodepool.yaml
+  s_dd6ba8541d96e2::t_bd3aed96de0e6d 1-47
+devops/k8s/onnx-sidecar.yaml
+  s_dd6ba8541d96e2::t_dc1f5d3b97e3b1 1-24
+monitoring/alerts/drift-alert-engine.ts
+  s_dd6ba8541d96e2::t_5f53b31bab69be 1-25
+monitoring/alerts/repro-alert-engine.ts
+  s_dd6ba8541d96e2::t_0ca30f4172de43 1-29
+monitoring/collectors/onnx-collector.ts
+  s_dd6ba8541d96e2::t_bdda044a6f6800 1-16
+monitoring/prometheus/alerts/sandbox-3-alerts.yml
+  s_dd6ba8541d96e2::t_1432fc96d2696a 1-47
+monitoring/prometheus/cic-metrics-exporter.ts
+  s_dd6ba8541d96e2::t_a372e09fa8d4c3 1-28
+src/harness/replayHarness.ts
+  s_dd6ba8541d96e2::t_6500835c7556d3 1-16
+toolforge/GOVERNANCE.md
+  s_dd6ba8541d96e2::t_f0179b0d21237c 1-193
+toolforge/INDEX.md
+  s_dd6ba8541d96e2::t_cfce1bfdaa0b55 1-145
+toolforge/OPERATOR_GUIDE.md
+  s_dd6ba8541d96e2::t_4a7bd2393323b7 1-284
+toolforge/README.md
+  s_dd6ba8541d96e2::t_74e13d90724a04 1-56
+toolforge/ROADMAP.md
+  s_dd6ba8541d96e2::t_8b3ccde335f301 1-104
+toolforge/TOOL_CREATION_GUIDE.md
+  s_dd6ba8541d96e2::t_60cafda7b2dc62 1-358
+toolforge/_TEMPLATE/README.md
+  s_dd6ba8541d96e2::t_bb5e157f2d6a60 1
+toolforge/_TEMPLATE/VERSION.md
+  s_dd6ba8541d96e2::t_4bbdb8566ad8f5 1
+toolforge/manifest.json
+  s_dd6ba8541d96e2::t_9726d30b299803 1-70
+toolforge/sync-tools/README.md
+  s_dd6ba8541d96e2::t_4e67a88340edf0 1-251
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.8",
+  "base_commit_sha": "e4c0745a3b34ad6c83d50ce9eae6c51a5a2faee9",
+  "prompts": {},
+  "sessions": {
+    "s_221e0e15286437": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3d4616f8-e928-4baa-ad90-d5cc01d545e6",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_36fb254a0cc773": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "65474609-ed90-4416-b93e-eda46cfea5ab",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_61d272931279ac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f3be727e-31ce-455a-b684-4be0b17901b2",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_dd6ba8541d96e2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "588c57dd-a154-4310-999a-7e439565b398",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_df2e6afa516d1b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a2e1852-b897-4d5c-bdd0-12ea7d0cb831",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_df325cb5e578a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dc9121f3-3563-4a3a-a4cc-390fec0b79ab",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
