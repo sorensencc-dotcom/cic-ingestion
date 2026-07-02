@@ -9,7 +9,7 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - name: Run validator
         run: |
           if [ -f setup/validate.sh ]; then
@@ -20,8 +20,9 @@ jobs:
           fi
       - name: Upload results
         if: always()
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: nightly-validation-${{ github.run_id }}
           path: .
+
 
