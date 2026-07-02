@@ -11,6 +11,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
 
       - name: Validate Phase 1 File Contract
         run: |
@@ -128,4 +131,5 @@ jobs:
 
       - name: Report Status
         run: echo "✅ Phase 1 Contract Gate: PASS"
+
 

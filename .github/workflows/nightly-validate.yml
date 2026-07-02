@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4.1.7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
       - name: Run validator
         run: |
           if [ -f setup/validate.sh ]; then
@@ -24,6 +27,7 @@ jobs:
         with:
           name: nightly-validation-${{ github.run_id }}
           path: .
+
 
 
 

@@ -10,6 +10,9 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4.1.7
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
       - name: Run validator
         run: |
           mkdir -p .github/reports
@@ -31,4 +34,5 @@ jobs:
         with:
           name: validation-summary
           path: .github/reports/
+
 
