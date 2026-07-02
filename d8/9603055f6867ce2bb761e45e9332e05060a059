@@ -1,0 +1,22 @@
+src/autonomy/AutonomyAPIServer.ts
+  s_cb9cc0072317a2::t_33a5d6f05c41df 12-16,19-22
+  s_cb9cc0072317a2::t_87a48423bb5bde 11
+  s_cb9cc0072317a2::t_6caec958c68649 10
+  s_cb9cc0072317a2::t_bbfcdaf9dabcfc 131-176
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.9",
+  "base_commit_sha": "d89603055f6867ce2bb761e45e9332e05060a059",
+  "prompts": {},
+  "sessions": {
+    "s_cb9cc0072317a2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2b9e4418-e9b7-4f47-8b0a-fa70e19169d1",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
