@@ -7,8 +7,19 @@ import express, { Express, Request, Response, NextFunction } from "express";
 import cron from "node-cron";
 import { createExecutionRouter } from "./routes/execution.js";
 import { createFireDrillRouter } from "./routes/firedrills.js";
+import { AdapterRegistry } from "../adapters/AdapterRegistry.js";
+import { AdapterIntegrationService } from "../services/AdapterIntegrationService.js";
+import { GrokHardenedAdapter } from "../adapters/grok/GrokHardenedAdapter.js";
+import { GrokProvider } from "../adapters/grok/grok-provider.js";
+import { GrokMcpClient } from "../adapters/grok/grok-mcp-client.js";
+import { GrokModelClient } from "../adapters/grok/grok-model-client.js";
+import { createExecuteRouter } from "../routes/execute.js";
 import { UsageLedger } from "../lib/usage/UsageLedger.js";
 import { generateCicCostComputeReport } from "../lib/report/CicCostComputeReport.js";
+import { HardeningRegistry } from "../../../src/resilience/hardeningOrchestrator.js";
+import { CircuitBreakerRegistry } from "../../../src/resilience/circuitBreaker.js";
+import { RateLimiterRegistry } from "../../../src/resilience/rateLimiter.js";
+import { ResilientMetricsCollector } from "../../../src/observability/resilientMetricsCollector.js";
 
 export interface AutonomyAPIServerConfig {
   port?: number;
@@ -116,6 +127,52 @@ export class AutonomyAPIServer {
 
     this.app.use("/autonomy", executionRouter);
     this.app.use("/autonomy", fireDrillRouter);
+
+    // Grok Hardened Adapter (Phase A+B+C: Cache + Hardening)
+    const adapterRegistry = new AdapterRegistry();
+    const torqueQueryUrl = this.config.memoryQueryApiUrl || process.env.MEMORY_STORE_URL || "http://localhost:3110";
+    const grokMcpClient = new GrokMcpClient(torqueQueryUrl);
+    const grokModelClient = new GrokModelClient(
+      process.env.GROK_MODEL_BASE_URL || "https://api.x.ai",
+      process.env.GROK_API_KEY || process.env.XAI_API_KEY || "mock-api-key"
+    );
+    const grokProvider = new GrokProvider(grokMcpClient, grokModelClient);
+
+    // Initialize hardening infrastructure (Phase B)
+    const circuitBreakerRegistry = new CircuitBreakerRegistry();
+    const rateLimiterRegistry = new RateLimiterRegistry();
+    const hardeningRegistry = new HardeningRegistry();
+
+    const metricsCollector = new ResilientMetricsCollector(
+      hardeningRegistry,
+      circuitBreakerRegistry,
+      rateLimiterRegistry
+    );
+
+    const grokHardenedAdapter = new GrokHardenedAdapter(
+      {
+        name: "grok-hardened",
+        version: "1.0.0",
+        timeout: 30000,
+        retries: 2,
+      },
+      grokProvider,
+      hardeningRegistry,
+      true, // cacheEnabled
+      true  // contextCacheEnabled
+    );
+
+    adapterRegistry.register("xai-docs-mcp", grokHardenedAdapter);
+    adapterRegistry.register("grok", grokHardenedAdapter);
+
+    // Expose metrics endpoint for Prometheus scraping (Phase C observability)
+    this.app.get("/metrics", (req: Request, res: Response) => {
+      return res.type("text/plain").send(metricsCollector.getPrometheusMetrics());
+    });
+
+    const adapterService = new AdapterIntegrationService(adapterRegistry);
+    const executeRouter = createExecuteRouter(adapterService);
+    this.app.use("/", executeRouter);
 
     // 404 handler
     this.app.use((req: Request, res: Response) => {
