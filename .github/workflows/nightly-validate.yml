@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: '24'
+          node-version: '20'
       - name: Run validator
         run: |
           if [ -f setup/validate.sh ]; then
@@ -27,6 +27,7 @@ jobs:
         with:
           name: nightly-validation-${{ github.run_id }}
           path: .
+
 
 
 
