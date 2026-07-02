@@ -9,7 +9,7 @@ jobs:
   validate:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.1.7
       - name: Run validator
         run: |
           mkdir -p .github/reports
@@ -27,7 +27,8 @@ jobs:
           }
           JSON_EOF
       - name: Upload artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.3.6
         with:
           name: validation-summary
           path: .github/reports/
+

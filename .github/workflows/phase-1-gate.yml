@@ -10,7 +10,7 @@ jobs:
   phase-1-validation:
     runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4.1.7
 
       - name: Validate Phase 1 File Contract
         run: |
@@ -128,3 +128,4 @@ jobs:
 
       - name: Report Status
         run: echo "✅ Phase 1 Contract Gate: PASS"
+
