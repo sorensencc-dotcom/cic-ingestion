@@ -1,0 +1,356 @@
+src/core/maal/codesign/Proposal.ts
+  s_38d1f14026a375::t_bdab837934ef2f 1-6,9,11-12,16
+  s_38d1f14026a375::t_cda104a1f8812c 17
+  s_0f5ebe671cb72e::t_817f0e8bc72e8d 21-22,26-27,32
+src/index.ts
+  s_38d1f14026a375::t_9f82737e5a2b2b 1-4,6-7,9-10,12,14-37,41
+  s_38d1f14026a375::t_53824c1f2aa3c0 38-40
+src/autonomy/routes/console.ts
+  s_0f5ebe671cb72e::t_05495912560956 39
+  s_0f5ebe671cb72e::t_d963311129bfbf 370-371,382,386
+  s_0f5ebe671cb72e::t_11cca7be79da74 21-22
+src/rag/grok-rag-optimized.ts
+  s_38d1f14026a375::t_63ec345dfc59f8 2
+  s_cb9cc0072317a2::t_4c181e86fcd308 1,3-209
+src/tests/harnesses/maalRoutingReplay.ts
+  s_38d1f14026a375::t_88c73b39b99394 177
+  s_df2e6afa516d1b::t_c20b2e5da12f8b 1-176
+src/ingestion/daemon.ts
+  s_38d1f14026a375::t_fa4008eb921421 92-103
+  s_38d1f14026a375::t_b6bba97ef4d663 8,12-13
+src/core/maal/index.ts
+  s_38d1f14026a375::t_4543da3732fa86 7-9,12,22,24-26,29-31,34-39,42,46,51-56,59-78
+  s_38d1f14026a375::t_046982092fe6ba 23
+  s_38d1f14026a375::t_cd173b76babfa9 57-58
+  s_38d1f14026a375::t_15f92ecaddad60 79-81
+  s_38d1f14026a375::t_4f341e92ebe928 82-108
+src/services/torquequery/TorqueQueryV2Server.py
+  s_df2e6afa516d1b::t_e3400194b4dcc9 1-197
+src/adapters/familysearch/FamilySearchAdapter.ts
+  s_0f5ebe671cb72e::t_6dc6fadf70f583 1
+  s_0f5ebe671cb72e::t_e7303d54a6277d 16
+src/adapters/torqueQueryV2.ts
+  s_df2e6afa516d1b::t_bb2ea26f45a618 1-124
+src/adapters/metrics/ConsoleMetricsAdapter.ts
+  s_0f5ebe671cb72e::t_6f3601e602ac3c 1,3-41
+  s_0f5ebe671cb72e::t_f0d19ed5e80675 2
+src/adapters/grok/grok-mcp-client.ts
+  s_0f5ebe671cb72e::t_a8790aa3da9cef 16
+  s_0f5ebe671cb72e::t_0757fb0b5514c6 1-3,5-15,17-27,29-39
+  s_0f5ebe671cb72e::t_e62fbf57b09bc8 4
+  s_0f5ebe671cb72e::t_a5532290a02239 28
+src/adapters/grokMcpAdapter.ts
+  s_df2e6afa516d1b::t_8bed906efe6e82 1-46,49-64,66-67
+src/adapters/grokRoutingAdapter.ts
+  s_df2e6afa516d1b::t_7340568d25bf11 2-7,10-11,13-16,18-21,23-24,27-28,30-32,34-48,50-51,54-55,57-66
+src/prompt-cache/config/index.ts
+  s_38d1f14026a375::t_350667307c4e16 1-2,4-6
+src/adapters/grok/GrokHardenedAdapter.ts
+  s_38d1f14026a375::t_eb58773dde2281 122,132,136,138-139
+  s_38d1f14026a375::t_731678c0014a57 147-150
+  s_38d1f14026a375::t_f76427ca734316 3-4
+src/adapters/grok/grok-provider.ts
+  s_0f5ebe671cb72e::t_a94975d19989b3 1-57
+src/drift/driftEngine.ts
+  s_c74da4cdd3552b::t_46d17038fffe4f 39,43,74
+  s_df2e6afa516d1b::t_75ae3ecd2df2c3 4-5,78
+src/adapters/grok/GrokUnifiedAdapterOptimized.ts
+  s_38d1f14026a375::t_c7562fc949e899 117-118
+  s_cb9cc0072317a2::t_3d9c63bcc77f31 1-2,4,6-7,9-22,24-59,61-116,119-124,129,132-163,166-170,173-177,180-185,188-201
+  s_38d1f14026a375::t_bdef575f201bd8 125-126,128
+  s_38d1f14026a375::t_bc726de22a040b 3
+  s_cb9cc0072317a2::t_30b024e366ca80 202-204
+src/lib/log.ts
+  s_0f5ebe671cb72e::t_fa7b14b5750db7 3,7,11-15
+  s_0f5ebe671cb72e::t_55eebdcb0cd4e8 1-2
+  s_0f5ebe671cb72e::t_eca66548af627b 4-6
+  s_0f5ebe671cb72e::t_0f6c4ec36b923e 8-10
+src/tests/harnesses/cicIngestionReplay.ts
+  s_df2e6afa516d1b::t_8ea89defb29685 1-161
+  s_38d1f14026a375::t_3057ed687c4e89 162
+tests/determinism-validation.test.ts
+  s_df2e6afa516d1b::t_937b19a0d2bdeb 2-4,7-10,12-14,16-17,20-29,32-42,45-69,72-77,79-81,83-85,87-88,90,93-101,104-107,109,111,113-114,116-117,120-130,133-135,137-138,140-143,146-148,150-152,155-165,168-170,172-173,175-178,181-187,191-192,194-195,198-208,211-237,240-255,258-263,265-268,270-271,273-276,278-279,283-294,297-308
+tsconfig.json
+  s_38d1f14026a375::t_62a982173ca2a7 14
+  s_38d1f14026a375::t_6485108e51ff79 15-19,28
+  s_0f5ebe671cb72e::t_24491ca03edbf4 27
+  s_38d1f14026a375::t_161bab61cb3169 1-6,9-12,26,29
+  s_38d1f14026a375::t_9c39b6560b1711 8,13,20-25
+  s_38d1f14026a375::t_3e85e99c0581cd 7
+src/tests/harnesses/runAllHarnesses.ts
+  s_38d1f14026a375::t_6347ddfdf2c708 181
+  s_38d1f14026a375::t_5b83e1fd1a8931 49
+  s_38d1f14026a375::t_ea12e601ec474b 46-48
+  s_38d1f14026a375::t_52d4d949fbbcde 50-52,178-180
+  s_38d1f14026a375::t_45df3174e7bc2e 1-45,53-177
+src/learning/LedgerEventConsumer.ts
+  s_0f5ebe671cb72e::t_b9075a127e49f9 1-3
+src/batch/driftBatcher.ts
+  s_cb9cc0072317a2::t_e8aee91f897aea 1-154
+src/config/cloudRoutingConfig.ts
+  s_df2e6afa516d1b::t_4680c4d4dbb557 1-61
+src/core/maal/support/Result.ts
+  s_38d1f14026a375::t_09da8c7191a24d 35
+  s_38d1f14026a375::t_5f4588414c52b4 14-15,18-19,42-43,46-47,51
+  s_38d1f14026a375::t_65c8fec1334da2 58
+  s_38d1f14026a375::t_e55c012ad55504 13
+  s_38d1f14026a375::t_1c413c662be24b 17
+  s_38d1f14026a375::t_c8d1204014c140 32-34
+  s_38d1f14026a375::t_2b4fca687dd3db 41
+  s_38d1f14026a375::t_97b6f8796a5654 44-45
+  s_38d1f14026a375::t_0d81b6b8357e6b 49-50
+  s_38d1f14026a375::t_6d40103ba1f27b 57
+  s_38d1f14026a375::t_e66df0945c05fc 4-7,10,21,25-26,29-31,38,53-54,61-62
+src/adapters/cloudProviderAdapter.ts
+  s_df2e6afa516d1b::t_49b6e45d5ea967 1-132
+src/autonomy/AutonomyAPIServer.ts
+  s_0f5ebe671cb72e::t_2e3b509bf2354c 19
+  s_38d1f14026a375::t_ae03a67a8a290c 10-12,23-27
+  s_0f5ebe671cb72e::t_f74df86ad4478f 132-137,141-142,181-195,233
+.gitignore
+  s_c74da4cdd3552b::t_d222ecb3b3fe16 5-17
+  s_38d1f14026a375::t_a4809652e7e11f 1-4
+  s_c74da4cdd3552b::t_6266b3b6bf26ca 18-20
+  s_38d1f14026a375::t_196b38e3e916e2 21-24
+package.json
+  s_38d1f14026a375::t_313f5bcafb0f06 1-9,11-21
+  s_0f5ebe671cb72e::t_5cdf482713a901 10
+src/tests/harnesses/driftScoringHarness.ts
+  s_38d1f14026a375::t_4c2c69f10433aa 214-215
+  s_df2e6afa516d1b::t_73677ebc9c91d2 1-213
+src/orchestrator/BridgeOrchestrator.ts
+  s_38d1f14026a375::t_4bc2e67742ea51 1-4
+  s_38d1f14026a375::t_1a74abb7f4e97c 15
+  s_38d1f14026a375::t_9937bb3e6cefa1 16-17
+  s_0f5ebe671cb72e::t_5e7a66d6e17f15 24,36,44,52,66,80,92,125
+reports/cicCostComputePdf.d.ts
+  s_0f5ebe671cb72e::t_76516c28cc4011 1-17
+reports/cicCostComputePdf.d.ts.map
+  s_0f5ebe671cb72e::t_db6075a7083de9 1
+reports/cicCostComputePdf.js
+  s_0f5ebe671cb72e::t_9e98eb9b152cfa 1-53
+reports/cicCostComputePdf.js.map
+  s_0f5ebe671cb72e::t_70c1111dfc907d 1
+src/ingestion/xai-docs-mcp.ts
+  s_5d0c5e7843ce32::t_78c937678bb966 1-120
+src/tests/xai-ingestion-flow.test.ts
+  s_5d0c5e7843ce32::t_4eaee6b6025b60 1-24,27-65,67,71-76,78,80-81,83-85,88-117
+dist/src/autonomy/routes/console.d.ts.map
+  s_15888ac6989198::t_8dca31328da051 1
+dist/src/autonomy/routes/console.js
+  s_15888ac6989198::t_111bd9df28bea3 21,26-28,339-340,344-348,350-367,379,382-388
+dist/src/autonomy/routes/console.js.map
+  s_15888ac6989198::t_fd3a68d7f492d4 1
+dist/src/cli/cic-cli-cache.js
+  s_15888ac6989198::t_d34d939be6289e 29
+dist/src/cli/cic-cli-cache.js.map
+  s_15888ac6989198::t_284bcbccedd562 1
+dist/src/extractors/browser/CloakBrowserAdapter.js
+  s_15888ac6989198::t_4bfea187ac002b 11-15,202
+dist/src/extractors/browser/CloakBrowserAdapter.js.map
+  s_15888ac6989198::t_9b9fec6bc0dda2 1
+dist/src/extractors/browser/RetryPolicy.js
+  s_15888ac6989198::t_67cf90a8cae956 10-11
+dist/src/extractors/browser/RetryPolicy.js.map
+  s_15888ac6989198::t_cac5ea7f88f3fe 1
+dist/src/extractors/sweeper/SweeperFallbackRouter.js
+  s_15888ac6989198::t_7f5580e017c525 25-27
+dist/src/extractors/sweeper/SweeperFallbackRouter.js.map
+  s_15888ac6989198::t_30c99d8e4d4518 1
+dist/src/services/torquequery/TorqueQueryClient.d.ts
+  s_15888ac6989198::t_2bec46aef5a146 4,13-15,17-31,44-48
+dist/src/services/torquequery/TorqueQueryClient.d.ts.map
+  s_15888ac6989198::t_41630bbf4345ee 1
+dist/src/services/torquequery/TorqueQueryClient.js
+  s_15888ac6989198::t_a16cdb3826d4cd 4,7-11,16-67,138-166
+dist/src/services/torquequery/TorqueQueryClient.js.map
+  s_15888ac6989198::t_27eb35e14a641e 1
+dist/src/validation/guards.js
+  s_15888ac6989198::t_b5d8595e2fe6f9 17,27
+dist/src/validation/guards.js.map
+  s_15888ac6989198::t_d78bfcaa7ccd2f 1
+src/aperture/engines/anthropic/AnthropicClient.ts
+  s_0f5ebe671cb72e::t_988c63e83ff50e 7-8
+src/autonomy/FireDrillManager.ts
+  s_38d1f14026a375::t_cb72ae4aef796d 7-9
+src/core/ledger/LedgerEvent.ts
+  s_38d1f14026a375::t_c42c9fe20f1798 1-2,4
+src/core/maal/BridgeOrchestrator.ts
+  s_38d1f14026a375::t_f71ec498ef5254 76,125,151,208,215,222,234,241
+src/core/maal/MAALRouter.ts
+  s_38d1f14026a375::t_208f06ad92b79b 1-7,9
+src/core/maal/canary/CanaryGateOrchestrator.ts
+  s_38d1f14026a375::t_ee753bc335e2cc 136-137
+src/core/maal/canary/CanaryTelemetry.ts
+  s_0f5ebe671cb72e::t_b64ee1c853eb83 1-22,27-32,43-44,47-48,51-52
+src/learning/policy/PolicyNetwork.ts
+  s_38d1f14026a375::t_5aa84cdf063620 1-3
+src/learning/reward/RouteOutcome.ts
+  s_38d1f14026a375::t_61e7d97c51b9ee 1-4
+src/learning/state/RouteState.ts
+  s_38d1f14026a375::t_83078c173fb4b1 1-4
+src/lib/report/htmlToPdf.ts
+  s_38d1f14026a375::t_b509b0a4299642 26
+src/services/WarmPoolManager.ts
+  s_38d1f14026a375::t_4c9718960ac18e 55-56
+src/tests/adapter-integration.test.ts
+  s_0f5ebe671cb72e::t_82392f323a312e 189
+dist/src/aperture/adapters/BaseAdapter.js
+  s_df2e6afa516d1b::t_5d576a46e65ce6 8-12
+dist/src/aperture/adapters/BaseAdapter.js.map
+  s_df2e6afa516d1b::t_9c1c0801fa844b 1
+dist/src/aperture/adapters/model/ModelGenerateAdapter.d.ts.map
+  s_df2e6afa516d1b::t_821beb439ebedf 1
+dist/src/aperture/adapters/model/ModelGenerateAdapter.js
+  s_df2e6afa516d1b::t_d1c947081157f2 9-13,101-102
+dist/src/aperture/adapters/model/ModelGenerateAdapter.js.map
+  s_df2e6afa516d1b::t_7bef68d7048da4 1
+dist/src/aperture/engines/anthropic/AnthropicClient.d.ts
+  s_df2e6afa516d1b::t_dd404a8c7815d3 11-17,36-37,39
+dist/src/aperture/engines/anthropic/AnthropicClient.d.ts.map
+  s_df2e6afa516d1b::t_682db474d0d403 1
+dist/src/aperture/engines/anthropic/AnthropicClient.js
+  s_df2e6afa516d1b::t_3c5cf578ca6473 6-7,14,62-78,81-82,91-92,94-95
+dist/src/aperture/engines/anthropic/AnthropicClient.js.map
+  s_df2e6afa516d1b::t_536167c2644071 1
+dist/src/aperture/engines/puppeteer/PuppeteerEngine.js
+  s_df2e6afa516d1b::t_4eec448cf4c09b 7-9
+dist/src/aperture/engines/puppeteer/PuppeteerEngine.js.map
+  s_df2e6afa516d1b::t_febb527b176bd2 1
+dist/src/aperture/orchestrator/ExecutionOrchestrator.js
+  s_df2e6afa516d1b::t_2d5caf2aba75ed 7-11
+dist/src/aperture/orchestrator/ExecutionOrchestrator.js.map
+  s_df2e6afa516d1b::t_cff4fc0c0d2338 1
+dist/src/aperture/policy/PolicyEngine.js
+  s_df2e6afa516d1b::t_d76e16accf98f0 6-8
+dist/src/aperture/policy/PolicyEngine.js.map
+  s_df2e6afa516d1b::t_e83302793eefee 1
+dist/src/aperture/registry/AdapterRegistry.js
+  s_df2e6afa516d1b::t_f1661376f2d91a 39
+dist/src/aperture/registry/AdapterRegistry.js.map
+  s_df2e6afa516d1b::t_d1e4974319398c 1
+dist/src/aperture/sandbox/SandboxRuntime.js
+  s_df2e6afa516d1b::t_5feb1396570379 15-17
+dist/src/aperture/sandbox/SandboxRuntime.js.map
+  s_df2e6afa516d1b::t_2e10eaf6a01118 1
+dist/src/autonomy/AutonomyAPIServer.d.ts
+  s_df2e6afa516d1b::t_b1a116e501ef7b 2-3,5-6,9-10,16-17,21
+dist/src/autonomy/AutonomyAPIServer.d.ts.map
+  s_df2e6afa516d1b::t_87bf200853e36d 1
+dist/src/autonomy/AutonomyAPIServer.js
+  s_df2e6afa516d1b::t_963a55c5d85814 2-3,5-21,23-27,30,39,41-44,54,56-57,63,65-82,85-98,100-102,107-133,135-137,141,148-149,151-152,156-159,161-189,192,194-195,198-200,204-205,216-219
+dist/src/autonomy/AutonomyAPIServer.js.map
+  s_df2e6afa516d1b::t_a69aea145b6165 1
+dist/src/autonomy/ExecutionPolicy.js
+  s_df2e6afa516d1b::t_4b8db0d576dd6f 49-128
+dist/src/autonomy/ExecutionPolicy.js.map
+  s_df2e6afa516d1b::t_83718db9ae3b24 1
+dist/src/autonomy/ExecutionPolicyInterceptor.js
+  s_df2e6afa516d1b::t_a5f59cbf09ec62 14-15
+dist/src/autonomy/ExecutionPolicyInterceptor.js.map
+  s_df2e6afa516d1b::t_c770360b70eb9c 1
+dist/src/autonomy/TaskMetadataStore.js
+  s_df2e6afa516d1b::t_7b2b81d205e75f 13-14
+dist/src/autonomy/TaskMetadataStore.js.map
+  s_df2e6afa516d1b::t_035d10ee760d01 1
+dist/src/prompt-cache/metrics/CacheMetricsExporter.d.ts
+  s_df2e6afa516d1b::t_8018de43a273df 2-3,5-18,21
+dist/src/prompt-cache/metrics/CacheMetricsExporter.d.ts.map
+  s_df2e6afa516d1b::t_9a1f8bbfdb7f1c 1
+dist/src/prompt-cache/metrics/CacheMetricsExporter.js
+  s_df2e6afa516d1b::t_30697b5db9017d 2-3,7,9,11-12,14,17-43
+dist/src/prompt-cache/metrics/CacheMetricsExporter.js.map
+  s_df2e6afa516d1b::t_9596d1116229aa 1
+dist/src/prompt-cache/router.d.ts
+  s_df2e6afa516d1b::t_06b1022fca585b 3,5-10,12-13,17-18
+dist/src/prompt-cache/router.d.ts.map
+  s_df2e6afa516d1b::t_0d7dec33e8d112 1
+dist/src/prompt-cache/router.js
+  s_df2e6afa516d1b::t_6fb95e651863a0 3,6-15,19,22-28
+dist/src/prompt-cache/router.js.map
+  s_df2e6afa516d1b::t_6bc3ec54f2388b 1
+dist/src/vector/retrievalDriftDetector.js
+  s_df2e6afa516d1b::t_d81d2b4dd666ee 9-11,13-14,18,20,24-25,31,33-34,39,51-59,61
+dist/src/vector/retrievalDriftDetector.js.map
+  s_df2e6afa516d1b::t_3b284351a34f90 1
+src/adapters/BaseAdapter.ts
+  s_df2e6afa516d1b::t_26f8cfd36042da 25
+src/adapters/grok/GrokUnifiedAdapter.ts
+  s_df2e6afa516d1b::t_75faaca525441b 1-129
+src/adapters/grok/grok-model-client.ts
+  s_df2e6afa516d1b::t_617be6afd0ae09 1-31
+src/adapters/grok/json-rpc.ts
+  s_df2e6afa516d1b::t_2cc72c486830e7 1-24
+src/core/maal/support/Phase4Types.ts
+  s_df2e6afa516d1b::t_2b044369b4387a 1-61
+src/drift/grok-drift.ts
+  s_df2e6afa516d1b::t_85fdf72f11d290 1-18
+src/learning/OfflineLearningService.ts
+  s_df2e6afa516d1b::t_5c15e549457903 1
+src/rag/grok-rag.ts
+  s_df2e6afa516d1b::t_31478bf65cc4fc 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "7d82bb869ea20c45ec937bec51930b59b7553a14",
+  "prompts": {},
+  "sessions": {
+    "s_0f5ebe671cb72e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bda57b96-bad7-402a-9012-63daaf1871dc",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_15888ac6989198": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2135e328-9fde-4392-88ac-25b506a8a9e3",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_38d1f14026a375": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "007a8e6d-b554-4ca7-b28a-8ec8c6d80cb4",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_5d0c5e7843ce32": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "13c90d8b-008b-4cd1-9cbc-a8e19f55c5d1",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_c74da4cdd3552b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d2fbbf7d-1d34-4479-994f-38749ce93498",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_cb9cc0072317a2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2b9e4418-e9b7-4f47-8b0a-fa70e19169d1",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_df2e6afa516d1b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a2e1852-b897-4d5c-bdd0-12ea7d0cb831",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
