@@ -22,6 +22,7 @@ export interface AdapterOutput {
   };
   score?: number;
   timestamp: number;
+  metadata?: Record<string, any>;
 }
 
 export abstract class BaseAdapter {

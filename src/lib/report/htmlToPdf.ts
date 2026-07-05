@@ -23,7 +23,7 @@ export async function htmlToPdf(
     // Try to import puppeteer dynamically
     const puppeteer = await import('puppeteer');
     const browser = await puppeteer.default.launch({
-      headless: 'new',
+      headless: true,
       args: ['--no-sandbox', '--disable-setuid-sandbox'],
     });
 

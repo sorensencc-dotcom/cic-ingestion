@@ -1,57 +1,27 @@
 /**
- * Autonomy API Server (Phase 23.7.3)
- * Express server that exposes autonomy endpoints:
- * - POST /autonomy/signals — detect signals
- * - GET /autonomy/signals — query signals
- * - GET /autonomy/proposals — query proposals
- * - POST /autonomy/proposals — generate proposals
- * - PUT /autonomy/proposals/:id — update proposal status
+ * CIC Autonomy API Server
+ * Express server exposing autonomy + execution + fire-drill endpoints
  */
-import { Express } from 'express';
-import { AutonomyService, AutonomyServiceConfig } from './AutonomyService.js';
-export interface AutonomyAPIServerConfig extends AutonomyServiceConfig {
+import { Express } from "express";
+export interface AutonomyAPIServerConfig {
     port?: number;
     host?: string;
+    memoryQueryApiUrl?: string;
+    roadmapContext?: any;
 }
 export declare class AutonomyAPIServer {
     private app;
-    private service;
     private config;
-    private cicConfig;
     private server;
-    private observability;
-    constructor(config: AutonomyAPIServerConfig);
-    /**
-     * Setup Express middleware
-     */
+    private cronJobs;
+    constructor(config?: AutonomyAPIServerConfig);
     private setupMiddleware;
-    /**
-     * Setup routes
-     */
     private setupRoutes;
-    /**
-     * Setup error handler
-     */
     private setupErrorHandler;
-    /**
-     * Start the server
-     */
+    private setupCronSchedules;
     start(): Promise<void>;
-    /**
-     * Stop the server
-     */
     stop(): Promise<void>;
-    /**
-     * Get the underlying Express app (for testing)
-     */
     getApp(): Express;
-    /**
-     * Get the service (for testing)
-     */
-    getService(): AutonomyService;
 }
-/**
- * Convenience function to start the server
- */
 export declare function startAutonomyAPIServer(config: AutonomyAPIServerConfig): Promise<AutonomyAPIServer>;
 //# sourceMappingURL=AutonomyAPIServer.d.ts.map

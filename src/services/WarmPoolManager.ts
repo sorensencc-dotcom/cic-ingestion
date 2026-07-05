@@ -52,8 +52,8 @@ export class WarmPoolManager {
   private readonly CONTAINER_TTL = 600000; // 10 minutes
   private readonly TRUSTED_TOOLS = new Set(['read', 'write', 'grep', 'execute_bash']); // Fast-path eligible
 
-  private readonly defaultTTL = 3600000; // 1 hour
-  private readonly maxPoolSize = 1000;
+  private defaultTTL: number;
+  private maxPoolSize: number;
   private cleanupInterval: NodeJS.Timeout | null = null;
 
   constructor(ttl = 3600000, maxSize = 1000) {

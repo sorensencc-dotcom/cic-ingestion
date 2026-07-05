@@ -4,9 +4,9 @@
  * Reports violations to SLO controller + governance layer
  */
 
-import { FireDrillHarness, FireDrillResult } from "../../../src/tests/d-phase/fire-drill-harness.js";
-import { MockProvider } from "../../../src/tests/mocks/mockProvider.js";
-import { logEvent } from "../../../src/observability/events.js";
+import { FireDrillHarness, FireDrillResult } from "src/tests/d-phase/fire-drill-harness.js";
+import { MockProvider } from "src/tests/mocks/mockProvider.js";
+import { logEvent } from "src/observability/events.js";
 
 export interface FireDrillConfig {
   enabled: boolean;

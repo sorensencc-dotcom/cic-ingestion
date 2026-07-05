@@ -8,11 +8,12 @@ import { v4 as uuidv4 } from 'uuid';
 import { BrowserErrorCode, } from './IBrowserEngine';
 import { RetryPolicy } from './RetryPolicy';
 export class CloakBrowserAdapter {
+    browser = null;
+    pages = new Map();
+    logCallbacks = [];
+    sessionMetadata = new Map();
+    retryPolicy;
     constructor() {
-        this.browser = null;
-        this.pages = new Map();
-        this.logCallbacks = [];
-        this.sessionMetadata = new Map();
         // CloakBrowser initialization deferred to first use
         this.retryPolicy = new RetryPolicy({ maxRetries: 2, backoffMs: [250, 500] });
     }
@@ -198,7 +199,7 @@ export class CloakBrowserAdapter {
         // For now, return a mock that can be replaced
         try {
             const cloakBrowser = await import('cloakbrowser');
-            return await cloakBrowser.launch({ headless: true });
+            return (await cloakBrowser.launch({ headless: true }));
         }
         catch (error) {
             throw new Error('CloakBrowser not installed. Run: npm install cloakbrowser');

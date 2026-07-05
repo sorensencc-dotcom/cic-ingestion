@@ -4,6 +4,9 @@
  */
 import puppeteer from 'puppeteer';
 export class PuppeteerEngine {
+    static browser = null;
+    static pageCount = 0;
+    static lastMemoryCheck = Date.now();
     /**
      * Get or create shared browser instance
      */
@@ -86,7 +89,4 @@ export class PuppeteerEngine {
         };
     }
 }
-PuppeteerEngine.browser = null;
-PuppeteerEngine.pageCount = 0;
-PuppeteerEngine.lastMemoryCheck = Date.now();
 //# sourceMappingURL=PuppeteerEngine.js.map

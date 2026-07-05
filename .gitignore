@@ -1,0 +1,24 @@
+# Config files
+!tsconfig.json
+!package.json
+
+# Whitelist specific tracked files in cic-ingestion
+!src/drift/driftEngine.ts
+!src/ingestion/jobs/docsManager*.ts
+!src/ingestion/daemon.ts
+!src/services/torquequery/TorqueQueryV2Server.py
+!src/adapters/torqueQueryV2.ts
+!src/adapters/cloudProviderAdapter.ts
+!src/adapters/grokMcpAdapter.ts
+!src/adapters/grokRoutingAdapter.ts
+!src/config/cloudRoutingConfig.ts
+!src/tests/harnesses/maalRoutingReplay.ts
+!src/tests/harnesses/cicIngestionReplay.ts
+!src/tests/harnesses/driftScoringHarness.ts
+node_modules/
+dist/
+.venv/
+coverage/
+*.log
+.env
+.env.local

@@ -1,7 +1,7 @@
 import { BaseAdapter, AdapterConfig, AdapterInput, AdapterOutput } from "../BaseAdapter.js";
 import { GrokProvider } from "./grok-provider.js";
-import { ragSearchCache, ragContextCache, RagCache } from "../../../../src/cache/ragCache.js";
-import { HardeningOrchestrator, HardeningRegistry } from "../../../../src/resilience/hardeningOrchestrator.js";
+import { ragSearchCache, ragContextCache, RagCache } from "src/cache/ragCache.js";
+import { HardeningOrchestrator, HardeningRegistry } from "src/resilience/hardeningOrchestrator.js";
 
 /**
  * Hardened Grok adapter with:
@@ -119,6 +119,7 @@ export class GrokHardenedAdapter extends BaseAdapter {
       return {
         success: true,
         data: result,
+        timestamp,
         metadata: {
           duration,
           timestamp,
@@ -128,17 +129,23 @@ export class GrokHardenedAdapter extends BaseAdapter {
         },
       };
     } catch (error) {
+      const errorTimestamp = Date.now();
       return {
         success: false,
         error: error instanceof Error ? error.message : String(error),
+        timestamp: errorTimestamp,
         metadata: {
-          duration: Date.now() - timestamp,
-          timestamp,
+          duration: errorTimestamp - timestamp,
+          timestamp: errorTimestamp,
           adapter: this.config.name,
           orchestratorMetrics: this.orchestrator.getMetrics(),
         },
       };
     }
+  }
+
+  validate(output: AdapterOutput): AdapterOutput {
+    return output;
   }
 
   /**

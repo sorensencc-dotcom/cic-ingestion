@@ -8,6 +8,13 @@ export interface AnthropicGenerateInput {
     maxTokens: number;
     systemPrompt?: string;
     temperature?: number;
+    meta?: {
+        source?: string;
+        stage?: string;
+        agent?: string;
+        jobId?: string;
+        local?: boolean;
+    };
 }
 export interface AnthropicGenerateOutput {
     text: string;
@@ -26,8 +33,9 @@ export declare class AnthropicClient {
      */
     static generate(input: AnthropicGenerateInput): Promise<AnthropicGenerateOutput>;
     /**
-     * Estimate cost of generation (input only, for pre-flight)
+     * Estimate cost of generation (for pre-flight)
+     * Uses unified pricing table with both input and output
      */
-    static estimateCost(inputTokens: number, model: string): number;
+    static estimateCost(inputTokens: number, model: string, outputTokens?: number): number;
 }
 //# sourceMappingURL=AnthropicClient.d.ts.map

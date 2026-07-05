@@ -7,19 +7,24 @@ import express, { Express, Request, Response, NextFunction } from "express";
 import cron from "node-cron";
 import { createExecutionRouter } from "./routes/execution.js";
 import { createFireDrillRouter } from "./routes/firedrills.js";
+import { createConsoleRouter } from "./routes/console.js";
+import { createMemoryRouter } from "./routes/memory.js";
+import { createGovernanceRouter } from "./routes/governance.js";
 import { AdapterRegistry } from "../adapters/AdapterRegistry.js";
 import { AdapterIntegrationService } from "../services/AdapterIntegrationService.js";
 import { GrokHardenedAdapter } from "../adapters/grok/GrokHardenedAdapter.js";
 import { GrokProvider } from "../adapters/grok/grok-provider.js";
 import { GrokMcpClient } from "../adapters/grok/grok-mcp-client.js";
 import { GrokModelClient } from "../adapters/grok/grok-model-client.js";
+import { ConsoleMetricsAdapter } from "../adapters/metrics/ConsoleMetricsAdapter.js";
 import { createExecuteRouter } from "../routes/execute.js";
 import { UsageLedger } from "../lib/usage/UsageLedger.js";
 import { generateCicCostComputeReport } from "../lib/report/CicCostComputeReport.js";
-import { HardeningRegistry } from "../../../src/resilience/hardeningOrchestrator.js";
-import { CircuitBreakerRegistry } from "../../../src/resilience/circuitBreaker.js";
-import { RateLimiterRegistry } from "../../../src/resilience/rateLimiter.js";
-import { ResilientMetricsCollector } from "../../../src/observability/resilientMetricsCollector.js";
+import { TorqueQueryClient } from "../../src/services/torquequery/TorqueQueryClient";
+import { HardeningRegistry } from "../../src/resilience/hardeningOrchestrator";
+import { CircuitBreakerRegistry } from "../../src/resilience/circuitBreaker";
+import { RateLimiterRegistry } from "../../src/resilience/rateLimiter";
+import { ResilientMetricsCollector } from "../../src/observability/resilientMetricsCollector";
 
 export interface AutonomyAPIServerConfig {
   port?: number;
@@ -124,9 +129,17 @@ export class AutonomyAPIServer {
     // Mount routers
     const executionRouter = createExecutionRouter();
     const fireDrillRouter = createFireDrillRouter();
+    const memoryRouter = createMemoryRouter({
+      memoryStoreUrl: this.config.memoryQueryApiUrl || process.env.MEMORY_STORE_URL || "http://localhost:3110",
+    });
+    const governanceRouter = createGovernanceRouter({
+      governanceControlPlaneUrl: process.env.GOVERNANCE_URL || "http://localhost:3113",
+    });
 
     this.app.use("/autonomy", executionRouter);
     this.app.use("/autonomy", fireDrillRouter);
+    this.app.use("/autonomy", memoryRouter);
+    this.app.use("/autonomy", governanceRouter);
 
     // Grok Hardened Adapter (Phase A+B+C: Cache + Hardening)
     const adapterRegistry = new AdapterRegistry();
@@ -165,6 +178,21 @@ export class AutonomyAPIServer {
     adapterRegistry.register("xai-docs-mcp", grokHardenedAdapter);
     adapterRegistry.register("grok", grokHardenedAdapter);
 
+    // Console Metrics Adapter (Phase 8)
+    const torqueQueryClient = new TorqueQueryClient(torqueQueryUrl);
+    const consoleMetricsAdapter = new ConsoleMetricsAdapter({
+      name: "console-metrics",
+      version: "1.0.0",
+      timeout: 5000,
+      retries: 1,
+      torqueQuery: torqueQueryClient,
+    });
+    adapterRegistry.register("console-metrics", consoleMetricsAdapter);
+
+    // Mount console router
+    const consoleRouter = createConsoleRouter(torqueQueryClient, new AdapterIntegrationService(adapterRegistry));
+    this.app.use("/", consoleRouter);
+
     // Expose metrics endpoint for Prometheus scraping (Phase C observability)
     this.app.get("/metrics", (req: Request, res: Response) => {
       return res.type("text/plain").send(metricsCollector.getPrometheusMetrics());
@@ -202,7 +230,7 @@ export class AutonomyAPIServer {
     try {
       // Dynamic import for generatePdfReport
       const importPdfReports = async () => {
-        const { generatePdfReport } = await import("../reports/cicCostComputePdf.js");
+        const { generatePdfReport } = await import("../../reports/cicCostComputePdf.js");
         return generatePdfReport;
       };
 

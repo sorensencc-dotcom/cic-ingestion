@@ -186,7 +186,7 @@ describe("AdapterIntegrationService", () => {
       retries: 3,
     });
 
-    errorAdapter.run = jest.fn().mockRejectedValue(new Error("Network error"));
+    (errorAdapter.run as any) = jest.fn().mockRejectedValue(new Error("Network error") as never);
     service.registerAdapter("error", errorAdapter);
 
     const result = await service.execute("error", { key: "error-1" });

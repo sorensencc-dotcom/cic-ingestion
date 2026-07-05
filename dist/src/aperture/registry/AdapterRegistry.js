@@ -36,9 +36,7 @@ function validateAgainstSchema(input, schema) {
     };
 }
 export class AdapterRegistry {
-    constructor() {
-        this.adapters = new Map();
-    }
+    adapters = new Map();
     /**
      * Register or update an adapter definition
      */

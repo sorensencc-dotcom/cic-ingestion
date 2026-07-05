@@ -18,10 +18,8 @@
  */
 
 import { Router, Request, Response } from 'express';
-import { AutonomyService } from '../AutonomyService.js';
-import { TorqueQueryClient } from '../../services/torquequery/TorqueQueryClient.js';
-import { ObservabilityManager } from '../ObservabilityManager.js';
-import { getDocsManagerMetrics } from '../ingestion/jobs/docsManagerJob.js';
+import { TorqueQueryClient } from '../../../src/services/torquequery/TorqueQueryClient';
+import { AdapterIntegrationService } from '../../../src/services/AdapterIntegrationService';
 import {
   mapTorqueHealthToConsole,
   mapTorquePipelinesToConsole,
@@ -37,11 +35,10 @@ interface MetricsCache {
 }
 
 export function createConsoleRouter(
-  service: AutonomyService,
   torqueQuery: TorqueQueryClient,
+  adapterService: AdapterIntegrationService,
 ): Router {
   const router = Router();
-  const observability = ObservabilityManager.getInstance();
 
   // Micro-cache for metrics endpoint (10ms TTL)
   let metricsCache: MetricsCache | null = null;
@@ -370,8 +367,8 @@ export function createConsoleRouter(
 
   /**
    * GET /console/metrics
-   * System metrics from TorqueQuery + docs-manager ingestion metrics
-   * Cached with 10ms TTL to reduce load on TorqueQuery during dashboard polling
+   * System metrics from adapter service
+   * Cached with 10ms TTL to reduce load during dashboard polling
    */
   router.get('/console/metrics', async (req: Request, res: Response) => {
     try {
@@ -382,39 +379,11 @@ export function createConsoleRouter(
         return res.json(metricsCache.data);
       }
 
-      const metrics = await torqueQuery.queryMetrics();
-
-      // Get docs-manager metrics from ingestion state
-      let docsManager: any = null;
-      try {
-        const state = (service as any).getState?.() || (service as any).state || {};
-        const docsManagerMetrics = getDocsManagerMetrics(state);
-        docsManager = {
-          drift: docsManagerMetrics.drift,
-          auditCount: docsManagerMetrics.audits.length,
-          lastSync: docsManagerMetrics.lastSync,
-          eventsProcessed: docsManagerMetrics.eventsProcessed,
-          eventsSkipped: docsManagerMetrics.eventsSkipped,
-          audits: docsManagerMetrics.audits.slice(-10), // Last 10 for dashboard
-        };
-      } catch (dmErr: any) {
-        console.warn('Failed to fetch docs-manager metrics:', dmErr?.message);
-      }
+      const adapterResult = await adapterService.execute("console-metrics", {});
 
       const responsePayload = {
         status: 'ok',
-        data: {
-          timestamp: new Date().toISOString(),
-          cpuPercent: metrics.cpuPercent,
-          memoryPercent: metrics.memoryPercent,
-          diskPercent: metrics.diskPercent,
-          networkIn: metrics.networkIn,
-          networkOut: metrics.networkOut,
-          requestsPerSecond: metrics.requestsPerSecond,
-          errorRate: metrics.errorRate,
-          avgLatencyMs: metrics.avgLatencyMs,
-          ...(docsManager && { docsManager }),
-        },
+        data: adapterResult.data || {},
         timestamp: new Date().toISOString(),
       };
 

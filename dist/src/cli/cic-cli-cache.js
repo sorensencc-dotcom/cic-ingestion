@@ -26,7 +26,7 @@ export function createCacheCommand() {
             console.log(`Total cache hits:     ${summary.total_cache_hits}`);
             console.log(`Total cache misses:   ${summary.total_cache_misses}`);
             console.log(`Tokens saved:         ${summary.total_cache_read_tokens_saved.toLocaleString()}`);
-            const weeklySavings = (summary.total_cache_read_tokens_saved / 1000000) * 0.3;
+            const weeklySavings = (summary.total_cache_read_tokens_saved / 1_000_000) * 0.3;
             console.log(`Estimated weekly:     $${weeklySavings.toFixed(2)}\n`);
         }
         catch (err) {

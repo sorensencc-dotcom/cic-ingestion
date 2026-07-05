@@ -22,9 +22,10 @@ export var Vertical;
     Vertical["UNKNOWN"] = "unknown";
 })(Vertical || (Vertical = {}));
 export class SweeperFallbackRouter {
+    browserEngine;
+    dlqEntries = [];
+    routingMetrics = new Map();
     constructor(browserEngine) {
-        this.dlqEntries = [];
-        this.routingMetrics = new Map();
         this.browserEngine = browserEngine || new CloakBrowserAdapter();
         this.setupLogging();
     }

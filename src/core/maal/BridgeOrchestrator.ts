@@ -73,7 +73,7 @@ export class BridgeOrchestrator {
     try {
       const parseResult = this.parser.parse(dsl);
 
-      if (parseResult.isErr()) {
+      if (parseResult.isErr) {
         const err = parseResult.err()!;
         return new Err({
           code: err.code,
@@ -122,7 +122,7 @@ export class BridgeOrchestrator {
 
       const reviewResult = this.reviewer.review(request);
 
-      if (reviewResult.isErr()) {
+      if (reviewResult.isErr) {
         return reviewResult;
       }
 
@@ -148,7 +148,7 @@ export class BridgeOrchestrator {
     try {
       const result = await this.orchestrator.execute(proposal);
 
-      if (result.isErr()) {
+      if (result.isErr) {
         const err = result.err()!;
         return new Err({
           code: err.code,
@@ -205,21 +205,21 @@ export class BridgeOrchestrator {
   async executeFullFlow(dsl: string): Promise<Result<PromotionDecision, string>> {
     // Step 1: Submit
     const submitResult = this.submitProposal(dsl);
-    if (submitResult.isErr()) {
+    if (submitResult.isErr) {
       return new Err(`Submit failed: ${submitResult.err()!.message}`);
     }
     const proposal = submitResult.ok()!;
 
     // Step 2: Validate
     const validateResult = this.validateProposal(proposal);
-    if (validateResult.isErr()) {
+    if (validateResult.isErr) {
       return new Err(`Validate failed: ${validateResult.err()!.message}`);
     }
     const validationResult = validateResult.ok()!;
 
     // Step 3: Review
     const reviewResult = this.governanceReview(proposal, validationResult);
-    if (reviewResult.isErr()) {
+    if (reviewResult.isErr) {
       return new Err(`Review failed: ${reviewResult.err()!.message}`);
     }
     const reviewDecision = reviewResult.ok()!;
@@ -231,14 +231,14 @@ export class BridgeOrchestrator {
 
     // Step 4: Canary
     const canaryResult = await this.executeCanary(proposal);
-    if (canaryResult.isErr()) {
+    if (canaryResult.isErr) {
       return new Err(`Canary execution failed: ${canaryResult.err()!.message}`);
     }
     const canaryOutcome = canaryResult.ok()!;
 
     // Step 5: Promote
     const promoteResult = await this.promoteOrRollback(proposal, canaryOutcome);
-    if (promoteResult.isErr()) {
+    if (promoteResult.isErr) {
       return new Err(`Promotion failed: ${promoteResult.err()!.message}`);
     }
 

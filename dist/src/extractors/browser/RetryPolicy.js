@@ -7,8 +7,9 @@
  */
 import { BrowserErrorCode } from './IBrowserEngine';
 export class RetryPolicy {
+    config;
+    attempts = new Map();
     constructor(config) {
-        this.attempts = new Map();
         this.config = {
             maxRetries: 2,
             backoffMs: [250, 500],

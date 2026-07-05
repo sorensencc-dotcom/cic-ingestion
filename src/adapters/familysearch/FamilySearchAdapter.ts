@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosInstance } from "axios";
 import {
   BaseAdapter,
   AdapterConfig,
@@ -13,7 +13,7 @@ export interface FamilySearchConfig extends AdapterConfig {
 }
 
 export class FamilySearchAdapter extends BaseAdapter {
-  private client: axios.AxiosInstance;
+  private client: AxiosInstance;
 
   constructor(private fsConfig: FamilySearchConfig) {
     super(fsConfig);

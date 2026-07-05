@@ -1,67 +1,47 @@
 /**
- * Autonomy API Server (Phase 23.7.3)
- * Express server that exposes autonomy endpoints:
- * - POST /autonomy/signals — detect signals
- * - GET /autonomy/signals — query signals
- * - GET /autonomy/proposals — query proposals
- * - POST /autonomy/proposals — generate proposals
- * - PUT /autonomy/proposals/:id — update proposal status
+ * CIC Autonomy API Server
+ * Express server exposing autonomy + execution + fire-drill endpoints
  */
-import express from 'express';
-import { AutonomyService } from './AutonomyService.js';
-import { createSignalsRouter } from './routes/signals.js';
-import { createProposalsRouter } from './routes/proposals.js';
-import { createCacheRouter } from './routes/cache.js';
-import { createExecutionRouter } from './routes/execution.js';
-import { createMemoryRouter } from './routes/memory.js';
-import { createGovernanceRouter } from './routes/governance.js';
-import { createConsoleRouter } from './routes/console.js';
-import { ObservabilityManager } from './ObservabilityManager.js';
-import { wireVectorLayer } from '../vector/index.js';
-import { TorqueQueryClient } from '../services/torquequery/TorqueQueryClient.js';
-import cicConfig from '../config/index.js';
+import express from "express";
+import cron from "node-cron";
+import { createExecutionRouter } from "./routes/execution.js";
+import { createFireDrillRouter } from "./routes/firedrills.js";
+import { AdapterRegistry } from "../adapters/AdapterRegistry.js";
+import { AdapterIntegrationService } from "../services/AdapterIntegrationService.js";
+import { GrokHardenedAdapter } from "../adapters/grok/GrokHardenedAdapter.js";
+import { GrokProvider } from "../adapters/grok/grok-provider.js";
+import { GrokMcpClient } from "../adapters/grok/grok-mcp-client.js";
+import { GrokModelClient } from "../adapters/grok/grok-model-client.js";
+import { createExecuteRouter } from "../routes/execute.js";
+import { UsageLedger } from "../lib/usage/UsageLedger.js";
+import { generateCicCostComputeReport } from "../lib/report/CicCostComputeReport.js";
+import { HardeningRegistry } from "src/resilience/hardeningOrchestrator.js";
+import { CircuitBreakerRegistry } from "src/resilience/circuitBreaker.js";
+import { RateLimiterRegistry } from "src/resilience/rateLimiter.js";
+import { ResilientMetricsCollector } from "src/observability/resilientMetricsCollector.js";
 export class AutonomyAPIServer {
-    constructor(config) {
-        this.server = null;
+    app;
+    config;
+    server = null;
+    cronJobs = [];
+    constructor(config = {}) {
         this.config = {
             port: 3000,
-            host: 'localhost',
+            host: "localhost",
             ...config,
         };
-        this.cicConfig = cicConfig;
-        this.observability = ObservabilityManager.getInstance();
         this.app = express();
-        this.service = new AutonomyService(config);
         this.setupMiddleware();
         this.setupRoutes();
         this.setupErrorHandler();
     }
-    /**
-     * Setup Express middleware
-     */
     setupMiddleware() {
-        // JSON body parser
-        this.app.use(express.json({ limit: '10mb' }));
-        // Observability middleware (request/response tracking)
+        this.app.use(express.json({ limit: "10mb" }));
         this.app.use((req, res, next) => {
-            const start = Date.now();
-            res.on('finish', () => {
-                const duration = Date.now() - start;
-                this.observability.recordRequest(req, res, duration);
-                const logger = this.observability.getLogger();
-                logger.info('api', `${req.method} ${req.path}`, {
-                    status: res.statusCode,
-                    duration_ms: duration,
-                });
-            });
-            next();
-        });
-        // CORS headers (allow all for now)
-        this.app.use((req, res, next) => {
-            res.header('Access-Control-Allow-Origin', '*');
-            res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-            res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-            if (req.method === 'OPTIONS') {
+            res.header("Access-Control-Allow-Origin", "*");
+            res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS");
+            res.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
+            if (req.method === "OPTIONS") {
                 res.sendStatus(200);
             }
             else {
@@ -69,169 +49,160 @@ export class AutonomyAPIServer {
             }
         });
     }
-    /**
-     * Setup routes
-     */
     setupRoutes() {
         // Health check
-        this.app.get('/health', (_req, res) => {
+        this.app.get("/health", (req, res) => {
             return res.json({
-                status: 'ok',
-                service: 'autonomy-api',
+                status: "ok",
+                service: "cic-autonomy-api",
                 uptime: process.uptime(),
                 timestamp: new Date().toISOString(),
             });
         });
-        // Metrics endpoint (Prometheus format)
-        this.app.get('/metrics', (_req, res) => {
-            res.set('Content-Type', 'text/plain; charset=utf-8');
-            return res.send(this.observability.getMetricsPrometheus());
-        });
-        // Metrics JSON endpoint
-        this.app.get('/metrics/json', (_req, res) => {
-            return res.json(this.observability.getMetricsJSON());
-        });
         // API info
-        this.app.get('/autonomy', (_req, res) => {
-            const endpoints = {
-                signals: {
-                    'POST /autonomy/signals': 'Detect signals from event history',
-                    'GET /autonomy/signals': 'Query stored signals',
-                    'GET /autonomy/signals/:id': 'Get specific signal',
-                    'GET /autonomy/signals/trends/:metric': 'Get signal trends',
-                },
-                proposals: {
-                    'GET /autonomy/proposals': 'Query stored proposals',
-                    'GET /autonomy/proposals/:id': 'Get specific proposal',
-                    'POST /autonomy/proposals': 'Generate proposals from signals',
-                    'PUT /autonomy/proposals/:id': 'Update proposal status',
-                    'POST /autonomy/proposals/simulate': 'Simulate proposal execution',
-                },
-                cache: {
-                    'GET /autonomy/cache/metrics': 'Cache statistics (JSON)',
-                    'GET /autonomy/cache/metrics/prometheus': 'Cache metrics in Prometheus text format',
-                    'GET /autonomy/cache/status': 'Cache status (human-readable)',
-                },
-                execution: {
-                    'POST /autonomy/execution/register': 'Register execution context before scheduling',
-                    'GET /autonomy/execution/status/:taskId': 'Get current execution status',
-                    'GET /autonomy/execution/audit/:taskId': 'Get detailed audit trail',
-                    'POST /autonomy/execution/check': 'Pre-flight check if tool would be allowed',
-                    'GET /autonomy/execution/modes': 'List available execution modes and policies',
-                },
-                memory: {
-                    'POST /autonomy/memory/ingest': 'Ingest event into memory store',
-                    'POST /autonomy/memory/ingest-batch': 'Ingest multiple events into memory store',
-                    'GET /autonomy/memory/search': 'Search memory store',
-                    'GET /autonomy/memory/by-type/:type': 'Query memory by event type',
-                    'GET /autonomy/memory/by-agent/:agentId': 'Query memory by agent ID',
-                    'GET /autonomy/memory/by-correlation/:correlationId': 'Query memory by correlation ID',
-                },
-                governance: {
-                    'POST /autonomy/governance/votes': 'Submit proposal for council voting',
-                    'POST /autonomy/governance/votes/:proposalId/vote': 'Record individual council vote',
-                    'POST /autonomy/governance/decisions': 'Finalize governance decision',
-                    'GET /autonomy/governance/log': 'Get governance decision log',
-                    'GET /autonomy/governance/queue': 'Get pending approval queue',
-                    'GET /autonomy/governance/proposal/:proposalId': 'Get specific proposal details',
-                },
-                observability: {
-                    'GET /metrics': 'Prometheus format metrics',
-                    'GET /metrics/json': 'JSON format metrics',
-                },
-            };
+        this.app.get("/autonomy", (req, res) => {
             return res.json({
-                service: 'CIC Autonomy API',
-                version: '1.0.0',
-                phase: '24.0',
-                endpoints,
+                service: "CIC Autonomy API",
+                version: "1.0.0",
+                endpoints: {
+                    execution: {
+                        "POST /autonomy/execution/register": "Register execution context",
+                        "GET /autonomy/execution/status/:taskId": "Get task status",
+                        "GET /autonomy/execution/audit/:taskId": "Get audit trail",
+                        "POST /autonomy/execution/check": "Check if tool is allowed",
+                        "GET /autonomy/execution/modes": "List execution modes",
+                    },
+                    firedrills: {
+                        "POST /autonomy/firedrills/run": "Execute all 6 fire-drills",
+                        "GET /autonomy/firedrills/report": "Get last fire-drill report",
+                        "GET /autonomy/firedrills/health": "Quick health check",
+                        "POST /autonomy/firedrills/schedule": "Schedule periodic runs",
+                        "POST /autonomy/firedrills/unschedule": "Stop periodic runs",
+                    },
+                },
             });
         });
-        // Phase 2.5: Config endpoint
-        this.app.get('/autonomy/config', (_req, res) => {
+        // Cost tracking routes
+        this.app.get("/api/usage-summary", (req, res) => {
+            return res.json(UsageLedger.getDailySummary());
+        });
+        this.app.get("/api/agent-burn", (req, res) => {
+            const report = generateCicCostComputeReport();
+            return res.json(report.agents.burn);
+        });
+        this.app.get("/api/local-roi", (req, res) => {
+            const report = generateCicCostComputeReport();
+            return res.json(report.local);
+        });
+        this.app.get("/api/usage-summary-env", (req, res) => {
+            const report = generateCicCostComputeReport();
             return res.json({
-                phase: '2.5',
-                loaded: true,
-                source: 'env+defaults',
-                services: this.cicConfig.services,
-                timestamp: new Date().toISOString(),
+                dev: report.env?.daily?.dev,
+                prod: report.env?.daily?.prod,
+                budget: report.budget,
             });
         });
         // Mount routers
-        const signalsRouter = createSignalsRouter(this.service);
-        const proposalsRouter = createProposalsRouter(this.service);
-        const cacheRouter = createCacheRouter(this.service.getCacheAdapter());
         const executionRouter = createExecutionRouter();
-        const memoryRouter = createMemoryRouter({
-            memoryStoreUrl: process.env.MEMORY_STORE_URL,
+        const fireDrillRouter = createFireDrillRouter();
+        this.app.use("/autonomy", executionRouter);
+        this.app.use("/autonomy", fireDrillRouter);
+        // Grok Hardened Adapter (Phase A+B+C: Cache + Hardening)
+        const adapterRegistry = new AdapterRegistry();
+        const torqueQueryUrl = this.config.memoryQueryApiUrl || process.env.MEMORY_STORE_URL || "http://localhost:3110";
+        const grokMcpClient = new GrokMcpClient(torqueQueryUrl);
+        const grokModelClient = new GrokModelClient(process.env.GROK_MODEL_BASE_URL || "https://api.x.ai", process.env.GROK_API_KEY || process.env.XAI_API_KEY || "mock-api-key");
+        const grokProvider = new GrokProvider(grokMcpClient, grokModelClient);
+        // Initialize hardening infrastructure (Phase B)
+        const circuitBreakerRegistry = new CircuitBreakerRegistry();
+        const rateLimiterRegistry = new RateLimiterRegistry();
+        const hardeningRegistry = new HardeningRegistry();
+        const metricsCollector = new ResilientMetricsCollector(hardeningRegistry, circuitBreakerRegistry, rateLimiterRegistry);
+        const grokHardenedAdapter = new GrokHardenedAdapter({
+            name: "grok-hardened",
+            version: "1.0.0",
+            timeout: 30000,
+            retries: 2,
+        }, grokProvider, hardeningRegistry, true, // cacheEnabled
+        true // contextCacheEnabled
+        );
+        adapterRegistry.register("xai-docs-mcp", grokHardenedAdapter);
+        adapterRegistry.register("grok", grokHardenedAdapter);
+        // Expose metrics endpoint for Prometheus scraping (Phase C observability)
+        this.app.get("/metrics", (req, res) => {
+            return res.type("text/plain").send(metricsCollector.getPrometheusMetrics());
         });
-        const governanceRouter = createGovernanceRouter({
-            governanceControlPlaneUrl: process.env.GOVERNANCE_URL,
-        });
-        const torqueQuery = new TorqueQueryClient({
-            url: process.env.TORQUE_QUERY_URL || 'http://localhost:3110',
-        });
-        const consoleRouter = createConsoleRouter(this.service, torqueQuery);
-        this.app.use('/autonomy', signalsRouter);
-        this.app.use('/autonomy', proposalsRouter);
-        this.app.use('/autonomy', cacheRouter);
-        this.app.use('/autonomy', executionRouter);
-        this.app.use('/autonomy', memoryRouter);
-        this.app.use('/autonomy', governanceRouter);
-        this.app.use('/', consoleRouter);
+        const adapterService = new AdapterIntegrationService(adapterRegistry);
+        const executeRouter = createExecuteRouter(adapterService);
+        this.app.use("/", executeRouter);
         // 404 handler
         this.app.use((req, res) => {
             return res.status(404).json({
-                error: 'Not found',
+                error: "Not found",
                 path: req.path,
                 method: req.method,
             });
         });
     }
-    /**
-     * Setup error handler
-     */
     setupErrorHandler() {
-        this.app.use((err, _req, res, _next) => {
-            const logger = this.observability.getLogger();
-            logger.error('api', 'Unhandled error', err);
-            // Sanitize error message to prevent path leakage
-            let sanitizedMessage = 'Internal server error';
-            if (err.message && !err.message.includes('/') && !err.message.includes('\\')) {
-                sanitizedMessage = err.message;
-            }
+        this.app.use((err, req, res, next) => {
+            console.error("API Error:", err);
             return res.status(500).json({
-                error: 'Internal server error',
-                message: sanitizedMessage,
+                error: "Internal server error",
+                message: err.message,
             });
         });
     }
-    /**
-     * Start the server
-     */
-    async start() {
+    setupCronSchedules() {
+        if (process.env.CIC_PDF_REPORTS_ENABLED !== 'true') {
+            return; // Disabled by default
+        }
         try {
-            await wireVectorLayer(this.app);
+            // Dynamic import for generatePdfReport
+            const importPdfReports = async () => {
+                const { generatePdfReport } = await import("../reports/cicCostComputePdf.js");
+                return generatePdfReport;
+            };
+            // Daily PDF report at midnight (0 0 * * *)
+            const dailyJob = cron.schedule('0 0 * * *', async () => {
+                try {
+                    const { generatePdfReport } = await importPdfReports();
+                    await generatePdfReport('daily');
+                }
+                catch (err) {
+                    console.error("[CRON] Daily PDF generation failed:", err);
+                }
+            });
+            this.cronJobs.push(dailyJob);
+            console.log("[CRON] Scheduled daily PDF report at midnight");
+            // Weekly PDF report every Monday at midnight (0 0 * * 1)
+            const weeklyJob = cron.schedule('0 0 * * 1', async () => {
+                try {
+                    const { generatePdfReport } = await importPdfReports();
+                    await generatePdfReport('weekly');
+                }
+                catch (err) {
+                    console.error("[CRON] Weekly PDF generation failed:", err);
+                }
+            });
+            this.cronJobs.push(weeklyJob);
+            console.log("[CRON] Scheduled weekly PDF report for Mondays at midnight");
         }
         catch (err) {
-            if (process.env.NODE_ENV === 'development') {
-                console.warn('⚠ Failed to wire VectorLayer in dev mode (continuing):', err.message);
-            }
-            else {
-                console.error('Failed to wire VectorLayer:', err);
-                throw err;
-            }
+            console.error("[CRON] Failed to setup schedules:", err);
         }
+    }
+    async start() {
         return new Promise((resolve, reject) => {
             try {
-                this.server = this.app.listen(this.config.port || 3000, this.config.host || 'localhost', () => {
+                // Setup cron jobs before starting server
+                this.setupCronSchedules();
+                this.server = this.app.listen(this.config.port, this.config.host, () => {
                     console.log(`[${new Date().toISOString()}] Autonomy API Server started on http://${this.config.host}:${this.config.port}`);
-                    console.log(`[${new Date().toISOString()}] Phase 2.5 Config loaded successfully`);
-                    console.log(`[${new Date().toISOString()}] MemoryQueryAPI: ${this.config.memoryQueryApiUrl}`);
                     resolve();
                 });
-                this.server.on('error', (err) => {
-                    console.error('Server error:', err);
+                this.server.on("error", (err) => {
+                    console.error("Server error:", err);
                     reject(err);
                 });
             }
@@ -240,11 +211,12 @@ export class AutonomyAPIServer {
             }
         });
     }
-    /**
-     * Stop the server
-     */
     async stop() {
         return new Promise((resolve, reject) => {
+            // Stop all cron jobs
+            this.cronJobs.forEach(job => job.stop());
+            this.cronJobs = [];
+            console.log(`[${new Date().toISOString()}] Cron jobs stopped`);
             if (!this.server) {
                 resolve();
                 return;
@@ -260,22 +232,10 @@ export class AutonomyAPIServer {
             });
         });
     }
-    /**
-     * Get the underlying Express app (for testing)
-     */
     getApp() {
         return this.app;
     }
-    /**
-     * Get the service (for testing)
-     */
-    getService() {
-        return this.service;
-    }
 }
-/**
- * Convenience function to start the server
- */
 export async function startAutonomyAPIServer(config) {
     const server = new AutonomyAPIServer(config);
     await server.start();

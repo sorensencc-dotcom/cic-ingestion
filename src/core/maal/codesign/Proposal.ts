@@ -1,43 +1,34 @@
-/**
- * Phase 4: Proposal — DSL wrapper + factory.
- */
-
-import { Proposal, ProposalDelta } from './ProposalTypes';
+export interface Proposal {
+  proposal_id: string;
+  submittedBy?: string;
+  deltas?: any[];
+  rationale?: string;
+}
 
 export class ProposalBuilder {
-  private proposal: Partial<Proposal> = {};
+  private proposal: Proposal = { proposal_id: '' };
 
-  withId(id: string): this {
-    this.proposal.proposalId = id;
+  withProposalId(id: string): this {
+    this.proposal.proposal_id = id;
     return this;
   }
 
-  fromSPL(spid: string): this {
-    this.proposal.submittedBy = spid;
+  withSubmittedBy(author: string): this {
+    this.proposal.submittedBy = author;
     return this;
   }
 
-  addDelta(delta: ProposalDelta): this {
-    if (!this.proposal.deltas) this.proposal.deltas = [];
-    this.proposal.deltas.push(delta);
+  withDeltas(deltas: any[]): this {
+    this.proposal.deltas = deltas;
     return this;
   }
 
-  withRationale(reason: string): this {
-    this.proposal.rationale = reason;
+  withRationale(rationale: string): this {
+    this.proposal.rationale = rationale;
     return this;
   }
 
   build(): Proposal {
-    if (!this.proposal.proposalId || !this.proposal.submittedBy || !this.proposal.deltas) {
-      throw new Error('Incomplete proposal');
-    }
-    return {
-      proposalId: this.proposal.proposalId,
-      submittedBy: this.proposal.submittedBy,
-      deltas: this.proposal.deltas,
-      rationale: this.proposal.rationale || '',
-      submittedAt: Date.now(),
-    };
+    return this.proposal;
   }
 }

@@ -11,10 +11,8 @@ import { getTaskMetadataStore } from './TaskMetadataStore.js';
  * Policy interceptor: enforces policy before tool execution
  */
 export class ExecutionPolicyInterceptor {
-    constructor() {
-        this.engine = getExecutionPolicyEngine();
-        this.store = getTaskMetadataStore();
-    }
+    engine = getExecutionPolicyEngine();
+    store = getTaskMetadataStore();
     /**
      * Check if tool call is allowed in current execution context
      * Called BEFORE the harness executes the tool

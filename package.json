@@ -1,0 +1,21 @@
+{
+  "name": "cic-ingestion",
+  "version": "0.26.0",
+  "private": true,
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "test": "node --test",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "qdrant-js": "1.7.0",
+    "axios": "1.6.0"
+  },
+  "devDependencies": {
+    "typescript": "5.4.5",
+    "ts-node": "10.9.2",
+    "@types/node": "20.11.0"
+  }
+}

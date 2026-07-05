@@ -4,8 +4,8 @@
  */
 
 import { Anthropic } from '@anthropic-ai/sdk';
-import { UsageLedger } from '../../usage/UsageLedger.js';
-import { computeCost } from '../../cost/modelPricing.js';
+import { UsageLedger } from 'src/lib/usage/UsageLedger.js';
+import { computeCost } from 'src/lib/cost/modelPricing.js';
 
 const ALLOWED_MODELS = [
   'claude-3-opus-20240229',

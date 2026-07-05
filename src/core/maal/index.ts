@@ -4,12 +4,12 @@
  */
 
 // Support
-export { Result, Ok, Err } from './support/Result';
-export { ValidationResult, ValidationError, ValidationWarning, ValidationResultBuilder } from './support/ValidationResult';
-export { ImmutabilityGuard, ImmutabilityCheckpoint } from './support/ImmutabilityGuard';
+import { Result, Ok, Err } from './support/Result';
+import { ValidationResult, ValidationError, ValidationWarning, ValidationResultBuilder } from './support/ValidationResult';
+import { ImmutabilityGuard, ImmutabilityCheckpoint } from './support/ImmutabilityGuard';
 
 // Codesign
-export {
+import {
   RegimeDelta,
   ConstraintDelta,
   FallbackDelta,
@@ -19,33 +19,90 @@ export {
   Proposal,
   ProposalMetadata,
 } from './codesign/ProposalTypes';
-export { ProposalBuilder } from './codesign/Proposal';
-export { GLOBAL_ROUTING_BOUNDS, GlobalRoutingBounds } from './codesign/GlobalRoutingBounds';
-export { ProposalParser, ProposalParseError } from './codesign/ProposalParser';
-export { ProposalValidationEngine } from './codesign/ProposalValidationEngine';
-export { ProposalValidationEngineImpl } from './codesign/ProposalValidationEngineImpl';
+import { ProposalBuilder } from './codesign/Proposal';
+import { GLOBAL_ROUTING_BOUNDS, GlobalRoutingBounds } from './codesign/GlobalRoutingBounds';
+import { ProposalParser, ProposalParseError } from './codesign/ProposalParser';
+import { ProposalValidationEngine } from './codesign/ProposalValidationEngine';
+import { ProposalValidationEngineImpl } from './codesign/ProposalValidationEngineImpl';
 
 // Governance
-export { GovernanceDecision, GovernanceDecisionLog } from './governance/GovernanceDecisions';
-export { GovernanceCaps, MetricThresholds, DEFAULT_GOVERNANCE_CAPS, DEFAULT_METRIC_THRESHOLDS } from './governance/GovernanceCaps';
-export { GovernanceReview, GovernanceReviewRequest, GovernanceReviewError } from './governance/GovernanceReview';
+import { GovernanceDecision, GovernanceDecisionLog } from './governance/GovernanceDecisions';
+import { GovernanceCaps, MetricThresholds, DEFAULT_GOVERNANCE_CAPS, DEFAULT_METRIC_THRESHOLDS } from './governance/GovernanceCaps';
+import { GovernanceReview, GovernanceReviewRequest, GovernanceReviewError } from './governance/GovernanceReview';
 
 // Canary
-export { CanaryGrowthConfig, CanaryGrowthConfigStore } from './canary/CanaryGrowthConfig';
-export { CanaryAssignment, CanaryAssignmentEngine } from './canary/CanaryAssignment';
-export { CanaryCohortController, CohortMetrics } from './canary/CanaryCohortController';
-export { CanaryTelemetryPoint, CanaryTelemetryCollector } from './canary/CanaryTelemetry';
-export { CanaryError, CANARY_ERRORS } from './canary/CanaryError';
-export { CanaryGateOrchestrator, CanaryGateOrchestrationResult, CanaryGateOrchestrationError } from './canary/CanaryGateOrchestrator';
+import { CanaryGrowthConfig, CanaryGrowthConfigStore } from './canary/CanaryGrowthConfig';
+import { CanaryAssignment, CanaryAssignmentEngine } from './canary/CanaryAssignment';
+import { CanaryCohortController, CohortMetrics } from './canary/CanaryCohortController';
+import { CanaryTelemetryPoint, CanaryTelemetryCollector } from './canary/CanaryTelemetry';
+import { CanaryError, CANARY_ERRORS } from './canary/CanaryError';
+import { CanaryGateOrchestrator, CanaryGateOrchestrationResult, CanaryGateOrchestrationError } from './canary/CanaryGateOrchestrator';
 
 // Integration
-export {
+import {
   BridgeOrchestrator,
   SubmitProposalError,
   ValidateProposalError,
-  GovernanceReviewError,
+  GovernanceReviewError as BridgeGovernanceReviewError,
   ExecuteCanaryError,
   PromoteOrRollbackError,
-  GovernanceDecision,
   PromotionDecision,
 } from './BridgeOrchestrator';
+
+export type {
+  Result,
+  RegimeDelta,
+  ConstraintDelta,
+  FallbackDelta,
+  RewardDelta,
+  SimulatorDelta,
+  ProposalDelta,
+  Proposal,
+  ProposalMetadata,
+  GlobalRoutingBounds,
+  ProposalParseError,
+  GovernanceDecision,
+  GovernanceDecisionLog,
+  GovernanceCaps,
+  MetricThresholds,
+  GovernanceReviewRequest,
+  GovernanceReviewError,
+  CanaryGrowthConfig,
+  CanaryGrowthConfigStore,
+  CanaryAssignment,
+  CohortMetrics,
+  CanaryTelemetryPoint,
+  CanaryGateOrchestrationResult,
+  CanaryGateOrchestrationError,
+  SubmitProposalError,
+  ValidateProposalError,
+  ExecuteCanaryError,
+  PromoteOrRollbackError,
+  PromotionDecision,
+  ValidationResult,
+  ValidationError,
+  ValidationWarning,
+  ImmutabilityGuard,
+  ImmutabilityCheckpoint,
+  ProposalValidationEngine,
+  CanaryError,
+};
+
+export {
+  Ok,
+  Err,
+  ValidationResultBuilder,
+  ProposalBuilder,
+  GLOBAL_ROUTING_BOUNDS,
+  ProposalParser,
+  ProposalValidationEngineImpl,
+  DEFAULT_GOVERNANCE_CAPS,
+  DEFAULT_METRIC_THRESHOLDS,
+  GovernanceReview,
+  CanaryAssignmentEngine,
+  CanaryCohortController,
+  CanaryTelemetryCollector,
+  CANARY_ERRORS,
+  CanaryGateOrchestrator,
+  BridgeOrchestrator,
+};

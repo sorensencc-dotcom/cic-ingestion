@@ -4,9 +4,12 @@
  */
 import { v4 as uuidv4 } from 'uuid';
 export class ExecutionOrchestrator {
+    registry;
+    policyEngine;
+    sandboxRuntime;
+    adapters = new Map();
+    eventHandlers = new Set();
     constructor(registry, policyEngine, sandboxRuntime) {
-        this.adapters = new Map();
-        this.eventHandlers = new Set();
         this.registry = registry;
         this.policyEngine = policyEngine;
         this.sandboxRuntime = sandboxRuntime;

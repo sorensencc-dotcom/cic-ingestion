@@ -12,9 +12,10 @@ const ENV_WHITELIST = ['PATH', 'NODE_ENV', 'LOG_LEVEL', 'TZ'];
 /** Blocked env-var prefixes that may carry secrets or host credentials */
 const ENV_BLOCK_PREFIXES = ['VAULT_', 'ANTHROPIC_', 'OPENAI_', 'AWS_', 'GITHUB_'];
 export class SandboxRuntime {
+    sandboxes = new Map();
+    meta = new Map();
+    options;
     constructor(options = {}) {
-        this.sandboxes = new Map();
-        this.meta = new Map();
         this.options = options;
     }
     /**

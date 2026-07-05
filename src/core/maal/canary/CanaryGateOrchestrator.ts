@@ -133,6 +133,8 @@ export class CanaryGateOrchestrator {
           minSuccessRate: 1 - govContext.thresholds.correctnessDeltaThreshold,
           maxDriftScore: govContext.thresholds.driftThreshold,
         },
+        timestamp: Date.now(),
+        approver: 'canary-orchestrator',
       };
 
       const growthDecision = this.cohortController.decideCohortGrowth(mockMetrics, growthConfig);

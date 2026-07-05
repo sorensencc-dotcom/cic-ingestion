@@ -1,6 +1,8 @@
 // cic-ingestion/src/drift/driftEngine.ts
 // semver: 0.1.0
 // date: 2026-06-29
+// NOTE: Drift events are system-generated autonomous operations, not policy governance decisions.
+// They audit metric updates without human approval gates, so policyChecksPassed/Failed are empty by design.
 
 import { createAuditEvent, appendAuditEvent } from "../../../governance/audit-policy.js";
 
@@ -34,10 +36,11 @@ export function updateDriftScores(
 
   if (score > 0) {
     try {
+      const now = Date.now();
       const auditEvent = createAuditEvent(
         "drift_score_updated",
         "drift_engine",
-        `drift-update-${backend}-${Date.now()}`,
+        `drift-update-${backend}-${now}`,
         "production",
         "success",
         `Drift score for backend ${backend} increased from ${oldScore.toFixed(3)} to ${driftState[backend].toFixed(3)} (latency: ${latency}ms, tokens: ${tokens})`,
@@ -68,10 +71,11 @@ export function decayDriftScores(
 
   if (decayedAny) {
     try {
+      const now = Date.now();
       const auditEvent = createAuditEvent(
         "drift_decay",
         "drift_engine",
-        `drift-decay-${Date.now()}`,
+        `drift-decay-${now}`,
         "production",
         "success",
         `Drift decay of ${((1 - rate) * 100).toFixed(0)}% applied to all backends`,

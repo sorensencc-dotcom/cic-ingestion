@@ -14,7 +14,7 @@ export const validatePng = (base64) => {
 };
 export const validateScreenshotSize = (base64) => {
     try {
-        return Buffer.byteLength(base64, 'base64') < 5000000;
+        return Buffer.byteLength(base64, 'base64') < 5_000_000;
     }
     catch {
         return false;
@@ -24,7 +24,7 @@ export const sanitizeText = (t) => t
     .replace(/\x00/g, '') // null bytes
     .replace(/\[[0-9;]*m/g, '') // ANSI escape codes
     .trim();
-export const validateTextLength = (t) => t.length > 0 && t.length < 10000;
+export const validateTextLength = (t) => t.length > 0 && t.length < 10_000;
 export const validateJsonCompleteness = (t) => {
     try {
         JSON.parse(t);

@@ -3,11 +3,9 @@
  * Declarative authorization & constraint enforcement
  */
 export class PolicyEngine {
-    constructor() {
-        this.policies = new Map();
-        this.agentLimitCounters = new Map();
-        this.agentTimestamps = new Map();
-    }
+    policies = new Map();
+    agentLimitCounters = new Map();
+    agentTimestamps = new Map();
     /**
      * Load policy from definition
      */

@@ -1,58 +1,64 @@
-/**
- * Phase 4: Result<T, E> — immutable success/error wrapper.
- */
-
 export interface Result<T, E> {
   readonly isOk: boolean;
   readonly isErr: boolean;
-
-  ok(): T | null;
-  err(): E | null;
-
-  map<U>(fn: (t: T) => U): Result<U, E>;
-  mapErr<F>(fn: (e: E) => F): Result<T, F>;
-
-  getOrThrow(label?: string): T;
+  map<U>(fn: (val: T) => U): Result<U, E>;
+  mapErr<F>(fn: (err: E) => F): Result<T, F>;
+  unwrap(): T;
+  unwrapErr(): E;
 }
 
-export class Ok<T, E> implements Result<T, E> {
+export class Ok<T, E = never> implements Result<T, E> {
   constructor(private value: T) {}
 
-  get isOk() { return true; }
-  get isErr() { return false; }
+  get isOk(): boolean {
+    return true;
+  }
 
-  ok() { return this.value; }
-  err() { return null; }
+  get isErr(): boolean {
+    return false;
+  }
 
-  map<U>(fn: (t: T) => U): Result<U, E> {
+  map<U>(fn: (val: T) => U): Result<U, E> {
     return new Ok(fn(this.value));
   }
 
-  mapErr<F>(_fn: (e: E) => F): Result<T, F> {
-    return this as any;
+  mapErr<F>(_fn: (err: E) => F): Result<T, F> {
+    return this as unknown as Result<T, F>;
   }
 
-  getOrThrow() { return this.value; }
+  unwrap(): T {
+    return this.value;
+  }
+
+  unwrapErr(): E {
+    throw new Error('Called unwrapErr on Ok');
+  }
 }
 
-export class Err<T, E> implements Result<T, E> {
+export class Err<T = never, E = any> implements Result<T, E> {
   constructor(private error: E) {}
 
-  get isOk() { return false; }
-  get isErr() { return true; }
-
-  ok() { return null; }
-  err() { return this.error; }
-
-  map<U>(_fn: (t: T) => U): Result<U, E> {
-    return this as any;
+  get isOk(): boolean {
+    return false;
   }
 
-  mapErr<F>(fn: (e: E) => F): Result<T, F> {
-    return new Err(fn(this.error));
+  get isErr(): boolean {
+    return true;
   }
 
-  getOrThrow(label = "Result is Err") {
-    throw new Error(`${label}: ${JSON.stringify(this.error)}`);
+  map<U>(_fn: (val: T) => U): Result<U, E> {
+    return this as unknown as Result<U, E>;
+  }
+
+  mapErr<F>(fn: (err: E) => F): Result<T, F> {
+    return new Err(fn(this.error)) as Result<T, F>;
+  }
+
+  unwrap(): T {
+    throw new Error(`Called unwrap on Err: ${this.error}`);
+  }
+
+  unwrapErr(): E {
+    return this.error;
   }
 }

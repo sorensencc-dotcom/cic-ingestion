@@ -46,86 +46,87 @@ function loadModeSettingsFromFile() {
  * Policy engine: decides if a tool call is allowed in current execution context
  */
 export class ExecutionPolicyEngine {
+    modeSettings;
+    policies = new Map([
+        [
+            ExecutionMode.INTERACTIVE,
+            {
+                allowed: ['*'], // Allow all tools
+                requirePreapproval: false,
+            },
+        ],
+        [
+            ExecutionMode.UNATTENDED,
+            {
+                allowed: [
+                    'Bash(docker-*)',
+                    'Bash(docker-compose *)',
+                    'Bash(npm *)',
+                    'Bash(npm test)',
+                    'Bash(npm run *)',
+                    'Bash(git *)',
+                    'Bash(git status)',
+                    'Bash(git log *)',
+                    'Bash(git diff *)',
+                    'Bash(git commit *)',
+                    'Bash(git push *)',
+                    'PowerShell(docker *)',
+                    'PowerShell(docker-compose *)',
+                    'Read',
+                    'Grep',
+                    'Glob',
+                    'Edit',
+                    'Write',
+                    'Bash',
+                ],
+                denied: [
+                    'Agent(*)', // No spawning agents in unattended mode
+                    'AskUserQuestion', // No user interaction
+                    'ScheduleWakeup', // No recursive scheduling
+                ],
+                requirePreapproval: true,
+            },
+        ],
+        [
+            ExecutionMode.BATCH,
+            {
+                allowed: [
+                    'Bash(docker-*)',
+                    'Bash(docker-compose *)',
+                    'Bash(npm *)',
+                    'Bash(git *)',
+                    'PowerShell(docker *)',
+                    'PowerShell(docker-compose *)',
+                    'Read',
+                    'Grep',
+                    'Glob',
+                    'Edit',
+                    'Write',
+                    'Bash',
+                ],
+                denied: ['Agent(*)', 'AskUserQuestion', 'ScheduleWakeup'],
+                requirePreapproval: false, // Single upfront approval
+                batchSize: 50,
+            },
+        ],
+        [
+            ExecutionMode.MAINTENANCE,
+            {
+                allowed: [
+                    'Bash(docker *)',
+                    'Bash(npm *)',
+                    'Bash(git *)',
+                    'PowerShell(docker *)',
+                    'Read',
+                    'Grep',
+                    'Bash',
+                ],
+                denied: ['Agent(*)', 'AskUserQuestion'],
+                requirePreapproval: true,
+            },
+        ],
+    ]);
     constructor() {
-        this.policies = new Map([
-            [
-                ExecutionMode.INTERACTIVE,
-                {
-                    allowed: ['*'], // Allow all tools
-                    requirePreapproval: false,
-                },
-            ],
-            [
-                ExecutionMode.UNATTENDED,
-                {
-                    allowed: [
-                        'Bash(docker-*)',
-                        'Bash(docker-compose *)',
-                        'Bash(npm *)',
-                        'Bash(npm test)',
-                        'Bash(npm run *)',
-                        'Bash(git *)',
-                        'Bash(git status)',
-                        'Bash(git log *)',
-                        'Bash(git diff *)',
-                        'Bash(git commit *)',
-                        'Bash(git push *)',
-                        'PowerShell(docker *)',
-                        'PowerShell(docker-compose *)',
-                        'Read',
-                        'Grep',
-                        'Glob',
-                        'Edit',
-                        'Write',
-                        'Bash',
-                    ],
-                    denied: [
-                        'Agent(*)', // No spawning agents in unattended mode
-                        'AskUserQuestion', // No user interaction
-                        'ScheduleWakeup', // No recursive scheduling
-                    ],
-                    requirePreapproval: true,
-                },
-            ],
-            [
-                ExecutionMode.BATCH,
-                {
-                    allowed: [
-                        'Bash(docker-*)',
-                        'Bash(docker-compose *)',
-                        'Bash(npm *)',
-                        'Bash(git *)',
-                        'PowerShell(docker *)',
-                        'PowerShell(docker-compose *)',
-                        'Read',
-                        'Grep',
-                        'Glob',
-                        'Edit',
-                        'Write',
-                        'Bash',
-                    ],
-                    denied: ['Agent(*)', 'AskUserQuestion', 'ScheduleWakeup'],
-                    requirePreapproval: false, // Single upfront approval
-                    batchSize: 50,
-                },
-            ],
-            [
-                ExecutionMode.MAINTENANCE,
-                {
-                    allowed: [
-                        'Bash(docker *)',
-                        'Bash(npm *)',
-                        'Bash(git *)',
-                        'PowerShell(docker *)',
-                        'Read',
-                        'Grep',
-                        'Bash',
-                    ],
-                    denied: ['Agent(*)', 'AskUserQuestion'],
-                    requirePreapproval: true,
-                },
-            ],
-        ]);
         this.modeSettings = loadModeSettingsFromFile();
     }
     /**

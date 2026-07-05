@@ -1,49 +1,21 @@
 /**
  * CIC Prompt Cache Router
- * Main integration point for autonomy agents to leverage prompt caching
- *
- * Usage:
- *   const router = new CICPromptCacheRouter();
- *   const { response, metadata } = await router.generateWithCache({
- *     docId: 'kroll_batch_001',
- *     docText: longArchivalText,
- *     userPrompt: 'Analyze this batch...',
- *   });
+ * Manages prompt cache state and metrics
  */
-import { CacheMetrics, CacheSummary } from './registry.js';
-import { BatchAnalysisRequest, BatchAnalysisResult } from './batch.js';
-import { CacheConfig } from './config/index.js';
-export interface GenerateOptions {
-    docId: string;
-    docText: string;
-    userPrompt: string;
-    model?: string;
-    maxTokens?: number;
-    registryDbPath?: string;
+export interface CacheSummary {
+    eligible_docs: number;
+    overall_hit_rate_percent: number;
+    total_cache_hits: number;
+    total_cache_misses: number;
+    total_cache_read_tokens_saved: number;
 }
-export interface GenerateResult {
-    response: string;
-    metadata: {
-        docId: string;
-        cacheHit: boolean;
-        cacheReadTokens: number;
-        inputTokens: number;
-        outputTokens: number;
-        costWithCache: number;
-        costWithoutCache: number;
-        costSavings: number;
-        timestamp: string;
-    };
+export interface CacheConfig {
+    [key: string]: any;
 }
 export declare class CICPromptCacheRouter {
-    private client;
-    private registry;
-    private batchManager;
     private config;
-    constructor(config?: CacheConfig, registryDbPath?: string);
-    generateWithCache(opts: GenerateOptions): Promise<GenerateResult>;
-    generateBatchWithCache(req: BatchAnalysisRequest): Promise<BatchAnalysisResult>;
-    getMetrics(contentHash: string): CacheMetrics | null;
+    private summary;
+    constructor(config: CacheConfig);
     getSummary(): CacheSummary;
     clearRegistry(): void;
 }

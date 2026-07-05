@@ -6,6 +6,11 @@ import { BaseAdapter } from '../BaseAdapter';
 import { ValidationUtils } from '../ValidationUtils';
 import { AnthropicClient } from '../../engines/anthropic/AnthropicClient';
 export class ModelGenerateAdapter extends BaseAdapter {
+    static ALLOWED_MODELS = [
+        'claude-3-sonnet-20240229',
+        'claude-3-opus-20240229',
+        'claude-3-haiku-20240307'
+    ];
     constructor() {
         const inputSchema = {
             type: 'object',
@@ -93,7 +98,8 @@ export class ModelGenerateAdapter extends BaseAdapter {
                 prompt,
                 maxTokens,
                 systemPrompt,
-                temperature
+                temperature,
+                meta: input.meta
             });
             // Validate output size
             const outputSizeValidation = ValidationUtils.validateBodySize(result.text);
@@ -124,11 +130,6 @@ export class ModelGenerateAdapter extends BaseAdapter {
         }
     }
 }
-ModelGenerateAdapter.ALLOWED_MODELS = [
-    'claude-3-sonnet-20240229',
-    'claude-3-opus-20240229',
-    'claude-3-haiku-20240307'
-];
 export function createModelGenerateAdapter() {
     return new ModelGenerateAdapter();
 }

@@ -1,26 +1,8 @@
-import { MAALRouter } from '../../cic-os/src/core/maal/MAALRouter';
-import { Proposal } from '../../cic-os/src/core/maal/codesign/Proposal';
-import { CanaryTelemetry } from '../../cic-os/src/core/maal/canary/CanaryTelemetry';
-import { Result } from '../../cic-os/src/core/maal/support/Result';
+import { MAALRouter } from '../core/maal/MAALRouter';
+import { Proposal } from '../core/maal/codesign/Proposal';
+import { CanaryTelemetry } from '../core/maal/canary/CanaryTelemetry';
+import { Result, Ok } from '../core/maal/support/Result';
 import {
-  Phase4Hooks,
-  ProposalAccepted,
-  ProposalError,
-  ValidationPassed,
-  ValidationError,
-  GovernanceApproved,
-  GovernanceRejected,
-  PromotionSuccess,
-  RollbackApplied,
-  RollbackError
-} from '../../cic-os/src/core/maal/support/Phase4Types';
-
-export interface MAARLRouterDependency {
-  maalRouter: MAALRouter;
-}
-
-// Re-export Phase 4 types for BridgeOrchestrator users
-export {
   Phase4Hooks,
   ProposalAccepted,
   ProposalError,
@@ -32,7 +14,26 @@ export {
   RollbackApplied,
   RollbackError,
   CanaryError
-} from '../../cic-os/src/core/maal/support/Phase4Types';
+} from '../core/maal/support/Phase4Types';
+
+export interface MAARLRouterDependency {
+  maalRouter: MAALRouter;
+}
+
+// Re-export Phase 4 types for BridgeOrchestrator users
+export type {
+  Phase4Hooks,
+  ProposalAccepted,
+  ProposalError,
+  ValidationPassed,
+  ValidationError,
+  GovernanceApproved,
+  GovernanceRejected,
+  PromotionSuccess,
+  RollbackApplied,
+  RollbackError,
+  CanaryError
+} from '../core/maal/support/Phase4Types';
 
 /**
  * BridgeOrchestrator: Integrates Phase 4 DSL/validation/governance/canary with Phase 1/3 MAAL/SPL.
@@ -40,12 +41,7 @@ export {
  * Uses Phase4HooksImpl as default implementation if no custom hooks provided.
  */
 export class BridgeOrchestrator implements Phase4Hooks {
-  private defaultHooks: Phase4HooksImpl | null = null;
-
-  constructor(private deps: MAARLRouterDependency & { hooks?: Partial<Phase4Hooks> }) {
-    // Phase4HooksImpl requires full dependency injection; only instantiate if needed
-    // (when no custom hooks provided and DB/governance/canary deps available)
-  }
+  constructor(private deps: MAARLRouterDependency & { hooks?: Partial<Phase4Hooks> }) {}
 
   submitProposal(proposal: Proposal): Result<ProposalAccepted, ProposalError> {
     if (this.deps.hooks?.submitProposal) {
@@ -53,7 +49,7 @@ export class BridgeOrchestrator implements Phase4Hooks {
     }
 
     // Default: accept and log (mock implementation)
-    return Result.ok({
+    return new Ok({
       proposal_id: proposal.proposal_id,
       received_at: new Date()
     });
@@ -67,7 +63,7 @@ export class BridgeOrchestrator implements Phase4Hooks {
     }
 
     // Default: pass validation
-    return Result.ok({
+    return new Ok({
       proposal_id: proposal.proposal_id,
       validated_at: new Date()
     });
@@ -81,7 +77,7 @@ export class BridgeOrchestrator implements Phase4Hooks {
     }
 
     // Default: approve
-    return Result.ok({
+    return new Ok({
       proposal_id: proposal.proposal_id,
       approved_at: new Date()
     });
@@ -93,7 +89,7 @@ export class BridgeOrchestrator implements Phase4Hooks {
     }
 
     // Default: return mock telemetry
-    return Result.ok({
+    return new Ok({
       telemetry_id: `mock-telemetry-${proposal.proposal_id}`,
       proposal_id: proposal.proposal_id,
       cohort_step: 0,
@@ -126,7 +122,7 @@ export class BridgeOrchestrator implements Phase4Hooks {
     }
 
     // Default: promote
-    return Result.ok({
+    return new Ok({
       proposal_id,
       promoted_at: new Date()
     });

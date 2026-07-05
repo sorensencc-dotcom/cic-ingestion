@@ -10,10 +10,8 @@ import { getExecutionPolicyEngine } from './ExecutionPolicy.js';
  * In-memory task metadata store
  */
 export class TaskMetadataStore {
-    constructor() {
-        this.contexts = new Map();
-        this.executions = new Map();
-    }
+    contexts = new Map();
+    executions = new Map();
     /**
      * Store execution context for a task (called before ScheduleWakeup)
      * Merges task context with mode settings defaults from .claude/settings.json

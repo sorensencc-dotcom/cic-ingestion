@@ -5,6 +5,11 @@
 import Ajv from 'ajv';
 const ajv = new Ajv({ allErrors: true });
 export class BaseAdapter {
+    id;
+    name;
+    version;
+    inputSchema;
+    outputSchema;
     constructor(id, name, version, inputSchema, outputSchema) {
         this.id = id;
         this.name = name;
