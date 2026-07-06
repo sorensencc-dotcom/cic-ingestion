@@ -10,6 +10,7 @@ import { createFireDrillRouter } from "./routes/firedrills.js";
 import { createConsoleRouter } from "./routes/console.js";
 import { createMemoryRouter } from "./routes/memory.js";
 import { createGovernanceRouter } from "./routes/governance.js";
+import { createSearchRouter } from "./routes/search.js";
 import { AdapterRegistry } from "../adapters/AdapterRegistry.js";
 import { AdapterIntegrationService } from "../services/AdapterIntegrationService.js";
 import { GrokHardenedAdapter } from "../adapters/grok/GrokHardenedAdapter.js";
@@ -20,11 +21,11 @@ import { ConsoleMetricsAdapter } from "../adapters/metrics/ConsoleMetricsAdapter
 import { createExecuteRouter } from "../routes/execute.js";
 import { UsageLedger } from "../lib/usage/UsageLedger.js";
 import { generateCicCostComputeReport } from "../lib/report/CicCostComputeReport.js";
-import { TorqueQueryClient } from "../../src/services/torquequery/TorqueQueryClient";
-import { HardeningRegistry } from "../../src/resilience/hardeningOrchestrator";
-import { CircuitBreakerRegistry } from "../../src/resilience/circuitBreaker";
-import { RateLimiterRegistry } from "../../src/resilience/rateLimiter";
-import { ResilientMetricsCollector } from "../../src/observability/resilientMetricsCollector";
+import { TorqueQueryClient } from "../services/torquequery/TorqueQueryClient";
+import { HardeningRegistry } from "../../../src/resilience/hardeningOrchestrator";
+import { CircuitBreakerRegistry } from "../../../src/resilience/circuitBreaker";
+import { RateLimiterRegistry } from "../../../src/resilience/rateLimiter";
+import { ResilientMetricsCollector } from "../../../src/observability/resilientMetricsCollector";
 
 export interface AutonomyAPIServerConfig {
   port?: number;
@@ -135,11 +136,16 @@ export class AutonomyAPIServer {
     const governanceRouter = createGovernanceRouter({
       governanceControlPlaneUrl: process.env.GOVERNANCE_URL || "http://localhost:3113",
     });
+    const searchRouter = createSearchRouter({
+      torqueQueryUrl: process.env.MEMORY_STORE_URL || "http://localhost:3110",
+      governanceUrl: process.env.GOVERNANCE_URL || "http://localhost:3113",
+    });
 
     this.app.use("/autonomy", executionRouter);
     this.app.use("/autonomy", fireDrillRouter);
     this.app.use("/autonomy", memoryRouter);
     this.app.use("/autonomy", governanceRouter);
+    this.app.use("/autonomy", searchRouter);
 
     // Grok Hardened Adapter (Phase A+B+C: Cache + Hardening)
     const adapterRegistry = new AdapterRegistry();
@@ -179,7 +185,7 @@ export class AutonomyAPIServer {
     adapterRegistry.register("grok", grokHardenedAdapter);
 
     // Console Metrics Adapter (Phase 8)
-    const torqueQueryClient = new TorqueQueryClient(torqueQueryUrl);
+    const torqueQueryClient = new TorqueQueryClient({ url: torqueQueryUrl });
     const consoleMetricsAdapter = new ConsoleMetricsAdapter({
       name: "console-metrics",
       version: "1.0.0",
@@ -231,7 +237,7 @@ export class AutonomyAPIServer {
       // Dynamic import for generatePdfReport
       const importPdfReports = async () => {
         const { generatePdfReport } = await import("../../reports/cicCostComputePdf.js");
-        return generatePdfReport;
+        return { generatePdfReport };
       };
 
       // Daily PDF report at midnight (0 0 * * *)

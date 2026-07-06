@@ -2,7 +2,10 @@
  * TorqueQuery HTTP Client
  * Communicates with TorqueQuery service for Console v3 data
  * Phase 4: Fast-path optimization for simple queries
+ * Phase 27: Counterfactual reasoning queries
  */
+
+import type { CICQueryResponse } from '../../types/search';
 
 interface QueryCache {
   timestamp: number;
@@ -175,6 +178,23 @@ export class TorqueQueryClient {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ action, ...options }),
+    });
+  }
+
+  /**
+   * CIC counterfactual reasoning query.
+   * Finds governance decisions with similar reasoning.
+   */
+  async cicQuery(req: {
+    query: string;
+    phase_ids?: string[];
+    confidence_min?: number;
+    limit?: number;
+  }): Promise<CICQueryResponse> {
+    return this.fetch('/search/cic-query', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(req),
     });
   }
 
