@@ -1,14 +1,14 @@
 /**
  * Phase 27.1 E2E Tests: Counterfactual Reasoning Query Bridge
  * Tests: TorqueQuery /search/cic-query → AutonomyAPIServer /autonomy/search/cic-query
+ * Using Node native test runner (not Jest)
  */
 
-import { describe, it, expect, beforeAll, afterAll } from '@jest/globals';
-import fetch from 'node-fetch';
+import { test, describe } from 'node:test';
+import * as assert from 'node:assert';
 
 const AUTONOMY_BASE = process.env.AUTONOMY_URL || 'http://localhost:3000';
 const TORQUE_BASE = process.env.TORQUE_URL || 'http://localhost:3110';
-const GOVERNANCE_BASE = process.env.GOVERNANCE_URL || 'http://localhost:3113';
 
 const TEST_TIMEOUT = 10000;
 
@@ -104,21 +104,15 @@ async function verifyIndexReady() {
   console.log(`✓ Index ready with ${stats.total_documents} documents`);
 }
 
-describe('Phase 27.1: Counterfactual Reasoning Query Bridge', () => {
-  beforeAll(async () => {
-    // Seed index with test data
-    console.log('Seeding TorqueQuery index...');
-    await seedIndex();
+// Seed index before tests
+console.log('Seeding TorqueQuery index...');
+await seedIndex();
+await new Promise(r => setTimeout(r, 500));
+await verifyIndexReady();
 
-    // Wait for index to be ready
-    await new Promise(r => setTimeout(r, 500));
-
-    // Verify index
-    await verifyIndexReady();
-  }, TEST_TIMEOUT);
-
-  describe('Case 1: Single-phase query', () => {
-    it('should return matching decisions for single phase filter', async () => {
+describe('Phase 27.1: Counterfactual Reasoning Query Bridge', async () => {
+  describe('Case 1: Single-phase query', async () => {
+    test('should return matching decisions for single phase filter', async (t) => {
       const response = await fetch(`${AUTONOMY_BASE}/autonomy/search/cic-query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -129,35 +123,34 @@ describe('Phase 27.1: Counterfactual Reasoning Query Bridge', () => {
         }),
       });
 
-      expect(response.status).toBe(200);
+      assert.strictEqual(response.status, 200, 'Response status should be 200');
 
       const result = await response.json();
 
       // Assertions
-      expect(result.query_id).toBeDefined();
-      expect(result.query_text).toBe('What if we had used a different adapter?');
-      expect(result.matching_decisions).toBeDefined();
-      expect(Array.isArray(result.matching_decisions)).toBe(true);
-      expect(result.matching_decisions.length).toBeGreaterThan(0);
+      assert.ok(result.query_id, 'query_id should be defined');
+      assert.strictEqual(result.query_text, 'What if we had used a different adapter?', 'query_text should match input');
+      assert.ok(Array.isArray(result.matching_decisions), 'matching_decisions should be array');
+      assert.ok(result.matching_decisions.length > 0, 'should have at least one result');
 
       // Check confidence threshold
       result.matching_decisions.forEach((decision: any) => {
-        expect(decision.confidence || decision.indexed_fields?.confidence).toBeGreaterThanOrEqual(0.7);
+        const conf = decision.confidence || decision.indexed_fields?.confidence;
+        assert.ok(conf >= 0.7, `confidence ${conf} should be >= 0.7`);
       });
 
       // Check counterfactual analysis
-      expect(result.counterfactual_analysis).toBeDefined();
-      expect(result.counterfactual_analysis.primary_match).toBeDefined();
-      expect(result.counterfactual_analysis.alternative_outcomes).toBeDefined();
-      expect(Array.isArray(result.counterfactual_analysis.alternative_outcomes)).toBe(true);
+      assert.ok(result.counterfactual_analysis, 'counterfactual_analysis should exist');
+      assert.ok(result.counterfactual_analysis.primary_match, 'primary_match should be defined');
+      assert.ok(Array.isArray(result.counterfactual_analysis.alternative_outcomes), 'alternative_outcomes should be array');
 
       // Check timing SLO
-      expect(result.took_ms).toBeLessThan(500);
-    }, TEST_TIMEOUT);
+      assert.ok(result.took_ms < 500, `took_ms ${result.took_ms} should be < 500ms`);
+    });
   });
 
-  describe('Case 2: Multi-phase with confidence filter', () => {
-    it('should filter results by phase and confidence threshold', async () => {
+  describe('Case 2: Multi-phase with confidence filter', async () => {
+    test('should filter results by phase and confidence threshold', async (t) => {
       const response = await fetch(`${AUTONOMY_BASE}/autonomy/search/cic-query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -169,33 +162,35 @@ describe('Phase 27.1: Counterfactual Reasoning Query Bridge', () => {
         }),
       });
 
-      expect(response.status).toBe(200);
+      assert.strictEqual(response.status, 200, 'Response status should be 200');
 
       const result = await response.json();
 
       // All results should meet confidence threshold
       result.matching_decisions.forEach((decision: any) => {
-        const confidence = decision.indexed_fields?.confidence || decision.score;
-        expect(confidence).toBeGreaterThanOrEqual(0.8);
+        const conf = decision.indexed_fields?.confidence || decision.score;
+        assert.ok(conf >= 0.8, `confidence ${conf} should be >= 0.8`);
       });
 
-      // Should have alternatives for counterfactual analysis
-      expect(result.counterfactual_analysis.alternative_outcomes.length).toBeGreaterThan(0);
+      // Should have alternatives
+      assert.ok(result.counterfactual_analysis.alternative_outcomes.length >= 0, 'should have alternatives list');
 
-      // Verify primary_match corresponds to top result
+      // Verify primary_match
       if (result.matching_decisions.length > 0) {
-        expect(result.counterfactual_analysis.primary_match).toBe(
+        assert.strictEqual(
+          result.counterfactual_analysis.primary_match,
           result.matching_decisions[0].source_id,
+          'primary_match should equal first result',
         );
       }
 
       // Check timing SLO
-      expect(result.took_ms).toBeLessThan(500);
-    }, TEST_TIMEOUT);
+      assert.ok(result.took_ms < 500, `took_ms ${result.took_ms} should be < 500ms`);
+    });
   });
 
-  describe('Case 3: Reasoning context (Phase 27.1+)', () => {
-    it('should accept reasoning context without error', async () => {
+  describe('Case 3: Reasoning context', async () => {
+    test('should accept reasoning context without error', async (t) => {
       const response = await fetch(`${AUTONOMY_BASE}/autonomy/search/cic-query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -210,19 +205,19 @@ describe('Phase 27.1: Counterfactual Reasoning Query Bridge', () => {
         }),
       });
 
-      expect(response.status).toBe(200);
+      assert.strictEqual(response.status, 200, 'Response status should be 200');
 
       const result = await response.json();
 
       // Should still return results despite reasoning_context being optional
-      expect(result.matching_decisions).toBeDefined();
-      expect(result.counterfactual_analysis).toBeDefined();
-      expect(result.took_ms).toBeLessThan(500);
-    }, TEST_TIMEOUT);
+      assert.ok(result.matching_decisions, 'matching_decisions should exist');
+      assert.ok(result.counterfactual_analysis, 'counterfactual_analysis should exist');
+      assert.ok(result.took_ms < 500, `took_ms ${result.took_ms} should be < 500ms`);
+    });
   });
 
-  describe('Global invariants (all tests)', () => {
-    it('primary_match should always equal first result source_id when results exist', async () => {
+  describe('Global invariants', async () => {
+    test('primary_match should equal first result source_id when results exist', async (t) => {
       const response = await fetch(`${AUTONOMY_BASE}/autonomy/search/cic-query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -236,13 +231,15 @@ describe('Phase 27.1: Counterfactual Reasoning Query Bridge', () => {
       const result = await response.json();
 
       if (result.matching_decisions.length > 0) {
-        expect(result.counterfactual_analysis.primary_match).toBe(
+        assert.strictEqual(
+          result.counterfactual_analysis.primary_match,
           result.matching_decisions[0].source_id,
+          'primary_match should match first result',
         );
       }
-    }, TEST_TIMEOUT);
+    });
 
-    it('should not exceed SLO latency for any query', async () => {
+    test('should not exceed SLO latency for any query', async (t) => {
       const response = await fetch(`${AUTONOMY_BASE}/autonomy/search/cic-query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -255,10 +252,10 @@ describe('Phase 27.1: Counterfactual Reasoning Query Bridge', () => {
       const result = await response.json();
 
       // Phase 27.3 SLO: P95 < 500ms
-      expect(result.took_ms).toBeLessThan(500);
-    }, TEST_TIMEOUT);
+      assert.ok(result.took_ms < 500, `took_ms ${result.took_ms} should be < 500ms (SLO)`);
+    });
 
-    it('should have applicable_precedents match total search results', async () => {
+    test('applicable_precedents should be >= matching results count', async (t) => {
       const response = await fetch(`${AUTONOMY_BASE}/autonomy/search/cic-query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -271,14 +268,15 @@ describe('Phase 27.1: Counterfactual Reasoning Query Bridge', () => {
       const result = await response.json();
 
       // applicable_precedents should match total documents matching query
-      expect(result.counterfactual_analysis.applicable_precedents).toBeGreaterThanOrEqual(
-        result.matching_decisions.length,
+      assert.ok(
+        result.counterfactual_analysis.applicable_precedents >= result.matching_decisions.length,
+        'applicable_precedents should be >= matching results',
       );
-    }, TEST_TIMEOUT);
+    });
   });
 
-  describe('Error handling', () => {
-    it('should return 400 for missing query parameter', async () => {
+  describe('Error handling', async () => {
+    test('should return error for missing query parameter', async (t) => {
       const response = await fetch(`${AUTONOMY_BASE}/autonomy/search/cic-query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -288,10 +286,10 @@ describe('Phase 27.1: Counterfactual Reasoning Query Bridge', () => {
       });
 
       // Should fail validation (no query field)
-      expect([400, 500]).toContain(response.status);
-    }, TEST_TIMEOUT);
+      assert.ok([400, 500].includes(response.status), `status ${response.status} should be 400 or 500`);
+    });
 
-    it('should handle limit > 100 gracefully', async () => {
+    test('should handle limit > 100 gracefully', async (t) => {
       const response = await fetch(`${AUTONOMY_BASE}/autonomy/search/cic-query`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -304,10 +302,13 @@ describe('Phase 27.1: Counterfactual Reasoning Query Bridge', () => {
       // Either reject or cap at 100
       if (response.ok) {
         const result = await response.json();
-        expect(result.matching_decisions.length).toBeLessThanOrEqual(100);
+        assert.ok(
+          result.matching_decisions.length <= 100,
+          `results ${result.matching_decisions.length} should be <= 100`,
+        );
       } else {
-        expect(response.status).toBe(400);
+        assert.strictEqual(response.status, 400, 'should reject with 400');
       }
-    }, TEST_TIMEOUT);
+    });
   });
 });
