@@ -1,0 +1,19 @@
+tests/phase-27-cic-query.test.ts
+  s_5c65f57dc4faee::t_26dbc862af4830 4,7-8,107-111,113-115,126,131-134,138-139,143-145,148-149,152-153,165,171-172,175-176,178,180-181,183,188-189,192-193,208,213-216,219-220,234-235,237,240,242,255-256,258,271-273,275,278-279,289-290,292,305-308,310,312
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "2512b257c4785d26b44a434f0a2cb89a1217a708",
+  "prompts": {},
+  "sessions": {
+    "s_5c65f57dc4faee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2498d9db-e36b-479e-8c22-bd7a1a7341c5",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
