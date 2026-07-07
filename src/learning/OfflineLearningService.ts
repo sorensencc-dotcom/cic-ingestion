@@ -1,4 +1,4 @@
-import { PolicyNetwork } from 'src/learning/policy/PolicyNetwork.js';
+import { PolicyNetwork } from './policy/PolicyNetwork';
 
 export interface OfflineLearningServiceConfig {
   ledgerPollIntervalMs: number;

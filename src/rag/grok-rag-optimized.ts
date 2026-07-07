@@ -1,5 +1,6 @@
-import { GrokProvider } from "../adapters/grok/grok-provider.js";
-import { ragSearchCache, ragContextCache, RagCache } from "src/cache/ragCache.js";
+import { GrokProvider } from "../adapters/grok/grok-provider";
+// TODO: ragCache import — file does not exist, commented pending cleanup
+// import { ragSearchCache, ragContextCache, RagCache } from "../cache/ragCache";
 
 export interface RagQueryOptions {
   maxResults?: number;

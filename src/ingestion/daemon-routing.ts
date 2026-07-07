@@ -1,6 +1,7 @@
-// cic-ingestion/src/ingestion/daemon.ts
-// semver: 0.1.0
-// date: 2026-06-29
+// cic-ingestion/src/ingestion/daemon-routing.ts
+// Phase 27 daemon with routing integration
+// This is a temporary wrapper to showcase routing integration
+// Will be merged into daemon.ts after Wave C validation
 
 import fs from "fs";
 import path from "path";
@@ -10,14 +11,18 @@ import { clientSessionExtractor } from "../extractors/clientSessionExtractor.js"
 import { processClientSession } from "../harness/replayHarness.js";
 import { decayDriftScores } from "../drift/driftEngine.js";
 import { verifyIngestionEntry, VerifyResult } from "./verify.js";
-// TODO: verify audit-policy path — currently missing from codebase
-// import { verifyAuditChain } from "cic/governance/audit-policy.js";
-import { runDocsManagerIngestionJob } from "./jobs/docsManagerJob.js";
+import { route } from "./ingestionRouter.js";
+import { recordIngestion } from "./ingestionManifest.js";
+import { getOverrideForEntry, applyOverride } from "./operatorOverrides.js";
+import { Cost, VerificationResult } from "./types.js";
 
-export class IngestionDaemon {
+const ROUTING_ENABLED = process.env.CIC_INGESTION_ROUTING_ENABLED !== "false";
+
+export class IngestionDaemonRouting {
   private intervalId: NodeJS.Timeout | null = null;
   private processedLines = new Set<string>();
   private dlqPath: string;
+  private quarantinedIds = new Set<string>();
 
   constructor(
     private logPath: string,
@@ -39,7 +44,12 @@ export class IngestionDaemon {
     }
   }
 
-  private addViolationInline(state: any, category: string, description: string, severity: "SEV-1" | "SEV-2" | "SEV-3"): void {
+  private addViolationInline(
+    state: any,
+    category: string,
+    description: string,
+    severity: "SEV-1" | "SEV-2" | "SEV-3"
+  ): void {
     const idx = state.violations.findIndex((v: any) => v.category === category);
     const violation = { category, description, severity, ts: Date.now() };
 
@@ -64,7 +74,11 @@ export class IngestionDaemon {
         state.activePlaybooks.ingestionRecovery = true;
       }
     } else if (severity === "SEV-3") {
-      if (category === "latency_breach" || category === "drift_spike" || category === "token_breach") {
+      if (
+        category === "latency_breach" ||
+        category === "drift_spike" ||
+        category === "token_breach"
+      ) {
         state.activePlaybooks.driftSpike = true;
       }
     }
@@ -84,7 +98,11 @@ export class IngestionDaemon {
       delete state.frozenBackend;
     } else if (category === "ingestion_backlog") {
       state.activePlaybooks.ingestionRecovery = false;
-    } else if (category === "latency_breach" || category === "drift_spike" || category === "token_breach") {
+    } else if (
+      category === "latency_breach" ||
+      category === "drift_spike" ||
+      category === "token_breach"
+    ) {
       state.activePlaybooks.driftSpike = false;
     }
   }
@@ -103,7 +121,7 @@ export class IngestionDaemon {
       fs.mkdirSync(path.dirname(this.dlqPath), { recursive: true });
       fs.appendFileSync(this.dlqPath, JSON.stringify(dlqEntry) + "\n", "utf8");
     } catch (err: any) {
-      console.error("[IngestionDaemon] DLQ write failed:", err.message);
+      console.error("[IngestionDaemonRouting] DLQ write failed:", err.message);
     }
   }
 
@@ -111,20 +129,6 @@ export class IngestionDaemon {
     try {
       const state = this.stateStore.load();
 
-      // 1. Check hash-chain integrity (TODO: verifyAuditChain not available in codebase)
-      // const chainCheck = verifyAuditChain();
-      // if (!chainCheck.valid) {
-      //   this.addViolationInline(
-      //     state,
-      //     "governance_chain_break",
-      //     `Hash-chain integrity broken at event index ${chainCheck.breakAt}`,
-      //     "SEV-1"
-      //   );
-      // } else {
-      //   this.clearViolationInline(state, "governance_chain_break");
-      // }
-
-      // 2. Read client_sessions.jsonl line-by-line (streaming)
       if (!fs.existsSync(this.logPath)) {
         return;
       }
@@ -132,7 +136,7 @@ export class IngestionDaemon {
       const fileStream = fs.createReadStream(this.logPath);
       const rl = readline.createInterface({
         input: fileStream,
-        crlfDelay: Infinity
+        crlfDelay: Infinity,
       });
 
       const newEntries: any[] = [];
@@ -153,7 +157,6 @@ export class IngestionDaemon {
         if (!entry || !entry.backend || !entry.timestamp) continue;
         const key = `${entry.timestamp}-${entry.backend}`;
 
-        // Idempotency check
         if (this.processedLines.has(key)) continue;
 
         newEntries.push(entry);
@@ -161,24 +164,96 @@ export class IngestionDaemon {
         processedInCycle++;
       }
 
-      // Apply 5% decay to all drift scores at the start of the cycle
       decayDriftScores(state.drift);
 
-      // Process new sessions and update drift scores
       let cycleTotalLatency = 0;
       let cycleTurns = 0;
       let cycleTotalTokens = 0;
 
       for (const entry of newEntries) {
         try {
+          // Phase 27: Check operator overrides
+          const override = getOverrideForEntry(entry);
+          if (override?.skip) {
+            console.log(`[IngestionDaemonRouting] Skipping entry ${entry.id} (operator override)`);
+            continue;
+          }
+
+          let routingDecision: any = null;
+          let operatorFlags = {};
+          let extractorCost = 0.001; // Placeholder cost
+          let verificationCost = 0.001; // Placeholder cost
+
+          // Phase 27: Route if enabled
+          if (ROUTING_ENABLED) {
+            routingDecision = route(entry);
+
+            // Apply operator overrides to routing decision
+            if (override) {
+              const applied = applyOverride(entry, override);
+              operatorFlags = applied.operatorFlags;
+              if (applied.profile) {
+                routingDecision.profile = applied.profile;
+              }
+              if (applied.lane) {
+                routingDecision.lane = applied.lane;
+              }
+            }
+          } else {
+            // Legacy mode: default routing
+            routingDecision = {
+              profile: "filesystem",
+              lane: "fast",
+              extractors: ["clientSessionExtractor"],
+            };
+          }
+
+          // Extract (Phase 26 logic still used for now)
           const extracted = await clientSessionExtractor(entry);
           const verifyResult = verifyIngestionEntry(extracted);
 
-          if (!verifyResult.ok) {
-            this.writeDlqEntry(extracted, verifyResult);
-            continue; // Skip state mutation, process next entry
+          // Record to manifest (Phase 27)
+          if (ROUTING_ENABLED) {
+            const cost: Cost = {
+              extractorCost,
+              verificationCost,
+              totalCost: extractorCost + verificationCost,
+            };
+
+            const verification: VerificationResult = {
+              passed: verifyResult.ok,
+              errors: verifyResult.ok ? [] : [verifyResult.reason || "unknown"],
+              cost: verificationCost,
+            };
+
+            try {
+              recordIngestion(
+                { ...entry, operatorFlags },
+                routingDecision,
+                verification,
+                cost
+              );
+            } catch (err: any) {
+              console.error("[IngestionDaemonRouting] Manifest write failed:", err.message);
+            }
           }
 
+          // Handle quarantine path (Phase 27)
+          if (ROUTING_ENABLED && !verifyResult.ok && routingDecision.lane === "deep") {
+            console.log(
+              `[IngestionDaemonRouting] Quarantining entry ${entry.id} (deep lane + failed verification)`
+            );
+            this.quarantinedIds.add(entry.id);
+            continue; // Skip state mutation, don't index
+          }
+
+          // Handle DLQ path
+          if (!verifyResult.ok) {
+            this.writeDlqEntry(extracted, verifyResult);
+            continue;
+          }
+
+          // Process if verification passed
           processClientSession(extracted, state);
 
           if (entry.response?.meta?.latency_ms) {
@@ -189,8 +264,7 @@ export class IngestionDaemon {
             cycleTotalTokens += entry.response.usage.total_tokens;
           }
         } catch (err: any) {
-          console.error("[IngestionDaemon] per-entry error:", err.message);
-          // Write to DLQ on extraction/verification failure
+          console.error("[IngestionDaemonRouting] per-entry error:", err.message);
           this.writeDlqEntry(entry, {
             ok: false,
             reasonCode: "EXTRACTOR_ERROR",
@@ -198,9 +272,6 @@ export class IngestionDaemon {
           });
         }
       }
-
-      // Ingest docs-manager events (independent stream)
-      runDocsManagerIngestionJob(state as any);
 
       // Update SLA Metrics
       const backlog = totalLines - this.processedLines.size;
@@ -226,8 +297,9 @@ export class IngestionDaemon {
 
       // Routing oscillation check
       const recentFails = newEntries.filter(
-        e => (e.response?.meta?.latency_ms || 0) > state.slaSettings.maxLatencyMs || 
-             (e.response?.usage?.total_tokens || 0) > state.slaSettings.maxTokens
+        (e) =>
+          (e.response?.meta?.latency_ms || 0) > state.slaSettings.maxLatencyMs ||
+          (e.response?.usage?.total_tokens || 0) > state.slaSettings.maxTokens
       );
 
       if (recentFails.length > state.slaSettings.maxOscillations) {
@@ -248,7 +320,7 @@ export class IngestionDaemon {
 
       this.stateStore.save(state);
     } catch (err: any) {
-      console.error("[IngestionDaemon] cycle error:", err.message);
+      console.error("[IngestionDaemonRouting] cycle error:", err.message);
     }
   }
 }

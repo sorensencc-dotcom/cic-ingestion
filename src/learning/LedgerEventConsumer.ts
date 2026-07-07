@@ -1,6 +1,6 @@
-import { LedgerEvent } from 'src/core/ledger/LedgerEvent.js';
-import { RouteState } from 'src/learning/state/RouteState.js';
-import { RouteOutcome } from 'src/learning/reward/RouteOutcome.js';
+import { LedgerEvent } from '../core/ledger/LedgerEvent';
+import { RouteState } from './state/RouteState';
+import { RouteOutcome } from './reward/RouteOutcome';
 
 export interface LedgerEventConsumer {
   consumeEvents(

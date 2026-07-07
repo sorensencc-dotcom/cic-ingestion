@@ -8,19 +8,29 @@ WORKDIR /app
 # Install build tools for native modules (better-sqlite3)
 RUN apk add --no-cache python3 make g++ gcc
 
-# Copy deps lock files
+# Copy root deps lock files
 COPY package*.json ./
-COPY tsconfig.json ./
 
-# Install all deps (including devDeps for build)
+# Copy cic-ingestion deps lock files
+COPY cic-ingestion/package*.json ./cic-ingestion/
+
+# Install all root deps (including devDeps for build)
 RUN npm install
 
-# Copy source
-COPY src ./src
-COPY config ./config
+# Install cic-ingestion deps
+RUN cd cic-ingestion && npm install
 
-# Build TypeScript
-RUN npm run build
+# Copy root source and config
+COPY src ./src
+COPY tsconfig.json ./
+
+# Copy cic-ingestion source and tsconfig
+COPY cic-ingestion/src ./cic-ingestion/src
+COPY cic-ingestion/config ./cic-ingestion/config
+COPY cic-ingestion/tsconfig.json ./cic-ingestion/
+
+# Build cic-ingestion (with root scope via tsconfig rootDir: ..)
+RUN cd cic-ingestion && npm run build
 
 # Runtime stage
 FROM node:20-alpine
@@ -34,13 +44,9 @@ LABEL component="autonomy-api-server"
 COPY package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 
-# Copy built assets from builder
-COPY --from=builder /app/dist ./dist
-COPY config ./config
-
-# Copy data files needed at runtime
-RUN mkdir -p src/vector
-COPY src/vector/goldenQueries.json ./src/vector/
+# Copy built assets from builder (cic-ingestion build output)
+COPY --from=builder /app/cic-ingestion/dist ./dist
+COPY cic-ingestion/config ./config
 
 # Health check
 HEALTHCHECK --interval=10s --timeout=5s --retries=3 --start-period=10s \
@@ -48,5 +54,5 @@ HEALTHCHECK --interval=10s --timeout=5s --retries=3 --start-period=10s \
 
 EXPOSE 3116
 
-# Start server with config validation
+# Start server
 CMD ["node", "dist/src/server.js"]

@@ -61,7 +61,7 @@ export class ProposalParser {
         if (deltaResult.isErr) {
           return deltaResult as any;
         }
-        deltas.push(deltaResult.ok()!);
+        deltas.push(deltaResult.unwrap());
       }
 
       const proposal: Proposal = {

@@ -1,0 +1,104 @@
+{
+  "fixtures": [
+    {
+      "name": "filesystem-small-file",
+      "entry": {
+        "id": "fs-small-1",
+        "source": "filesystem",
+        "mediaType": "text/plain",
+        "size": 1024,
+        "retryCount": 0
+      },
+      "expected": {
+        "profile": "filesystem",
+        "lane": "fast",
+        "extractorsInclude": ["TextExtractor"]
+      }
+    },
+    {
+      "name": "api-generic-json",
+      "entry": {
+        "id": "api-gen-1",
+        "source": "api:custom-api",
+        "mediaType": "application/json",
+        "size": 5000,
+        "retryCount": 0
+      },
+      "expected": {
+        "profile": "api:generic",
+        "lane": "fast",
+        "extractorsMinCount": 1
+      }
+    },
+    {
+      "name": "image-jpeg-deep",
+      "entry": {
+        "id": "img-1",
+        "source": "images",
+        "mediaType": "image/jpeg",
+        "size": 2000000,
+        "retryCount": 0
+      },
+      "expected": {
+        "profile": "images",
+        "lane": "deep",
+        "extractorsInclude": ["ImageAnalyzer"]
+      }
+    },
+    {
+      "name": "pdf-deep",
+      "entry": {
+        "id": "pdf-1",
+        "source": "documents",
+        "mediaType": "application/pdf",
+        "size": 5000000,
+        "retryCount": 0
+      },
+      "expected": {
+        "profile": "pdf",
+        "lane": "deep",
+        "extractorsInclude": ["PDFExtractor"]
+      }
+    },
+    {
+      "name": "oversized-quarantine",
+      "entry": {
+        "id": "oversized-1",
+        "source": "filesystem",
+        "mediaType": "text/plain",
+        "size": 200000000,
+        "retryCount": 0
+      },
+      "expected": {
+        "lane": "quarantine"
+      }
+    },
+    {
+      "name": "dlq-repeat-quarantine",
+      "entry": {
+        "id": "retry-1",
+        "source": "api:generic",
+        "mediaType": "application/json",
+        "size": 5000,
+        "fromDLQ": true,
+        "retryCount": 5
+      },
+      "expected": {
+        "lane": "quarantine"
+      }
+    },
+    {
+      "name": "unknown-source-deep",
+      "entry": {
+        "id": "unknown-1",
+        "source": "unknown-source",
+        "mediaType": "text/plain",
+        "size": 1024,
+        "retryCount": 0
+      },
+      "expected": {
+        "lane": "deep"
+      }
+    }
+  ]
+}

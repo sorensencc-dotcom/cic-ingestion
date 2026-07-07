@@ -74,14 +74,14 @@ export class BridgeOrchestrator {
       const parseResult = this.parser.parse(dsl);
 
       if (parseResult.isErr) {
-        const err = parseResult.err()!;
+        const err = parseResult.unwrapErr();
         return new Err({
           code: err.code,
           message: err.message,
         });
       }
 
-      return new Ok(parseResult.ok()!);
+      return new Ok(parseResult.unwrap());
     } catch (e) {
       return new Err({
         code: 'SUBMIT_PROPOSAL_ERROR',
@@ -126,7 +126,7 @@ export class BridgeOrchestrator {
         return reviewResult;
       }
 
-      const decision = reviewResult.ok()!;
+      const decision = reviewResult.unwrap()!;
       return new Ok({
         approved: decision.approved,
         requiresManualApproval: decision.requiresManualApproval,
@@ -149,14 +149,14 @@ export class BridgeOrchestrator {
       const result = await this.orchestrator.execute(proposal);
 
       if (result.isErr) {
-        const err = result.err()!;
+        const err = result.unwrapErr()!;
         return new Err({
           code: err.code,
           message: err.message,
         });
       }
 
-      return new Ok(result.ok()!);
+      return new Ok(result.unwrap()!);
     } catch (e) {
       return new Err({
         code: 'EXECUTE_CANARY_ERROR',
@@ -206,23 +206,23 @@ export class BridgeOrchestrator {
     // Step 1: Submit
     const submitResult = this.submitProposal(dsl);
     if (submitResult.isErr) {
-      return new Err(`Submit failed: ${submitResult.err()!.message}`);
+      return new Err(`Submit failed: ${submitResult.unwrapErr()!.message}`);
     }
-    const proposal = submitResult.ok()!;
+    const proposal = submitResult.unwrap()!;
 
     // Step 2: Validate
     const validateResult = this.validateProposal(proposal);
     if (validateResult.isErr) {
-      return new Err(`Validate failed: ${validateResult.err()!.message}`);
+      return new Err(`Validate failed: ${validateResult.unwrapErr()!.message}`);
     }
-    const validationResult = validateResult.ok()!;
+    const validationResult = validateResult.unwrap()!;
 
     // Step 3: Review
     const reviewResult = this.governanceReview(proposal, validationResult);
     if (reviewResult.isErr) {
-      return new Err(`Review failed: ${reviewResult.err()!.message}`);
+      return new Err(`Review failed: ${reviewResult.unwrapErr()!.message}`);
     }
-    const reviewDecision = reviewResult.ok()!;
+    const reviewDecision = reviewResult.unwrap()!;
 
     // If manual approval required, stop here
     if (reviewDecision.requiresManualApproval && !reviewDecision.approved) {
@@ -232,16 +232,16 @@ export class BridgeOrchestrator {
     // Step 4: Canary
     const canaryResult = await this.executeCanary(proposal);
     if (canaryResult.isErr) {
-      return new Err(`Canary execution failed: ${canaryResult.err()!.message}`);
+      return new Err(`Canary execution failed: ${canaryResult.unwrapErr()!.message}`);
     }
-    const canaryOutcome = canaryResult.ok()!;
+    const canaryOutcome = canaryResult.unwrap()!;
 
     // Step 5: Promote
     const promoteResult = await this.promoteOrRollback(proposal, canaryOutcome);
     if (promoteResult.isErr) {
-      return new Err(`Promotion failed: ${promoteResult.err()!.message}`);
+      return new Err(`Promotion failed: ${promoteResult.unwrapErr()!.message}`);
     }
 
-    return new Ok(promoteResult.ok()!);
+    return new Ok(promoteResult.unwrap()!);
   }
 }

@@ -17,8 +17,8 @@ export class ConsoleMetricsAdapter extends BaseAdapter {
     return _input;
   }
 
-  validate(_input: AdapterInput): boolean {
-    return true;
+  validate(output: AdapterOutput): AdapterOutput {
+    return output;
   }
 
   async run(input: AdapterInput): Promise<AdapterOutput> {

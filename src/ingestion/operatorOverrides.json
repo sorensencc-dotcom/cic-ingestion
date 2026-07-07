@@ -1,0 +1,14 @@
+{
+  "_comment": "Operator overrides for ingestion entries. Structure: { entryId: { forceReingest?, skip?, quarantine?, overrideProfile?, overrideLane? } }",
+  "_examples": {
+    "entry-123": {
+      "forceReingest": true,
+      "skip": false
+    },
+    "entry-456": {
+      "quarantine": true,
+      "overrideProfile": "api:generic",
+      "overrideLane": "deep"
+    }
+  }
+}

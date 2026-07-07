@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "patternProperties": {
+    "^[a-zA-Z0-9:_-]+$": {
+      "type": "object",
+      "properties": {
+        "defaultLane": {
+          "type": "string",
+          "enum": ["fast", "deep", "quarantine"],
+          "description": "Default ingestion lane for this profile"
+        },
+        "extractors": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "minItems": 1,
+          "description": "List of extractor names to run for this profile"
+        },
+        "maxSizeMB": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum file size in MB for this profile"
+        },
+        "requiresOperatorApproval": {
+          "type": "boolean",
+          "description": "Whether operator approval is required before ingestion"
+        },
+        "maxRetries": {
+          "type": "number",
+          "minimum": 0,
+          "description": "Maximum retry attempts for this profile"
+        }
+      },
+      "required": ["defaultLane", "extractors"],
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

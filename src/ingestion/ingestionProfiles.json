@@ -1,0 +1,37 @@
+{
+  "filesystem": {
+    "defaultLane": "fast",
+    "extractors": ["TextExtractor", "SemanticExtractor"],
+    "maxSizeMB": 5,
+    "requiresOperatorApproval": false,
+    "maxRetries": 3
+  },
+  "api:familysearch": {
+    "defaultLane": "deep",
+    "extractors": ["TextExtractor", "RelationshipExtractor", "TopicExtractor"],
+    "maxSizeMB": 10,
+    "requiresOperatorApproval": true,
+    "maxRetries": 5
+  },
+  "api:generic": {
+    "defaultLane": "fast",
+    "extractors": ["TextExtractor", "SemanticExtractor"],
+    "maxSizeMB": 10,
+    "requiresOperatorApproval": false,
+    "maxRetries": 3
+  },
+  "images": {
+    "defaultLane": "deep",
+    "extractors": ["ImageAnalyzer", "ReverseImageSearchExtractor"],
+    "maxSizeMB": 50,
+    "requiresOperatorApproval": false,
+    "maxRetries": 3
+  },
+  "pdf": {
+    "defaultLane": "deep",
+    "extractors": ["PDFExtractor", "TextExtractor", "SemanticExtractor"],
+    "maxSizeMB": 100,
+    "requiresOperatorApproval": false,
+    "maxRetries": 3
+  }
+}
