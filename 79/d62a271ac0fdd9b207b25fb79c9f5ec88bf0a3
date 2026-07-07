@@ -1,0 +1,22 @@
+src/ingestion/ingestion-durability-gate.test.ts
+  s_eaf7b68a8592fd::t_39a73dfe864ba5 201
+  s_eaf7b68a8592fd::t_5e832364338d97 198-200
+  s_eaf7b68a8592fd::t_9b03a8e980a4ef 202-204
+  s_eaf7b68a8592fd::t_99605c2fc47898 1-197,205-255
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "79d62a271ac0fdd9b207b25fb79c9f5ec88bf0a3",
+  "prompts": {},
+  "sessions": {
+    "s_eaf7b68a8592fd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0547e723-ba1b-434f-bf82-37e8f88c2262",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
