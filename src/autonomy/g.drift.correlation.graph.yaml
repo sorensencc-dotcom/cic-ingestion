@@ -1,0 +1,200 @@
+# Wave G — Cross-Wave Drift Correlation Graph Specification
+# Maps drift signals across Waves B–F to identify root causes
+
+version: 1.0.0
+namespace: wave_g.correlation
+
+overview: |
+  Correlates drift signals across execution waves to trace drift to root cause.
+  Identifies multi-wave patterns and recommends healing primitives based on
+  failure mode + wave origin.
+
+correlation_patterns:
+
+  B→F: planning_ambiguity_to_refactor
+    source_wave: B
+    target_wave: F
+    confidence: 0.85
+    description: Ambiguous plan expectations lead to refactor drift in validation
+    trigger: KITCHEN_SINK in B, RUNAWAY_REFACTOR in F with overlapping files
+    root_cause: Plan definition did not specify scope boundaries clearly
+
+  C→E: dependency_creep_to_healing
+    source_wave: C
+    target_wave: E
+    confidence: 0.80
+    description: Unjustified dependencies cause repair loop activation
+    trigger: New imports in C (no justification), WRONG_ABSTRACTION in E
+    root_cause: Dependency added without architectural review
+
+  D→F: debug_misdiagnosis_to_drift
+    source_wave: D
+    target_wave: F
+    confidence: 0.75
+    description: Incorrect debugging leads to optimistic path or wrong abstraction
+    trigger: OPTIMISTIC_PATH in D, escalation to OPTIMISTIC_PATH/WRONG_ABSTRACTION in F
+    root_cause: Debug fix addressed symptom not root cause
+
+  E→F: healing_failure_to_runaway
+    source_wave: E
+    target_wave: F
+    confidence: 0.70
+    description: Healing step failed to resolve root cause, drift escalates
+    trigger: Repair/healing in E, RUNAWAY_REFACTOR in F
+    root_cause: Healing primitive did not address underlying issue
+
+  F→B: drift_requires_replan
+    source_wave: F
+    target_wave: B
+    confidence: 0.65
+    description: Detected drift requires plan revision and restart
+    trigger: CRITICAL drift in F, replanning triggered
+    root_cause: Original plan was insufficient or execution diverged
+
+correlation_algorithm:
+
+  step_1_group_by_wave:
+    - Partition events by source wave (B, C, D, E, F)
+    - Track failure mode, severity, details (files modified, duplicates, etc.)
+
+  step_2_pattern_matching:
+    - For each event, look for edges from source wave to other waves
+    - Check if target wave has event with related failure mode
+    - Verify file/module overlap between events
+    - Related modes: (KITCHEN_SINK, RUNAWAY_REFACTOR), (OPTIMISTIC_PATH, WRONG_ABSTRACTION)
+
+  step_3_confidence_scoring:
+    - Base score: edge confidence (0.65–0.85)
+    - Boost if multiple waves affected: × (1 + (waveCount - 1) × 0.25)
+    - Cap at 1.0
+    - Consensus: only report if confidence > 0.6
+
+  step_4_root_cause_tracing:
+    - Walk backwards through correlation edges
+    - Stop when no incoming edge with confidence > 0.6
+    - Traceback limit: 5 hops max
+
+  step_5_vector_generation:
+    - For each primary event: build CorrelatedDriftVector
+    - Include: sourceWave, failureMode, rootCause, correlatedEvents[], severity, confidence
+    - Compute severity as weighted average, escalate by waveCount
+    - Recommend healing primitives based on failureMode
+
+  step_6_deduplication:
+    - Key: rootCauseWave + failureMode
+    - Merge events with same root cause + mode
+    - Retain highest confidence vector
+
+output_types:
+
+  CorrelatedDriftVector:
+    sourceWave: B|C|D|E|F (where drift detected)
+    rootCauseWave: B|C|D|E|F (traced to origin)
+    failureMode: KITCHEN_SINK | WRONG_ABSTRACTION | OPTIMISTIC_PATH | RUNAWAY_REFACTOR
+    severity: 0.0–1.0 (weighted by wave count + event count)
+    correlatedEvents: WaveDriftEvent[]
+    recommendedPrimitives: heal.* []
+    confidence: 0.0–1.0 (correlation strength)
+    description: string (human-readable pattern)
+    timestamp: unix timestamp
+
+  WaveDriftEvent:
+    wave: B|C|D|E|F
+    failureMode: KITCHEN_SINK | WRONG_ABSTRACTION | OPTIMISTIC_PATH | RUNAWAY_REFACTOR
+    severity: LOW | MEDIUM | HIGH | CRITICAL
+    details: object (files modified, duplicates, missing tests, etc.)
+    timestamp: unix timestamp
+
+integration_with_g1:
+
+  Input to G.2: DriftSignal[] from Wave B–F execution
+  - Accumulated events: one event per wave per drift detection
+
+  Output from G.2: CorrelatedDriftVector[]
+  - Identifies root cause wave
+  - Recommends healing primitives based on pattern
+
+  Flow to G.3:
+  - G.2 produces vector with rootCauseWave + recommendedPrimitives
+  - G.3 Resume Gate validates revised plan/criteria
+  - If approved: resume with G.1 primitives applied
+
+correlation_matrix:
+
+  Confidence table (rows: source, cols: target):
+       B    C    D    E    F
+    B  —   0.55 0.50 0.60 0.85
+    C  —   —    0.55 0.80 0.60
+    D  —   —    —    0.60 0.75
+    E  —   —    —    —    0.70
+    F  0.65 —    —    —    —
+
+  Notes:
+  - F→B allows replanning (feedback loop)
+  - Most patterns flow forward (B→F, C→E, etc.)
+  - Diagonal (B→C→D→E→F) represents cascade
+
+visualization:
+
+  Graph structure:
+    B --0.55--> C --0.80--> E
+    |                       |
+    +--0.85---> F <--0.70---+
+    |
+    D --0.75--------> F
+    |
+    +--0.65-------> B (feedback)
+
+failure_mode_transitions:
+
+  KITCHEN_SINK can transition to:
+  - RUNAWAY_REFACTOR (scope creep cascades)
+  - WRONG_ABSTRACTION (duplicated logic emerges)
+
+  OPTIMISTIC_PATH can transition to:
+  - WRONG_ABSTRACTION (skipped error paths cause duplication)
+  - RUNAWAY_REFACTOR (error recovery attempts cascade)
+
+  WRONG_ABSTRACTION:
+  - Contained (no further transition)
+  - Addressed by abstraction primitive
+
+  RUNAWAY_REFACTOR:
+  - Highest severity, stops execution
+  - Requires surgical + freeze primitives
+
+testing:
+
+  coverage: 18 test cases
+  categories:
+    - Single-wave events (baseline)
+    - B→F planning ambiguity
+    - C→E dependency creep
+    - D→F debug misdiagnosis
+    - E→F healing failure
+    - F→B replan trigger
+    - Primitive recommendation (per failure mode)
+    - Severity computation
+    - Correlation matrix
+    - Root cause tracing
+    - Multi-wave chains
+    - Confidence scoring
+  status: ALL 18 PASS
+
+telemetry_fields:
+
+  correlation.detected: CorrelatedDriftVector[]
+  correlation.matrix: Record<string, Record<string, number>>
+  correlation.root_cause_wave: string (aggregated)
+  correlation.confidence: number (aggregated across vectors)
+  correlation.recommended_primitives: heal.* []
+  correlation.wave_count: number (how many waves affected)
+  correlation.multi_wave_detected: boolean (> 1 wave in chain)
+
+next_step:
+
+  G.3 Resume Gate:
+  - Accepts CorrelatedDriftVector from G.2
+  - Validates revised plan + criteria from G.1
+  - Decides whether to resume or escalate to human review
+  - Gate conditions: revised plan exists, criteria valid, no contradictions
