@@ -1,0 +1,217 @@
+# Wave G — Resume-Gate Logic Specification
+# Validates readiness to resume execution after healing
+
+version: 1.0.0
+namespace: wave_g.gate
+
+overview: |
+  Resume gate validates that revised plan + criteria are in place, checks
+  for cross-wave contradictions, and decides whether to resume execution.
+
+  Hard drift (KITCHEN_SINK, RUNAWAY_REFACTOR) requires manual approval.
+  Soft drift (WRONG_ABSTRACTION, OPTIMISTIC_PATH) auto-approved if all
+  resume conditions pass.
+
+resume_conditions:
+
+  1_revised_criteria_exist:
+    description: Revised acceptance criteria are defined and complete
+    required_fields:
+      - acceptanceCriteria (string[])
+      - negativeTestCases (number > 0)
+      - errorPaths (string[])
+      - dependencyJustifications (Record<string, string>)
+    verification: "Criteria must have >= 1 acceptance criterion and >= 1 negative test"
+    importance: CRITICAL
+
+  2_revised_plan_exists:
+    description: Revised scope + constraints are defined
+    required_fields:
+      - scope (string[] of module paths)
+      - expectedFiles (string[] of files to modify)
+      - maxFileChanges (number)
+      - maxDuplicates (number, optional)
+    verification: "Plan must have scope + expectedFiles + maxFileChanges defined"
+    importance: CRITICAL
+
+  3_drift_severity_below_threshold:
+    description: Drift severity from G.2 is < 0.5
+    threshold: 0.5
+    measurement: "Max severity across all CorrelatedDriftVector[]"
+    escalation_rule: "Severity computed as weighted average of events, escalated by wave count"
+    importance: CRITICAL
+
+  4_no_cross_wave_contradictions:
+    description: Plan + criteria are consistent across waves
+    contradiction_types:
+      - Plan scope conflicts with acceptance criteria
+      - Severity vs plan constraints mismatch (high severity + relaxed limits)
+      - Multiple failure modes suggesting incomplete revision
+      - Multiple root cause waves (suggests multi-origin issues)
+      - Dependency creep without justifications
+    importance: CRITICAL
+
+  5_healing_primitives_applied:
+    description: G.1 healing primitives were applied to the execution
+    required: "At least 1 primitive must be in appliedPrimitives[]"
+    importance: HIGH
+
+  6_negative_tests_present:
+    description: Negative test cases are defined in revised criteria
+    minimum: 3 test cases recommended
+    verification: "negativeTestCases must be > 0"
+    importance: HIGH
+
+  7_dependency_justifications_complete:
+    description: All dependencies have documented justifications
+    rule: "If dependencies declared, all must have justification"
+    verification: "For each dep in dependencyJustifications, value.length > 0"
+    importance: MEDIUM
+
+drift_classification:
+
+  HARD:
+    modes: [KITCHEN_SINK, RUNAWAY_REFACTOR]
+    reason: Structural changes affecting scope or architecture
+    approval: Manual (human_review + engineering_approval required)
+    auto_resume: false
+    description: |
+      Scope creep (KITCHEN_SINK) or cascading refactors (RUNAWAY_REFACTOR)
+      cannot be auto-approved. Requires human judgment on scope/risk tradeoffs.
+
+  SOFT:
+    modes: [WRONG_ABSTRACTION, OPTIMISTIC_PATH]
+    reason: Localized code duplication or missing error handling
+    approval: Automatic (if all 7 conditions pass)
+    auto_resume: true
+    description: |
+      Duplication (WRONG_ABSTRACTION) or missing error paths (OPTIMISTIC_PATH)
+      can be addressed deterministically by healing primitives.
+      If conditions pass, resumable without escalation.
+
+  NONE:
+    modes: []
+    reason: No drift detected
+    approval: Automatic (if all 7 conditions pass)
+    auto_resume: true
+    description: No drift signals from Waves B–F. Resumable if conditions pass.
+
+approval_decision_logic:
+
+  step_1_classify_drift:
+    - Check if any CorrelatedDriftVector has failureMode in HARD modes
+    - If yes: classification = HARD
+    - Else if any in SOFT modes: classification = SOFT
+    - Else: classification = NONE
+
+  step_2_check_conditions:
+    - Evaluate all 7 resume conditions
+    - Build failedConditions[] list
+    - Build contradictions[] list
+
+  step_3_decide_approval:
+    - If HARD drift: allowed = false (manual required)
+    - Else if failedConditions.length > 0: allowed = false
+    - Else: allowed = true
+
+  step_4_build_required_approvals:
+    - If HARD: requiredApprovals = [human_review, engineering_approval]
+    - Else: requiredApprovals = []
+
+output_types:
+
+  ResumeDecision:
+    allowed: boolean (true if resume approved)
+    driftClassification: HARD | SOFT | NONE
+    severity: number (0.0–1.0, max from G.2 vectors)
+    failureMode: string (primary failure mode, if any)
+    conditions: ResumeCondition[]
+    failedConditions: string[] (keys of failed conditions)
+    contradictions: string[] (human-readable contradiction descriptions)
+    requiredApprovals: string[] (approvals needed before resuming)
+    reasoning: string (human-readable explanation of decision)
+    timestamp: unix timestamp
+
+  ResumeCondition:
+    name: string (condition name)
+    passed: boolean
+    reason: string (short explanation)
+
+  RevisedPlan:
+    id: string (optional identifier)
+    wave: B | C | D | E | F
+    scope: string[] (modules/paths affected)
+    expectedFiles: string[] (files expected to be modified)
+    maxFileChanges: number (limit on files to touch)
+    maxDuplicates: number (optional, limit on code duplication)
+    dependencies: string[] (optional, new dependencies)
+    timestamp: unix timestamp
+
+  RevisedCriteria:
+    acceptanceCriteria: string[]
+    negativeTestCases: number (count of negative test cases)
+    errorPaths: string[] (error handling paths tested)
+    dependencyJustifications: Record<string, string> (dep → reason)
+    maxCorruptionPercent: number (optional, repair constraint)
+    timestamp: unix timestamp
+
+integration_with_waves:
+
+  Input from G.2:
+  - CorrelatedDriftVector[] with failureMode, severity, confidence
+  - Identifies root cause wave, recommended primitives
+
+  Input from G.1:
+  - appliedPrimitives: string[] (list of healing primitives applied)
+  - Success/failure of each primitive
+
+  Input from Execution:
+  - RevisedPlan from planner (Wave B or replanning after Wave F)
+  - RevisedCriteria from acceptance (Wave C or revised after healing)
+
+  Output to Next Phase:
+  - ResumeDecision.allowed → can resume execution
+  - ResumeDecision.requiredApprovals → escalation path
+  - ResumeDecision.reasoning → audit trail
+
+flow_to_g4:
+
+  If ResumeDecision.allowed = true:
+  - Proceed to Wave G.4 Telemetry Stitching
+  - Collect unified drift + healing history (Waves B–F)
+
+  If ResumeDecision.allowed = false:
+  - If HARD drift: escalate to human for approval
+  - If failed conditions: show remediation steps (e.g., add negative tests, justify deps)
+  - Loop back to G.1 or G.3 until approved
+
+testing:
+
+  coverage: 25 test cases
+  categories:
+    - Individual resume conditions (8 tests)
+    - Cross-wave contradictions (3 tests)
+    - Drift classification (5 tests)
+    - Approval decision logic (4 tests)
+    - Integration scenarios (e2e) (3 tests)
+    - Output validation (2 tests)
+  status: ALL 25 PASS
+
+telemetry_fields:
+
+  gate.condition_results: Record<string, boolean> (each condition pass/fail)
+  gate.failed_conditions: string[] (list of failed condition keys)
+  gate.contradictions_detected: number (count of contradictions)
+  gate.drift_classification: HARD | SOFT | NONE
+  gate.drift_severity: number (0.0–1.0)
+  gate.approval_allowed: boolean
+  gate.required_approvals: string[]
+  gate.decision_timestamp: unix timestamp
+
+next_step:
+
+  Wave G.4 Multi-Wave Telemetry Stitching:
+  - Collects unified drift + healing history from Waves B–F
+  - Creates dashboard for root cause analysis
+  - Closes Wave G loop
+  - Phase 28 entry point

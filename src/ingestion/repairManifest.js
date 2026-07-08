@@ -1,22 +1,18 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.repairManifest = repairManifest;
-exports.getRepairStats = getRepairStats;
-var fs = require("fs");
-var path = require("path");
-var MANIFEST_DIR = path.join(__dirname, "..", "..");
-var MANIFEST_PATH = path.join(MANIFEST_DIR, "ingestionManifest.jsonl");
-var MANIFEST_BACKUP = path.join(MANIFEST_DIR, "ingestionManifest.backup.jsonl");
-var LOCK_PATH = path.join(MANIFEST_DIR, "ingestionManifest.lock");
-var LOCK_TIMEOUT_MS = 5000;
+import * as fs from "fs";
+import * as path from "path";
+const MANIFEST_DIR = path.join(__dirname, "..", "..");
+const MANIFEST_PATH = path.join(MANIFEST_DIR, "ingestionManifest.jsonl");
+const MANIFEST_BACKUP = path.join(MANIFEST_DIR, "ingestionManifest.backup.jsonl");
+const LOCK_PATH = path.join(MANIFEST_DIR, "ingestionManifest.lock");
+const LOCK_TIMEOUT_MS = 5000;
 function acquireLock() {
-    var start = Date.now();
+    const start = Date.now();
     while (Date.now() - start < LOCK_TIMEOUT_MS) {
         try {
             fs.writeFileSync(LOCK_PATH, "", { flag: "wx" });
             return true;
         }
-        catch (_a) {
+        catch {
             // File exists, wait and retry
         }
     }
@@ -26,12 +22,12 @@ function releaseLock() {
     try {
         fs.unlinkSync(LOCK_PATH);
     }
-    catch (_a) {
+    catch {
         // Lock may not exist
     }
 }
 function validateRecord(record) {
-    var requiredFields = [
+    const requiredFields = [
         "id",
         "source",
         "profile",
@@ -43,20 +39,19 @@ function validateRecord(record) {
         "routingVersion",
         "retryCount",
     ];
-    var missing = [];
-    for (var _i = 0, requiredFields_1 = requiredFields; _i < requiredFields_1.length; _i++) {
-        var field = requiredFields_1[_i];
+    const missing = [];
+    for (const field of requiredFields) {
         if (!(field in record)) {
             missing.push(field);
         }
     }
     return { valid: missing.length === 0, missingFields: missing };
 }
-function repairManifest() {
+export function repairManifest() {
     // Acquire lock
-    var lockAcquired = acquireLock();
+    const lockAcquired = acquireLock();
     if (!lockAcquired) {
-        throw new Error("Failed to acquire manifest lock after ".concat(LOCK_TIMEOUT_MS, "ms"));
+        throw new Error(`Failed to acquire manifest lock after ${LOCK_TIMEOUT_MS}ms`);
     }
     try {
         if (!fs.existsSync(MANIFEST_PATH)) {
@@ -68,20 +63,19 @@ function repairManifest() {
             };
         }
         // Read original manifest
-        var content = fs.readFileSync(MANIFEST_PATH, "utf-8");
-        var lines = content.split("\n").filter(function (line) { return line.trim(); });
-        var stats = {
+        const content = fs.readFileSync(MANIFEST_PATH, "utf-8");
+        const lines = content.split("\n").filter((line) => line.trim());
+        const stats = {
             totalLines: lines.length,
             validLines: 0,
             corruptedLines: [],
             missingFields: [],
         };
-        var validRecords = [];
-        for (var _i = 0, lines_1 = lines; _i < lines_1.length; _i++) {
-            var line = lines_1[_i];
+        const validRecords = [];
+        for (const line of lines) {
             try {
-                var record = JSON.parse(line);
-                var validation = validateRecord(record);
+                const record = JSON.parse(line);
+                const validation = validateRecord(record);
                 if (validation.valid) {
                     validRecords.push(record);
                     stats.validLines++;
@@ -104,8 +98,8 @@ function repairManifest() {
             fs.copyFileSync(MANIFEST_PATH, MANIFEST_BACKUP);
         }
         // Rewrite manifest with valid records only
-        var cleanContent = validRecords
-            .map(function (r) { return JSON.stringify(r); })
+        const cleanContent = validRecords
+            .map((r) => JSON.stringify(r))
             .join("\n");
         if (cleanContent) {
             fs.writeFileSync(MANIFEST_PATH, cleanContent + "\n", { flag: "w" });
@@ -114,7 +108,7 @@ function repairManifest() {
             fs.writeFileSync(MANIFEST_PATH, "", { flag: "w" });
         }
         // fsync
-        var fd = fs.openSync(MANIFEST_PATH, "a");
+        const fd = fs.openSync(MANIFEST_PATH, "a");
         fs.fsyncSync(fd);
         fs.closeSync(fd);
         return stats;
@@ -123,7 +117,7 @@ function repairManifest() {
         releaseLock();
     }
 }
-function getRepairStats() {
+export function getRepairStats() {
     if (!fs.existsSync(MANIFEST_PATH)) {
         return {
             totalLines: 0,
@@ -132,19 +126,18 @@ function getRepairStats() {
             missingFields: [],
         };
     }
-    var content = fs.readFileSync(MANIFEST_PATH, "utf-8");
-    var lines = content.split("\n").filter(function (line) { return line.trim(); });
-    var stats = {
+    const content = fs.readFileSync(MANIFEST_PATH, "utf-8");
+    const lines = content.split("\n").filter((line) => line.trim());
+    const stats = {
         totalLines: lines.length,
         validLines: 0,
         corruptedLines: [],
         missingFields: [],
     };
-    for (var _i = 0, lines_2 = lines; _i < lines_2.length; _i++) {
-        var line = lines_2[_i];
+    for (const line of lines) {
         try {
-            var record = JSON.parse(line);
-            var validation = validateRecord(record);
+            const record = JSON.parse(line);
+            const validation = validateRecord(record);
             if (validation.valid) {
                 stats.validLines++;
             }
