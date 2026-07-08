@@ -1,0 +1,26 @@
+src/autonomy/HealingPrimitives.test.ts
+  s_9df6068d39c023::t_0f11af77c0c311 1-356,358-371
+  s_9df6068d39c023::t_d55dc7b853f0a8 357
+  s_9df6068d39c023::t_d747c1c4044bb0 372-374
+  s_9df6068d39c023::t_24593c0db31e1b 375-379
+src/autonomy/g.healing.primitives.yaml
+  s_9df6068d39c023::t_e6eaea344d364a 1-179
+src/autonomy/HealingPrimitives.ts
+  s_9df6068d39c023::t_c24cab90f6d260 1-442
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "2441e016fe7e0a19009f4dbe7190fe39e2534d14",
+  "prompts": {},
+  "sessions": {
+    "s_9df6068d39c023": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bd3a8b0d-47f8-4f0f-a511-393c978880be",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
