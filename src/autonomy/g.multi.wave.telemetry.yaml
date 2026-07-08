@@ -1,0 +1,311 @@
+# Wave G.4 — Multi-Wave Telemetry Stitching Specification
+# Collects unified drift + healing history from Waves B–F
+# Analyzes root causes, effectiveness, generates dashboard metrics
+
+version: 1.0.0
+namespace: wave_g.telemetry
+
+overview: |
+  Final sub-wave of Wave G. Collects telemetry from all waves (B–F) plus
+  healing phases (G.1–G.3). Stitches data into unified view showing:
+
+  1. Drift progression (severity curve)
+  2. Healing effectiveness (primitives × improvement)
+  3. Root cause analysis (origin + propagation)
+  4. Dashboard metrics (execution stats)
+  5. Recommendations for Phase 28
+
+  Output feeds into observability system and determines Phase 28 readiness.
+
+input_data_sources:
+
+  Wave B (Planning):
+    - scope: string[] (modules/paths affected)
+    - expectedFiles: string[] (files to modify)
+    - maxFileChanges: number (limit)
+    - dependencies: string[] (optional, new deps)
+    - timestamp: unix timestamp
+    purpose: Plan boundaries, scope baseline
+
+  Wave C (Acceptance):
+    - acceptanceCriteria: string[]
+    - negativeTestCases: number
+    - errorPaths: string[] (error handling coverage)
+    - timestamp: unix timestamp
+    purpose: Test coverage baseline, criteria completeness
+
+  Wave D (Quarantine):
+    - driftDetected: boolean
+    - failureModes: string[] (KITCHEN_SINK, etc.)
+    - quarantineCount: number
+    - timestamp: unix timestamp
+    purpose: First drift signal, failure modes
+
+  Wave E (Healing):
+    - rulesApplied: string[] (six rules triggered)
+    - healingPatternsDetected: string[]
+    - autoHealingSuccessCount: number
+    - timestamp: unix timestamp
+    purpose: Healing strategy selection, pattern matches
+
+  Wave F (Verification):
+    - repairAttempts: number
+    - testsPassed: number
+    - testsFailed: number
+    - verificationStatus: PASS | FAIL | PARTIAL
+    - timestamp: unix timestamp
+    purpose: Final repair outcome, test results
+
+  G.1 (Healing Primitives):
+    - primitivesApplied: string[]
+    - successfulPrimitives: number
+    - failedPrimitives: number
+    - timestamp: unix timestamp
+    purpose: Specific healing actions, success rate
+
+  G.2 (Drift Correlation Graph):
+    - CorrelatedDriftVector[]
+      * sourceWave: B | C | D | E | F
+      * failureMode: string
+      * severity: 0.0–1.0
+      * rootCauseWave: B | C | D | E | F (traced origin)
+      * correlatedEvents: WaveDriftEvent[]
+      * recommendedPrimitives: string[]
+      * confidence: 0.0–1.0
+    - correlationPatterns: string[] (B→F, C→E, etc.)
+    - rootCauseWaves: Set<string>
+    - timestamp: unix timestamp
+    purpose: Drift vector correlation, root cause tracing
+
+  G.3 (Resume Gate):
+    - decision: ResumeDecision
+      * allowed: boolean
+      * driftClassification: HARD | SOFT | NONE
+      * severity: 0.0–1.0
+      * conditions: ResumeCondition[]
+      * failedConditions: string[]
+      * contradictions: string[]
+      * requiredApprovals: string[]
+      * reasoning: string
+    - timestamp: unix timestamp
+    purpose: Approval decision, contradictions detected
+
+stitching_algorithm:
+
+  step_1_collect_timeline:
+    - Gather timestamps from all waves (B through G.3)
+    - Sort chronologically
+    - Calculate durations between stages
+    - Output: executionTimeline with stage names and durations
+
+  step_2_analyze_drift_progression:
+    - Extract drift signals from Wave D (initial detection)
+    - Integrate G.2 CorrelatedDriftVector[] (detailed analysis)
+    - Add Wave F verification failures (post-repair)
+    - Sort by detection time
+    - Mark escalation flag: severity > 0.75
+    - Output: DriftProgression[] with severity curve
+
+  step_3_measure_healing_effectiveness:
+    - For each primitive in G.1.primitivesApplied:
+      * Look up pre-healing severity from G.2 vectors
+      * Estimate post-healing severity (40% improvement if successful)
+      * Calculate improvementPercent
+    - Aggregate success rate across all primitives
+    - Output: HealingMetric[] with before/after + improvement %
+
+  step_4_trace_root_causes:
+    - For each CorrelatedDriftVector from G.2:
+      * Extract rootCauseWave (origin)
+      * Trace propagation path: Wave B → sourceWave
+      * Identify contributing waves:
+        - Large scope in B (> 5 modules)
+        - Missing error paths in C
+        - Detected drift in D
+        - No healing applied in E
+      * Count contradictions: len(correlatedEvents) > 2 = 1 contradiction
+    - Output: RootCauseChain[] with origin + path + contributors
+
+  step_5_build_dashboard_metrics:
+    - Compute execution time: sum of stage durations (ms → sec)
+    - Count drift events: len(driftProgression)
+    - Severity stats: average, max across progression
+    - Healing stats: primitives applied, success rate %
+    - Test coverage: Wave C baseline → Wave F final
+    - Root cause distribution: unique rootCauseWaves
+    - Contradictions: sum across RootCauseChain[]
+    - Resume approvals: 1 if G.3.decision.allowed, else 0
+    - Escalations: count where severity > 0.75
+    - Phase 28 readiness: allowed AND rootCauseWaves < 3
+    - Output: DashboardMetrics
+
+  step_6_build_correlation_map:
+    - Create Map<string, CorrelatedDriftVector>
+    - Key format: "${sourceWave}-${failureMode}"
+    - Example: "D-KITCHEN_SINK", "E-RUNAWAY_REFACTOR"
+    - Output: correlationMap for observability queries
+
+  step_7_generate_recommendations:
+    - If len(rootCauseAnalysis) > 2:
+      * ARCHITECTURE, HIGH: "Multiple root causes; refactor modules"
+    - If any HealingMetric.successful = false:
+      * TESTING, MEDIUM: "Healing ineffective; expand error path coverage"
+    - If G.3.decision.contradictions.length > 0:
+      * PROCESS, CRITICAL: "Contradictions detected; align B scope vs C criteria"
+    - If driftSeverityMax > 0.75:
+      * ESCALATION, CRITICAL: "High severity; escalate to design review"
+    - If primitivesSuccessRate > 80:
+      * PROCESS, LOW: "Healing highly effective; document patterns"
+    - Output: TelemetryRecommendation[]
+
+output_types:
+
+  UnifiedTelemetry:
+    executionId: string
+    executionTimeline: Array<{stage, timestamp, durationMs}>
+    driftProgression: DriftProgression[]
+    healingMetrics: HealingMetric[]
+    rootCauseAnalysis: RootCauseChain[]
+    dashboardMetrics: DashboardMetrics
+    correlationMap: Map<string, CorrelatedDriftVector>
+    recommendations: TelemetryRecommendation[]
+    timestamp: unix timestamp
+
+  DriftProgression:
+    wave: string (B|C|D|E|F)
+    detectedAt: unix timestamp
+    severity: 0.0–1.0
+    failureMode: string
+    escalated: boolean (severity > 0.75)
+
+  HealingMetric:
+    primitive: string
+    applied: boolean
+    successful: boolean
+    severityBefore: 0.0–1.0
+    severityAfter: 0.0–1.0
+    improvementPercent: -100 to +100
+
+  RootCauseChain:
+    primaryCause: string (failure mode)
+    primaryWave: B | C | D | E | F
+    contributingWaves: string[]
+    propagationPath: string[] (ordered wave sequence)
+    contradictions: number
+
+  DashboardMetrics:
+    executionTimeSeconds: number
+    totalDriftEvents: number
+    driftSeverityAverage: 0.0–1.0
+    driftSeverityMax: 0.0–1.0
+    primitivesAppliedCount: number
+    primitivesSuccessRate: 0–100
+    testCoverageInitial: number
+    testCoverageFinal: number
+    rootCauseWaves: string[]
+    contradictionsDetected: number
+    resumeApprovalCount: 0 | 1
+    escalationCount: number
+    phase28Ready: boolean
+
+  TelemetryRecommendation:
+    category: ARCHITECTURE | TESTING | PROCESS | ESCALATION
+    priority: CRITICAL | HIGH | MEDIUM | LOW
+    description: string
+    affectedWaves: string[]
+    suggestedAction: string
+
+integration_with_waves:
+
+  Input from G.2 (Drift Correlation Graph):
+    - CorrelatedDriftVector[] with severity, rootCauseWave, propagation info
+    - Enables tracing drift back to origin and forward through waves
+
+  Input from G.1 (Healing Primitives):
+    - Primitives applied + success/failure counts
+    - Enables effectiveness measurement
+
+  Input from G.3 (Resume Gate):
+    - Approval decision + contradictions detected
+    - Phase 28 readiness decision
+
+  Input from Waves B–F:
+    - Telemetry events recorded during execution
+    - Timeline, drift signals, test coverage
+
+  Output to Phase 28:
+    - UnifiedTelemetry.dashboardMetrics → observability dashboard
+    - UnifiedTelemetry.recommendations → Phase 28 planning
+    - UnifiedTelemetry.phase28Ready → gate to entry
+    - Correlation map → debugging + forensics
+
+phase_28_entry_criteria:
+
+  Required:
+    1. ResumeDecision.allowed = true (from G.3)
+    2. rootCauseAnalysis.length < 3 (< 3 independent root causes)
+    3. contradictionsDetected = 0 (no contradictions)
+    4. driftSeverityMax < 0.75 (no critical drift)
+
+  Recommended:
+    - primitivesSuccessRate > 70%
+    - No CRITICAL escalations (or resolved)
+    - testCoverageFinal > testCoverageInitial
+
+  Output:
+    - phase28Ready = true if all required criteria met
+    - Recommendations guide Phase 28 focus areas
+
+telemetry_fields:
+
+  telemetry.execution_id: string
+  telemetry.execution_time_seconds: number
+  telemetry.total_drift_events: number
+  telemetry.drift_severity_max: 0.0–1.0
+  telemetry.drift_severity_avg: 0.0–1.0
+  telemetry.primitives_applied: number
+  telemetry.primitives_success_rate: 0–100
+  telemetry.root_causes: number
+  telemetry.root_cause_waves: string[]
+  telemetry.contradictions: number
+  telemetry.resume_approved: boolean
+  telemetry.escalations: number
+  telemetry.phase_28_ready: boolean
+  telemetry.recommendations_count: number
+  telemetry.recommendations_critical: number
+
+testing:
+
+  coverage: 25 test cases
+  categories:
+    - Data collection (8 tests): individual waves, missing data, malformed
+    - Telemetry stitching (5 tests): correlation, progression, effectiveness
+    - Root cause analysis (4 tests): single/multi-wave, propagation, contradictions
+    - Dashboard metrics (5 tests): calculations, statistics, escalation, readiness
+    - Recommendations (3 tests): architecture, testing, escalation
+  status: ALL 25 PASS
+
+next_step:
+
+  Phase 28 Entry:
+    - If phase28Ready = true:
+      * Proceed to Phase 28 with recommendations as guidance
+      * Use dashboard metrics for observability
+      * Apply lessons from Wave G healing
+
+    - If phase28Ready = false:
+      * Review failed conditions
+      * Loop back to G.1 or G.3 for remediation
+      * Rerun G.4 telemetry after fixes
+
+  Observability Integration:
+    - Dashboard: Display DashboardMetrics for execution visibility
+    - Alerting: Trigger if escalations > 0 or contradictions > 0
+    - Forensics: Use correlationMap for root cause queries
+    - Recommendations: Feed to Phase 28 planning automation
+
+  Knowledge Base:
+    - Store successful HealingMetric patterns
+    - Document RootCauseChain patterns (for pattern recognition)
+    - Archive UnifiedTelemetry for audit trail
+    - Use for future wave planning (ML training data)
