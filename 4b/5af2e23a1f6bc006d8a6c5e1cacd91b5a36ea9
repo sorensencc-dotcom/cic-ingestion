@@ -1,0 +1,26 @@
+src/autonomy/MultiWaveTelemetryStitcher.ts
+  s_9df6068d39c023::t_1bc271c7e7929c 1-345,350,356-542
+  s_9df6068d39c023::t_e3a7b4cfd5c4f5 346-349,351-355
+src/autonomy/MultiWaveTelemetryStitcher.test.ts
+  s_9df6068d39c023::t_bfc28fea55bd27 1-533,535-798,800-950
+  s_9df6068d39c023::t_58c64f85f4a6df 799
+  s_9df6068d39c023::t_180425b1729a61 534
+src/autonomy/g.multi.wave.telemetry.yaml
+  s_9df6068d39c023::t_c13a795eb0025a 1-311
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "4b5af2e23a1f6bc006d8a6c5e1cacd91b5a36ea9",
+  "prompts": {},
+  "sessions": {
+    "s_9df6068d39c023": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bd3a8b0d-47f8-4f0f-a511-393c978880be",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
