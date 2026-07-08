@@ -1,0 +1,179 @@
+# Wave G — Healing Primitives Specification
+# Deterministic, stateless, reversible building blocks for autonomous healing
+
+version: 1.0.0
+namespace: wave_g.healing
+primitives:
+
+  - id: heal.shrink_scope
+    type: scope_reduction
+    trigger:
+      - KITCHEN_SINK (HIGH or CRITICAL)
+      - RUNAWAY_REFACTOR (MEDIUM or CRITICAL)
+    effect:
+      - Reduce plan.expectedScope to primary file/module only
+      - Extract module path from first code change
+      - Apply to all plan nodes
+    deterministic: true
+    reversible: true
+    examples:
+      - input: codeChanges = [src/core/main.ts, src/utils/helper.ts]
+        output: expectedScope = [src/core]
+      - input: codeChanges = []
+        output: no-op (returns applied=false)
+
+  - id: heal.tighten_criteria
+    type: criteria_hardening
+    trigger:
+      - KITCHEN_SINK (HIGH or CRITICAL) with unrelated files
+    effect:
+      - Reduce maxCorruptionPercent by 20% (threshold * 0.8)
+      - Increase minSurvivalPercent by 20% (threshold * 1.2)
+      - Add moduleBoundaries constraint (per-file module tracking)
+      - Lock thresholds to prevent future drift
+    deterministic: true
+    reversible: true
+    examples:
+      - input: maxCorruptionPercent=50, unrelatedFiles=[src/utils/helper.ts]
+        output: maxCorruptionPercent=40, minSurvivalPercent=60
+      - input: unrelatedFiles=[]
+        output: no-op (returns applied=false)
+
+  - id: heal.inject_negative_tests
+    type: test_injection
+    trigger:
+      - OPTIMISTIC_PATH (HIGH or CRITICAL) with no negative tests
+      - Tests exist but zero cover error/edge cases
+    effect:
+      - Auto-generate 5 negative test stubs:
+        * handles invalid input gracefully
+        * rejects malformed data
+        * timeout recovery
+        * null-reference protection
+        * error boundary containment
+      - Add to failing test list
+      - Increase coverage target by 20%
+    deterministic: true
+    reversible: true
+    examples:
+      - input: tests.failing=[], tests.passing=[success1, success2]
+        output: tests.failing=[5 generated], coverage += 20%
+      - input: tests.failing=[error1], tests.passing=[success1]
+        output: no-op (returns applied=false)
+
+  - id: heal.enforce_surgical_diff
+    type: scope_surgical
+    trigger:
+      - RUNAWAY_REFACTOR (CRITICAL) with filesModified > 1
+    effect:
+      - Keep primary code change only (first in list)
+      - Discard all secondary changes
+      - Update plan.expectedScope to [primary.file]
+      - Cap execution to single file
+    deterministic: true
+    reversible: true
+    examples:
+      - input: codeChanges = [a.ts, b.ts, c.ts]
+        output: keep a.ts, discard b.ts + c.ts
+      - input: codeChanges = [a.ts]
+        output: no-op (returns applied=false, already surgical)
+
+  - id: heal.freeze_architecture
+    type: architecture_lock
+    trigger:
+      - RUNAWAY_REFACTOR (CRITICAL) with refactorLogs containing:
+        * 'clean up', 'modernize', 'refactor', 'rename', 'restructure'
+    effect:
+      - Set _architectureFrozen=true in criteria
+      - Add frozen rules:
+        * no module renames
+        * no directory moves
+        * no interface changes
+        * no dependency reordering
+      - Block structural changes at validation gate
+    deterministic: true
+    reversible: true
+    examples:
+      - input: driftSignal.details.refactorLogs=[renamed X to Y, moved dir A to B]
+        output: _frozenRules=[4 blocking rules]
+      - input: driftSignal.type=KITCHEN_SINK
+        output: no-op (returns applied=false)
+
+  - id: heal.require_abstraction_step
+    type: plan_injection
+    trigger:
+      - WRONG_ABSTRACTION (HIGH or CRITICAL) with duplicate blocks
+    effect:
+      - Insert new step at beginning of plan
+      - Step: "Extract duplicated logic into shared module"
+      - Set expectedScope = modules containing duplicates
+      - Set estimatedEffort = 4 hours
+    deterministic: true
+    reversible: true
+    examples:
+      - input: driftSignal.type=WRONG_ABSTRACTION, duplicates=[validate(), format()]
+        output: plan[0] = abstraction step for [modules with duplicates]
+      - input: driftSignal.type=KITCHEN_SINK
+        output: no-op (returns applied=false)
+
+  - id: heal.require_dependency_justification
+    type: dependency_audit
+    trigger:
+      - New imports detected in code changes
+      - Pattern: import .*from '[MODULE]'
+    effect:
+      - Extract all new dependency names
+      - Add to criteria._dependencyJustification
+      - Mark all with status='PENDING'
+      - Block merge until all justified
+    deterministic: true
+    reversible: true
+    examples:
+      - input: hunks=[import lodash from 'lodash', import moment from 'moment']
+        output: _dependencyJustification={lodash: PENDING, moment: PENDING}
+      - input: hunks=[]
+        output: no-op (returns applied=false)
+
+composition:
+  strategy: sequential
+  behavior: "Each primitive receives modified context from previous primitive"
+  example_sequence:
+    - heal.shrink_scope      # Reduce scope
+    - heal.tighten_criteria  # Harden criteria
+    - heal.inject_negative_tests  # Improve test coverage
+  constraints:
+    - All primitives are idempotent (safe to re-apply)
+    - All primitives are reversible (can be undone)
+    - Primitives compose into healing strategies
+    - Failed primitive (applied=false) does not block next
+
+instinct_alignment:
+  verification_first: inject_negative_tests adds failing test stubs first
+  define_done: tighten_criteria locks acceptance criteria upfront
+  surgical_change: enforce_surgical_diff caps to single file
+  drift_halt_reflex: freeze_architecture + shrink_scope stop cascading
+  dependency_skepticism: require_dependency_justification audits imports
+
+gate_integration:
+  pre_healing: Detect drift signal (type + severity)
+  healing: Compose primitives for drift type (KS → shrink, OP → inject tests, etc.)
+  post_healing: Validate revised plan + criteria against Resume Gate logic
+  resume_decision: approved by gate logic (Wave G.3)
+
+testing:
+  coverage: 20 test cases across all 7 primitives
+  categories:
+    - Unit tests for each primitive
+    - Composition tests (sequential application)
+    - Instinct alignment tests
+    - Reversibility validation
+  status: ALL 20 PASS
+
+telemetry_fields:
+  - primitive_id: string (heal.X)
+  - applied: boolean
+  - reason: string (why applied or not)
+  - modifiedPlan: PlanNode[] | undefined
+  - modifiedCriteria: AcceptanceCriteria | undefined
+  - modifiedTests: TestBundle | undefined
+  - reversible: boolean (always true for Wave G.1)
