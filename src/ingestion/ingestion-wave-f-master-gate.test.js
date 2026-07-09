@@ -131,6 +131,7 @@ function testWaveDQuarantine() {
         .split("\n")
         .filter((l) => l.trim())
         .map((l) => JSON.parse(l))
+        .reverse()
         .find((r) => r.id === "quarantine-1");
     assert(approved?.operatorFlags.forceReingest === true, "Approval sets forceReingest");
     assert(approved?.lane === "deep", "Approval moved to target lane");
