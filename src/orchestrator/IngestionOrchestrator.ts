@@ -3,6 +3,7 @@ import { DeadLetterQueue } from "../queue/dlq";
 import { IExtractor } from "../extractors/IExtractor";
 import { log } from "../lib/logger";
 import { metricsCollector } from "../lib/metrics";
+import { ProposalCreation, AuditRecord } from "../governance/proposal-creation";
 
 export interface PipelineStage {
   name: string;
@@ -45,6 +46,7 @@ export class IngestionOrchestrator {
   private activePromises: Set<Promise<any>>;
   private processedRecords: Map<string, ProcessingResult>;
   private lastProcessedTime: number | null = null;
+  private proposalCreation: ProposalCreation;
 
   constructor(
     producer: Producer,
@@ -55,6 +57,7 @@ export class IngestionOrchestrator {
     this.producer = producer;
     this.dlq = dlq;
     this.extractor = extractor;
+    this.proposalCreation = new ProposalCreation();
     this.opts = {
       timeout: opts.timeout ?? 30000,
       maxRetries: opts.maxRetries ?? 3,
@@ -134,11 +137,28 @@ export class IngestionOrchestrator {
         return await this._confirmRecord(r);
       });
 
+      // Stage 5: Create proposal for governance pipeline (Phase 4 integration point)
+      // Extract audit record metadata and create proposal for governance review
+      const auditRecord: AuditRecord = {
+        profile: record.profile || 'filesystem',
+        lane: record.lane || 'fast',
+        orchestration_cost: record.orchestration_cost || 0,
+        entry_id: recordId,
+        created_at: new Date().toISOString(),
+      };
+
+      const proposal = this.proposalCreation.fromAuditRecord(auditRecord);
+      log(`info: _orchestratePipeline() created proposal ${proposal.proposal_id} for entry ${recordId}`);
+
       const result: ProcessingResult = {
         recordId,
         status: "success",
         stage: "confirm",
-        data: confirmed,
+        data: {
+          ...confirmed,
+          proposal_id: proposal.proposal_id,
+          source_entry_id: proposal.source_entry_id,
+        },
         timestamp: Date.now(),
       };
 
