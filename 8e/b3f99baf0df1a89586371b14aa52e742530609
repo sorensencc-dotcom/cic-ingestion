@@ -1,0 +1,20 @@
+src/tests/phase5-multicanary-ab-e2e.test.ts
+  s_19e803433dc32b::t_f3b65a75bcb9e9 1-852,855-856,858-860,867-868,881-970
+  s_19e803433dc32b::t_9edc646713dba6 853-854,857,861-866,869-880
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "8eb3f99baf0df1a89586371b14aa52e742530609",
+  "prompts": {},
+  "sessions": {
+    "s_19e803433dc32b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "00bcb37e-9e4c-47df-9f18-83402dbc5734",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
