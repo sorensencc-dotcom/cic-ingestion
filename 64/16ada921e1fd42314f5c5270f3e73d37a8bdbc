@@ -1,0 +1,42 @@
+src/orchestrator/IngestionOrchestrator.ts
+  s_692ee940a08bb4::t_0279dbafbd1d86 90
+  s_659aefbaf5fabf::t_89ce866921639b 77,94
+  s_659aefbaf5fabf::t_f8e28ccd8d866a 1-76,78-89,91-93,95-317
+__tests__/unit/queue-dlq.test.ts
+  s_659aefbaf5fabf::t_d8e08ad337e773 5-6
+  s_659aefbaf5fabf::t_f0c96cb7036023 2-4
+  s_659aefbaf5fabf::t_5ce02c4c6a2ad3 7
+  s_424af7b1aaa96b::t_57bc3cc414b364 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "6416ada921e1fd42314f5c5270f3e73d37a8bdbc",
+  "prompts": {},
+  "sessions": {
+    "s_424af7b1aaa96b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a48ac6747e7f6a122",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_659aefbaf5fabf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "154d4d74-8bba-4a86-af10-c33faf83fe81",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_692ee940a08bb4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7ce40ef2-3f3b-44cb-8082-782e623311bd",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
