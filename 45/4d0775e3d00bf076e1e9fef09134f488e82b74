@@ -1,0 +1,21 @@
+src/tests/phase4-governance-e2e.test.ts
+  s_19e803433dc32b::t_a9f28aeb5a3900 1-329,332-636,639-659
+  s_19e803433dc32b::t_efd76bffad40fc 637-638
+  s_19e803433dc32b::t_c81dbaa56cc267 330-331
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "454d0775e3d00bf076e1e9fef09134f488e82b74",
+  "prompts": {},
+  "sessions": {
+    "s_19e803433dc32b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "00bcb37e-9e4c-47df-9f18-83402dbc5734",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
