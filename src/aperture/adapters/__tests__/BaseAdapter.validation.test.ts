@@ -3,8 +3,8 @@
  */
 
 import { JSONSchema7 } from 'json-schema';
-import { BaseAdapter } from '../BaseAdapter.js';
-import { SandboxHandle, ExecutionOptions } from '../../types/index.js';
+import { BaseAdapter } from '../BaseAdapter.ts';
+import { SandboxHandle, ExecutionOptions } from '../../types/index.ts';
 
 // Concrete subclass to exercise BaseAdapter directly
 class TestAdapter extends BaseAdapter {

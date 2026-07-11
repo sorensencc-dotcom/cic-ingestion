@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "@jest/globals";
-import { AutonomyAPIServer } from "../../AutonomyAPIServer.js";
+import { AutonomyAPIServer } from "../../AutonomyAPIServer.ts";
 import fetch from "node-fetch";
 
 describe("D-Phase: Fire-Drill Integration (AutonomyAPIServer)", () => {

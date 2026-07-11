@@ -4,7 +4,7 @@
  */
 
 import { Command } from 'commander';
-import { createCacheCommand } from './cic-cli-cache.js';
+import { createCacheCommand } from './cic-cli-cache.ts';
 
 async function main() {
   const program = new Command();

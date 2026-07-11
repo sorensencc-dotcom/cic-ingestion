@@ -8,10 +8,10 @@
  * Semver: 1.0.0
  */
 
-import { runMaalRoutingReplay, printMaalRoutingReplaySummary } from './maalRoutingReplay.js';
-import { runCicIngestionReplay, printCicIngestionReplaySummary } from './cicIngestionReplay.js';
-import { runDriftScoringHarness, printDriftScoringHarnessSummary } from './driftScoringHarness.js';
-import { logStructured } from '../../lib/log.js';
+import { runMaalRoutingReplay, printMaalRoutingReplaySummary } from './maalRoutingReplay.ts';
+import { runCicIngestionReplay, printCicIngestionReplaySummary } from './cicIngestionReplay.ts';
+import { runDriftScoringHarness, printDriftScoringHarnessSummary } from './driftScoringHarness.ts';
+import { logStructured } from '../../lib/log.ts';
 import * as fs from 'fs';
 
 interface HarnessReport {

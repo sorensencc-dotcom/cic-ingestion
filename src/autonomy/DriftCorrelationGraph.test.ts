@@ -2,7 +2,7 @@
  * Wave G — Drift Correlation Graph Tests
  */
 
-import { DriftCorrelationGraph, WaveDriftEvent } from './DriftCorrelationGraph.js';
+import { DriftCorrelationGraph, WaveDriftEvent } from './DriftCorrelationGraph.ts';
 
 describe('DriftCorrelationGraph', () => {
   let graph: DriftCorrelationGraph;

@@ -2,7 +2,7 @@
  * Tests for ConfigLoader
  */
 
-import { loadConfig } from '../ConfigLoader.js';
+import { loadConfig } from '../ConfigLoader.ts';
 import fs from 'fs';
 import path from 'path';
 import { describe, it, expect, beforeEach, afterEach } from '@jest/globals';

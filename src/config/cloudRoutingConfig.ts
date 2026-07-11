@@ -7,9 +7,9 @@
  * Semver: 1.0.0
  */
 
-import { UnifiedCloudGateway, DeterministicRoutingRule } from '../adapters/cloudProviderAdapter.js';
-import { GrokMcpAdapter } from '../adapters/grokMcpAdapter.js';
-import { GrokRoutingAdapter } from '../adapters/grokRoutingAdapter.js';
+import { UnifiedCloudGateway, DeterministicRoutingRule } from '../adapters/cloudProviderAdapter.ts';
+import { GrokMcpAdapter } from '../adapters/grokMcpAdapter.ts';
+import { GrokRoutingAdapter } from '../adapters/grokRoutingAdapter.ts';
 
 // Initialize adapters
 const adapters = [

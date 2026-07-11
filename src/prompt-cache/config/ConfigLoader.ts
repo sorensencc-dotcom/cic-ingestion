@@ -3,7 +3,7 @@
  * Loads CacheConfig from environment variables with fallback to defaults
  */
 
-import { CacheConfig, DEFAULT_CACHE_CONFIG } from './CacheConfig.js';
+import { CacheConfig, DEFAULT_CACHE_CONFIG } from './CacheConfig.ts';
 
 export function loadCacheConfig(): CacheConfig {
   const ttlHours = process.env.CIC_CACHE_TTL_HOURS

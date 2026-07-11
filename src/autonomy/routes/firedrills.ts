@@ -7,7 +7,7 @@
  */
 
 import { Router, Request, Response } from "express";
-import { FireDrillManager, FireDrillConfig } from "../FireDrillManager.js";
+import { FireDrillManager, FireDrillConfig } from "../FireDrillManager.ts";
 
 let fireDrillManager: FireDrillManager | null = null;
 

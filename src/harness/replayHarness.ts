@@ -2,7 +2,7 @@
 // semver: 0.1.0
 // date: 2026-06-29
 
-import { updateDriftScores, DriftEvent } from "../drift/driftEngine.js";
+import { updateDriftScores, DriftEvent } from "../drift/driftEngine.ts";
 
 export interface CICState {
   drift: Record<string, number>;

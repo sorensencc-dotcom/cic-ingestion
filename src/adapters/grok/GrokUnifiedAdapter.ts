@@ -1,5 +1,5 @@
-import { BaseAdapter, AdapterConfig, AdapterInput, AdapterOutput } from "../BaseAdapter.js";
-import { GrokProvider } from "./grok-provider.js";
+import { BaseAdapter, AdapterConfig, AdapterInput, AdapterOutput } from "../BaseAdapter.ts";
+import { GrokProvider } from "./grok-provider.ts";
 
 export class GrokUnifiedAdapter extends BaseAdapter {
   constructor(

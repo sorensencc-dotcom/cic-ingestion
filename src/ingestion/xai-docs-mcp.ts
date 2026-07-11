@@ -1,7 +1,7 @@
-import { GrokUnifiedAdapter } from "../adapters/grok/GrokUnifiedAdapter.js";
-import { GrokProvider } from "../adapters/grok/grok-provider.js";
-import { GrokMcpClient } from "../adapters/grok/grok-mcp-client.js";
-import { GrokModelClient } from "../adapters/grok/grok-model-client.js";
+import { GrokUnifiedAdapter } from "../adapters/grok/GrokUnifiedAdapter.ts";
+import { GrokProvider } from "../adapters/grok/grok-provider.ts";
+import { GrokMcpClient } from "../adapters/grok/grok-mcp-client.ts";
+import { GrokModelClient } from "../adapters/grok/grok-model-client.ts";
 
 export type XaiDocsIngestionRequest =
   | { mode: "slug"; slug: string }

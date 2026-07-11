@@ -1,5 +1,5 @@
-import { GrokMcpClient } from "./grok-mcp-client.js";
-import { GrokModelClient } from "./grok-model-client.js";
+import { GrokMcpClient } from "./grok-mcp-client.ts";
+import { GrokModelClient } from "./grok-model-client.ts";
 
 export type GrokRequest =
   | {

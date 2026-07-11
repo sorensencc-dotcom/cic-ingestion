@@ -8,7 +8,7 @@
  */
 
 import fetch from 'node-fetch';
-import { CloudModelRequest, CloudModelResponse, CloudProviderAdapter } from './cloudProviderAdapter.js';
+import { CloudModelRequest, CloudModelResponse, CloudProviderAdapter } from './cloudProviderAdapter.ts';
 
 export class GrokRoutingAdapter implements CloudProviderAdapter {
   name = 'grok-routing';

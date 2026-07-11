@@ -3,7 +3,7 @@
  * Starts Phase 2.5 config system + autonomy endpoints
  */
 
-import { startAutonomyAPIServer, AutonomyAPIServerConfig } from './autonomy/AutonomyAPIServer.js';
+import { startAutonomyAPIServer, AutonomyAPIServerConfig } from './autonomy/AutonomyAPIServer.ts';
 
 const port = parseInt(process.env.PORT || '3000', 10);
 const memoryStoreUrl = process.env.MEMORY_STORE_URL || 'http://localhost:3110';

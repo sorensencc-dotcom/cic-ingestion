@@ -10,8 +10,8 @@ import {
   ExecutionMode,
   ExecutionContext,
   getExecutionPolicyEngine,
-} from './ExecutionPolicy.js';
-import { getTaskMetadataStore } from './TaskMetadataStore.js';
+} from './ExecutionPolicy.ts';
+import { getTaskMetadataStore } from './TaskMetadataStore.ts';
 
 /**
  * Result of policy check

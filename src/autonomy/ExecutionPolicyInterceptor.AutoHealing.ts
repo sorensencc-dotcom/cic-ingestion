@@ -8,9 +8,9 @@
  * Integrates with CodeLevelDriftDetector + InstinctOps + Six Rules Framework.
  */
 
-import { DriftSignal, CodeLevelDriftDetector } from '../drift/CodeLevelDriftDetector.js';
-import { InstinctOps, InstinctResult } from './InstinctOps.js';
-import { getExecutionPolicyInterceptor, ExecutionPolicyInterceptor } from './ExecutionPolicyInterceptor.js';
+import { DriftSignal, CodeLevelDriftDetector } from '../drift/CodeLevelDriftDetector.ts';
+import { InstinctOps, InstinctResult } from './InstinctOps.ts';
+import { getExecutionPolicyInterceptor, ExecutionPolicyInterceptor } from './ExecutionPolicyInterceptor.ts';
 
 /**
  * Output from auto-healing process

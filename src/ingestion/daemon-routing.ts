@@ -6,15 +6,15 @@
 import fs from "fs";
 import path from "path";
 import readline from "readline";
-import { CICStateStore, BackendId } from "src/server/cicStateStore.js";
-import { clientSessionExtractor } from "../extractors/clientSessionExtractor.js";
-import { processClientSession } from "../harness/replayHarness.js";
-import { decayDriftScores } from "../drift/driftEngine.js";
-import { verifyIngestionEntry, VerifyResult } from "./verify.js";
-import { route } from "./ingestionRouter.js";
-import { recordIngestion } from "./ingestionManifest.js";
-import { getOverrideForEntry, applyOverride } from "./operatorOverrides.js";
-import { Cost, VerificationResult } from "./types.js";
+import { CICStateStore, BackendId } from "src/server/cicStateStore.ts";
+import { clientSessionExtractor } from "../extractors/clientSessionExtractor.ts";
+import { processClientSession } from "../harness/replayHarness.ts";
+import { decayDriftScores } from "../drift/driftEngine.ts";
+import { verifyIngestionEntry, VerifyResult } from "./verify.ts";
+import { route } from "./ingestionRouter.ts";
+import { recordIngestion } from "./ingestionManifest.ts";
+import { getOverrideForEntry, applyOverride } from "./operatorOverrides.ts";
+import { Cost, VerificationResult } from "./types.ts";
 
 const ROUTING_ENABLED = process.env.CIC_INGESTION_ROUTING_ENABLED !== "false";
 

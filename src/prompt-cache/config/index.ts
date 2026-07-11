@@ -1,5 +1,5 @@
-import { CacheConfig, PricingTiers, DEFAULT_CACHE_CONFIG } from './CacheConfig.js';
-import { loadCacheConfig } from './ConfigLoader.js';
+import { CacheConfig, PricingTiers, DEFAULT_CACHE_CONFIG } from './CacheConfig.ts';
+import { loadCacheConfig } from './ConfigLoader.ts';
 
 export type { CacheConfig, PricingTiers };
 

@@ -3,7 +3,7 @@
  * MAAL routing bias calculation based on cost/savings data
  */
 
-import { generateCicCostComputeReport, type CicCostComputeReport } from '../lib/report/CicCostComputeReport.js';
+import { generateCicCostComputeReport, type CicCostComputeReport } from '../lib/report/CicCostComputeReport.ts';
 
 export interface RoutingSignal {
   agent: string;

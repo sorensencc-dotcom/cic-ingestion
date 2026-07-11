@@ -1,4 +1,4 @@
-import { GrokProvider } from "../adapters/grok/grok-provider.js";
+import { GrokProvider } from "../adapters/grok/grok-provider.ts";
 
 export async function grokRagQuery(
   grok: GrokProvider,

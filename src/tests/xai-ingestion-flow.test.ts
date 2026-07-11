@@ -1,9 +1,9 @@
 import { describe, it, expect, jest, beforeEach } from "@jest/globals";
-import { GrokUnifiedAdapter } from "../adapters/grok/GrokUnifiedAdapter.js";
-import { XaiDocsIngestionModule } from "../ingestion/xai-docs-mcp.js";
-import { GrokProvider } from "../adapters/grok/grok-provider.js";
-import { GrokMcpClient } from "../adapters/grok/grok-mcp-client.js";
-import { GrokModelClient } from "../adapters/grok/grok-model-client.js";
+import { GrokUnifiedAdapter } from "../adapters/grok/GrokUnifiedAdapter.ts";
+import { XaiDocsIngestionModule } from "../ingestion/xai-docs-mcp.ts";
+import { GrokProvider } from "../adapters/grok/grok-provider.ts";
+import { GrokMcpClient } from "../adapters/grok/grok-mcp-client.ts";
+import { GrokModelClient } from "../adapters/grok/grok-model-client.ts";
 
 describe("Unified Grok Provider & Ingestion Integration", () => {
   let grokProvider: GrokProvider;

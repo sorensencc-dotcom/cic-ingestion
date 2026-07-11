@@ -4,10 +4,10 @@
  * Tests for CodeLevelDriftDetector, InstinctOps, and ExecutionPolicyAutoHealing
  */
 
-import { CodeLevelDriftDetector, CodeLevelInput } from '../drift/CodeLevelDriftDetector.js';
-import { InstinctOps } from '../autonomy/InstinctOps.js';
-import { ExecutionPolicyAutoHealing } from '../autonomy/ExecutionPolicyInterceptor.AutoHealing.js';
-import { DriftSignal } from '../drift/CodeLevelDriftDetector.js';
+import { CodeLevelDriftDetector, CodeLevelInput } from '../drift/CodeLevelDriftDetector.ts';
+import { InstinctOps } from '../autonomy/InstinctOps.ts';
+import { ExecutionPolicyAutoHealing } from '../autonomy/ExecutionPolicyInterceptor.AutoHealing.ts';
+import { DriftSignal } from '../drift/CodeLevelDriftDetector.ts';
 
 describe('CodeLevelDriftDetector', () => {
   let detector: CodeLevelDriftDetector;

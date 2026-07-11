@@ -3,13 +3,13 @@
  * Loads, validates, and exports configuration
  */
 
-import { loadConfig } from './ConfigLoader.js';
-import { validateConfig } from './ConfigValidator.js';
+import { loadConfig } from './ConfigLoader.ts';
+import { validateConfig } from './ConfigValidator.ts';
 
 const config = loadConfig();
 validateConfig(config);
 
-export type { CICConfig } from './ConfigLoader.js';
+export type { CICConfig } from './ConfigLoader.ts';
 export default config;
 
 

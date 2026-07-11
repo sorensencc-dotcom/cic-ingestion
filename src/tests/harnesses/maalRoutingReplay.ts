@@ -7,8 +7,8 @@
  * Semver: 1.0.0
  */
 
-import { torqueQueryV2Search, TorqueQueryV2SearchRequest, TorqueQueryV2SearchResponse } from '../../adapters/torqueQueryV2.js';
-import { logStructured } from '../../lib/log.js';
+import { torqueQueryV2Search, TorqueQueryV2SearchRequest, TorqueQueryV2SearchResponse } from '../../adapters/torqueQueryV2.ts';
+import { logStructured } from '../../lib/log.ts';
 
 interface ReplayTask {
   id: string;

@@ -9,9 +9,9 @@
  * - Auto-Healing: recover if repair violates constraints
  */
 
-import { repairManifest as baseRepairManifest, getRepairStats } from './repairManifest.js';
-import { InstinctOps, InstinctContext } from '../autonomy/InstinctOps.js';
-import { CodeLevelDriftDetector, CodeLevelInput, DriftSignal } from '../drift/CodeLevelDriftDetector.js';
+import { repairManifest as baseRepairManifest, getRepairStats } from './repairManifest.ts';
+import { InstinctOps, InstinctContext } from '../autonomy/InstinctOps.ts';
+import { CodeLevelDriftDetector, CodeLevelInput, DriftSignal } from '../drift/CodeLevelDriftDetector.ts';
 
 /**
  * Acceptance criteria for repair operation

@@ -5,14 +5,14 @@
 import fs from "fs";
 import path from "path";
 import readline from "readline";
-import { CICStateStore, BackendId } from "src/server/cicStateStore.js";
-import { clientSessionExtractor } from "../extractors/clientSessionExtractor.js";
-import { processClientSession } from "../harness/replayHarness.js";
-import { decayDriftScores } from "../drift/driftEngine.js";
-import { verifyIngestionEntry, VerifyResult } from "./verify.js";
+import { CICStateStore, BackendId } from "src/server/cicStateStore.ts";
+import { clientSessionExtractor } from "../extractors/clientSessionExtractor.ts";
+import { processClientSession } from "../harness/replayHarness.ts";
+import { decayDriftScores } from "../drift/driftEngine.ts";
+import { verifyIngestionEntry, VerifyResult } from "./verify.ts";
 // TODO: verify audit-policy path — currently missing from codebase
-// import { verifyAuditChain } from "cic/governance/audit-policy.js";
-import { runDocsManagerIngestionJob } from "./jobs/docsManagerJob.js";
+// import { verifyAuditChain } from "cic/governance/audit-policy.ts";
+import { runDocsManagerIngestionJob } from "./jobs/docsManagerJob.ts";
 
 export class IngestionDaemon {
   private intervalId: NodeJS.Timeout | null = null;

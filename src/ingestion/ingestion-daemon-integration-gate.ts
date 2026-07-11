@@ -4,14 +4,14 @@
 
 import * as fs from "fs";
 import * as path from "path";
-import { route } from "./ingestionRouter.js";
-import { recordIngestion, loadManifest } from "./ingestionManifest.js";
-import { getOverrideForEntry, applyOverride, loadOperatorOverrides } from "./operatorOverrides.js";
+import { route } from "./ingestionRouter.ts";
+import { recordIngestion, loadManifest } from "./ingestionManifest.ts";
+import { getOverrideForEntry, applyOverride, loadOperatorOverrides } from "./operatorOverrides.ts";
 import {
   RoutedIngestionDecision,
   VerificationResult,
   Cost,
-} from "./types.js";
+} from "./types.ts";
 
 const MANIFEST_DIR = path.join(__dirname, "..", "..");
 const MANIFEST_PATH = path.join(MANIFEST_DIR, "ingestionManifest.jsonl");

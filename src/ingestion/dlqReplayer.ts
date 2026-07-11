@@ -10,8 +10,8 @@
 import fs from "fs";
 import path from "path";
 import readline from "readline";
-import { clientSessionExtractor } from "../extractors/clientSessionExtractor.js";
-import { verifyIngestionEntry, VerifyReasonCode } from "./verify.js";
+import { clientSessionExtractor } from "../extractors/clientSessionExtractor.ts";
+import { verifyIngestionEntry, VerifyReasonCode } from "./verify.ts";
 
 interface DlqEntry {
   dlqVersion: number;

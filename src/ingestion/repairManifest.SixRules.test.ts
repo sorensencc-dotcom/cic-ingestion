@@ -4,8 +4,8 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { RepairManifestSixRules, RepairAcceptanceCriteria } from './repairManifest.SixRules.js';
-import { recordIngestion } from './ingestionManifest.js';
+import { RepairManifestSixRules, RepairAcceptanceCriteria } from './repairManifest.SixRules.ts';
+import { recordIngestion } from './ingestionManifest.ts';
 
 const MANIFEST_DIR = path.join(__dirname, '..', '..');
 const MANIFEST_PATH = path.join(MANIFEST_DIR, 'ingestionManifest.jsonl');

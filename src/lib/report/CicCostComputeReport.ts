@@ -3,8 +3,8 @@
  * Single source of truth for all cost/usage analytics
  */
 
-import { UsageLedger, type DailySummary } from '../usage/UsageLedger.js';
-import { getDailyGpuCost } from '../cost/GpuAmortization.js';
+import { UsageLedger, type DailySummary } from '../usage/UsageLedger.ts';
+import { getDailyGpuCost } from '../cost/GpuAmortization.ts';
 
 export interface CicCostComputeReport {
   usage: {
