@@ -1,0 +1,26 @@
+src/tests/phase2-e2e-integration.test.ts
+  s_19e803433dc32b::t_3302247d7de980 1-7,10-17,19-28,30-108,110-111,113-123,125-126,128-140,142-198,200-206,208-274,276-327,329,331-340,343-359
+  s_19e803433dc32b::t_0f3a1f75d6c78b 8-9
+  s_19e803433dc32b::t_ef180d19f72439 109,112,124,127
+  s_19e803433dc32b::t_d01dd26ebc40dc 328,330,341-342
+  s_19e803433dc32b::t_025ca6238b04ed 141
+  s_19e803433dc32b::t_866671252bd3b2 18,29
+  s_19e803433dc32b::t_3bdefe44274fde 199,207
+  s_19e803433dc32b::t_b0bd6b067da643 275
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "838f1849b4fec38b6034401bc29faca2902a5cd1",
+  "prompts": {},
+  "sessions": {
+    "s_19e803433dc32b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "00bcb37e-9e4c-47df-9f18-83402dbc5734",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
