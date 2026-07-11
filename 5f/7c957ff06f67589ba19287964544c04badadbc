@@ -1,0 +1,24 @@
+src/governance/custom-metrics-engine.ts
+  s_970389637ddcef::t_71e778dca8faec 1-388
+__tests__/governance/custom-metrics-engine.test.ts
+  s_970389637ddcef::t_a71ed03242eeb6 106,117,120-121,125,128-129
+  s_970389637ddcef::t_a3aa752d9e2ccd 1-105,107-116,118-119,122-124,126-127,130-527
+src/governance/index.ts
+  s_970389637ddcef::t_fee1b73d7adea7 7-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "5f7c957ff06f67589ba19287964544c04badadbc",
+  "prompts": {},
+  "sessions": {
+    "s_970389637ddcef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31370f92-89b8-4321-b817-d1500000411c",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
