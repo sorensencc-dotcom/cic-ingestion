@@ -5,9 +5,81 @@
 
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { GovernanceEngine } from '../src/governance/governance-engine';
-import { Proposal } from '../src/governance/proposal-validator';
+import { Proposal, ProposalValidator } from '../src/governance/proposal-validator';
 import { PromotionEngine, PromotionRecord, CanaryResult } from '../src/governance/promotion-engine';
 import { CanaryMetrics } from '../src/governance/canary-engine';
+
+describe('Proposal Validation', () => {
+  let validator: ProposalValidator;
+
+  beforeEach(() => {
+    validator = new ProposalValidator();
+  });
+
+  it('validates correct proposal', () => {
+    const proposal: Proposal = {
+      proposal_id: crypto.randomUUID(),
+      source_entry_id: crypto.randomUUID(),
+      profile: 'filesystem',
+      lane: 'fast',
+      orchestration_cost: 0.002,
+      created_at: new Date().toISOString(),
+      version: '1.0.0',
+    };
+
+    const result = validator.validate(proposal);
+
+    expect(result.passed).toBe(true);
+    expect(result.errors.length).toBe(0);
+  });
+
+  it('rejects proposal with missing fields', () => {
+    const proposal: any = {
+      proposal_id: crypto.randomUUID(),
+      profile: 'filesystem',
+    };
+
+    const result = validator.validate(proposal);
+
+    expect(result.passed).toBe(false);
+    expect(result.errors.length).toBeGreaterThan(0);
+    expect(result.errors).toContain('Missing source_entry_id');
+  });
+
+  it('rejects proposal with invalid profile', () => {
+    const proposal: Proposal = {
+      proposal_id: crypto.randomUUID(),
+      source_entry_id: crypto.randomUUID(),
+      profile: 'invalid-profile',
+      lane: 'fast',
+      orchestration_cost: 0.002,
+      created_at: new Date().toISOString(),
+      version: '1.0.0',
+    };
+
+    const result = validator.validate(proposal);
+
+    expect(result.passed).toBe(false);
+    expect(result.errors).toContain('Invalid profile: invalid-profile');
+  });
+
+  it('warns on high cost', () => {
+    const proposal: Proposal = {
+      proposal_id: crypto.randomUUID(),
+      source_entry_id: crypto.randomUUID(),
+      profile: 'pdf',
+      lane: 'deep',
+      orchestration_cost: 1.5, // > $1.00
+      created_at: new Date().toISOString(),
+      version: '1.0.0',
+    };
+
+    const result = validator.validate(proposal);
+
+    expect(result.passed).toBe(true); // Passes validation (not rejected)
+    expect(result.warnings).toContain('High cost detected (>$1.00)');
+  });
+});
 
 describe('Governance Review', () => {
   let governanceEngine: GovernanceEngine;

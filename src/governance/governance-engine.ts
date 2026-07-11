@@ -2,7 +2,7 @@ import { Proposal } from './proposal-validator';
 
 export interface GovernanceDecision {
   proposal_id: string;
-  decision: 'approved' | 'rejected' | 'deferred';
+  decision: 'approved' | 'rejected';
   reason: string;
   reviewed_at: string;
 }
