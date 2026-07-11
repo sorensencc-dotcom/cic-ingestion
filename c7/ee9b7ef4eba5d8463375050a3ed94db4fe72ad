@@ -1,0 +1,30 @@
+src/tests/phase5-ab-testing-e2e.test.ts
+  s_970389637ddcef::t_25e04964855234 216
+  s_970389637ddcef::t_d7c76427065f7b 213-215
+  s_970389637ddcef::t_8a8886348a4435 217-219
+  s_1072674717ce4d::t_ccf87c9d2d29b2 1-212,220-1038
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "c7ee9b7ef4eba5d8463375050a3ed94db4fe72ad",
+  "prompts": {},
+  "sessions": {
+    "s_1072674717ce4d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-acfe6953e228c15e0",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_970389637ddcef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31370f92-89b8-4321-b817-d1500000411c",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
