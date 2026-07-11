@@ -1,0 +1,23 @@
+src/governance/canary-engine.ts
+  s_659aefbaf5fabf::t_d6736db3216c75 2,4-16,21,36-45,47-52,54-55,60-65,68-100,102,124
+  s_659aefbaf5fabf::t_6b1d9c0f933aac 17-20
+  s_659aefbaf5fabf::t_6e8e831ff65d64 101,103-123
+src/__tests__/governance.test.ts
+  s_659aefbaf5fabf::t_bad08a88d5b8fe 1-92
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "192368ccb94f80e973aae2a45eb6f8b402b651ed",
+  "prompts": {},
+  "sessions": {
+    "s_659aefbaf5fabf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "154d4d74-8bba-4a86-af10-c33faf83fe81",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
