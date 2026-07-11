@@ -1,0 +1,16 @@
+
+> cic-ingestion@0.26.0 test
+> npx jest
+
+ReferenceError: module is not defined in ES module scope
+This file is being treated as an ES module because it has a '.js' file extension and 'C:\dev\cic-ingestion\package.json' contains "type": "module". To treat it as a CommonJS script, rename it to use the '.cjs' file extension.
+    at file:///C:/dev/cic-ingestion/jest.config.js:1:1
+    at ModuleJobSync.runSync (node:internal/modules/esm/module_job:534:37)
+    at ModuleLoader.importSyncForRequire (node:internal/modules/esm/loader:388:47)
+    at loadESMFromCJS (node:internal/modules/cjs/loader:1629:24)
+    at Module._compile (node:internal/modules/cjs/loader:1794:5)
+    at Object..js (node:internal/modules/cjs/loader:1943:10)
+    at Module.load (node:internal/modules/cjs/loader:1533:32)
+    at Module._load (node:internal/modules/cjs/loader:1335:12)
+    at wrapModuleLoad (node:internal/modules/cjs/loader:255:19)
+    at Module.require (node:internal/modules/cjs/loader:1556:12)
