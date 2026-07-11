@@ -4,3 +4,7 @@ export * from './canary-engine';
 export * from './promotion-engine';
 export * from './proposal-creation';
 export * from './governance-log';
+export * from './multi-cohort-engine';
+export * from './custom-metrics-engine';
+export * from './ab-test-engine';
+export * from './cohort-promotion-engine';
