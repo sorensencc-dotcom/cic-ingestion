@@ -1,0 +1,20 @@
+src/tests/phase3-gateway-e2e.test.ts
+  s_19e803433dc32b::t_8de54f0b625a7d 55,60,65,70,74
+  s_19e803433dc32b::t_43c55e34eab71e 1-54,56-59,61-64,66-69,71-73,75-569
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "075eac7b32bf0271f634230b26ac3881d304a406",
+  "prompts": {},
+  "sessions": {
+    "s_19e803433dc32b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "00bcb37e-9e4c-47df-9f18-83402dbc5734",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
