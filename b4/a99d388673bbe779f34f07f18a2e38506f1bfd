@@ -1,0 +1,22 @@
+__tests__/governance.test.ts
+  s_659aefbaf5fabf::t_8bfee937616692 8,12-82
+  s_659aefbaf5fabf::t_5c7040493a0d4e 83
+src/governance/governance-engine.ts
+  s_659aefbaf5fabf::t_53a0255162514b 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "b4a99d388673bbe779f34f07f18a2e38506f1bfd",
+  "prompts": {},
+  "sessions": {
+    "s_659aefbaf5fabf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "154d4d74-8bba-4a86-af10-c33faf83fe81",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
