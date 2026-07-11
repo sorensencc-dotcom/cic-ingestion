@@ -1,0 +1,38 @@
+src/governance/proposal-creation.ts
+  s_659aefbaf5fabf::t_c6919e74ada167 1-74
+src/orchestrator/IngestionOrchestrator.ts
+  s_659aefbaf5fabf::t_5881b898cf2ae0 140-152,157-161
+  s_659aefbaf5fabf::t_44261891f55f44 6
+  s_659aefbaf5fabf::t_33e68506f807f4 49,60
+src/governance/governance-log.ts
+  s_659aefbaf5fabf::t_11b19b78a01955 1-146
+__tests__/governance.test.ts
+  s_659aefbaf5fabf::t_f83359e689eba6 10-12
+  s_659aefbaf5fabf::t_f848a95fe48ad6 429-686
+src/governance/index.ts
+  s_e53182619b4a41::t_391f141190dad1 5-6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "1477f6726c65675c3f0662487cce4cbf8f470491",
+  "prompts": {},
+  "sessions": {
+    "s_659aefbaf5fabf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "154d4d74-8bba-4a86-af10-c33faf83fe81",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_e53182619b4a41": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ae8a283d63f5ee272",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
