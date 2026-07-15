@@ -23,6 +23,7 @@ module.exports = {
   },
   moduleNameMapper: {
     '^@/(.*)$': '<rootDir>/src/',
+    '^uuid$': '<rootDir>/__mocks__/uuid.cjs',
   },
   transformIgnorePatterns: [
     'node_modules/(?!(commander)/)',
