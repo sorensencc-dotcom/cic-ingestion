@@ -22,6 +22,7 @@
  */
 
 import { randomUUID } from 'crypto';
+import { Phase5SnapshotCapture } from './snapshot-capture';
 
 /**
  * Phase 4 Proposal record (input)
@@ -137,6 +138,11 @@ export class MultiCohortRolloutPipeline {
   private assignments: Phase5CohortAssignment[] = []; // Append-only log
   private decisionLog: RolloutDecisionLogEntry[] = []; // Append-only log
   private pipelineState: Map<string, RolloutPipelineState> = new Map(); // proposal_id → state
+  private snapshotCapture: Phase5SnapshotCapture;
+
+  constructor(snapshotCapture: Phase5SnapshotCapture = new Phase5SnapshotCapture()) {
+    this.snapshotCapture = snapshotCapture;
+  }
 
   /**
    * Convert Phase 4 proposal to Phase 5 variant
@@ -342,9 +348,14 @@ export class MultiCohortRolloutPipeline {
    * @param decision Promotion decision (promote_cohort, continue_observing, rollback, promote_all)
    * @param cohort_id Current cohort identifier
    * @param current_cohort_size Current cohort size (0.0-1.0)
-   * @param next_cohort_size Next cohort size (if applicable)
    * @param reason Decision rationale
+   * @param next_cohort_size Next cohort size (if applicable)
+   * @param feature_flag_state Feature flag state to snapshot before deployment (promote decisions only)
    * @returns RolloutDecisionLogEntry (immutable)
+   *
+   * For 'promote_cohort' / 'promote_all' decisions, captures a Phase 5 pre-deployment
+   * snapshot (config + feature flags) before the decision is recorded and Phase 6
+   * deployment begins. Throws if the snapshot fails to persist, blocking Phase 6.
    */
   recordRolloutDecision(
     proposal_id: string,
@@ -353,8 +364,28 @@ export class MultiCohortRolloutPipeline {
     cohort_id: string,
     current_cohort_size: number,
     reason: string,
-    next_cohort_size?: number
+    next_cohort_size?: number,
+    feature_flag_state: Record<string, boolean> = {}
   ): RolloutDecisionLogEntry {
+    if (decision === 'promote_cohort' || decision === 'promote_all') {
+      const variant = this.variants.get(variant_id);
+      const configState = (variant?.treatment_config.config as Record<string, any>) ?? {};
+
+      this.snapshotCapture.capturePreDeploymentSnapshot(
+        proposal_id,
+        variant_id,
+        configState,
+        feature_flag_state
+      );
+
+      // Snapshot missing after capture: block Phase 6 deployment
+      if (!this.snapshotCapture.hasSnapshot(proposal_id, variant_id)) {
+        throw new Error(
+          `Phase 5 snapshot capture failed for proposal=${proposal_id}, variant=${variant_id}. Phase 6 deployment blocked.`
+        );
+      }
+    }
+
     const entry: RolloutDecisionLogEntry = {
       log_id: randomUUID(),
       proposal_id,
