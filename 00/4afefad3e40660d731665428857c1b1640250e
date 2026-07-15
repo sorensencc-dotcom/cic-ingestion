@@ -1,0 +1,21 @@
+__mocks__/uuid.cjs
+  s_ad60e6d4907ca7::t_a1c9d3ea14ab22 1-5
+jest.config.cjs
+  s_ad60e6d4907ca7::t_d52779852f79ac 26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "004afefad3e40660d731665428857c1b1640250e",
+  "prompts": {},
+  "sessions": {
+    "s_ad60e6d4907ca7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0e150237-fc96-4442-b8b7-c8bbd3a3f611",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
