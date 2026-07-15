@@ -1,0 +1,19 @@
+tsconfig.json
+  s_ad60e6d4907ca7::t_d9c8e4f1f0abd8 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "7e63565008192b66697c0f847b5587942e215af7",
+  "prompts": {},
+  "sessions": {
+    "s_ad60e6d4907ca7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0e150237-fc96-4442-b8b7-c8bbd3a3f611",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
