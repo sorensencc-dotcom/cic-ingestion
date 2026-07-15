@@ -1,0 +1,26 @@
+src/drift/driftEngine.ts
+  s_3c4c528fa7d8bd::t_1e154466c45da6 11,15,20,30,51-59,85-86
+  s_3c4c528fa7d8bd::t_92e49e9384c011 8-10
+  s_3c4c528fa7d8bd::t_f585f750474455 12-14
+  s_3c4c528fa7d8bd::t_41234dc3be800c 16-19
+  s_3c4c528fa7d8bd::t_f9433dbf7dceae 21-23,27-29
+  s_3c4c528fa7d8bd::t_12ef6d2508d6fa 31-33,48-50
+  s_3c4c528fa7d8bd::t_81e48c0ad7ab49 60-62,82-84
+  s_3c4c528fa7d8bd::t_99092145d47aff 1-7,24-26,34-47,63-81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.4",
+  "base_commit_sha": "ff12a385edcd849e14b09cd28c2d33ab0e7b891a",
+  "prompts": {},
+  "sessions": {
+    "s_3c4c528fa7d8bd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4568709f-67d2-4790-96e9-6240756d776f",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

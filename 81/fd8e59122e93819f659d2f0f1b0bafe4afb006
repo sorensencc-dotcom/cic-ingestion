@@ -1,0 +1,151 @@
+src/sections/SectionTracker.ts
+  s_692ee940a08bb4::t_62087f2d7f0e20 72
+  s_692ee940a08bb4::t_34159b5b44de86 6
+  s_692ee940a08bb4::t_2395ea73bdae9b 3-5
+  s_692ee940a08bb4::t_2897bcc9b6026c 7-9,69-71
+  s_692ee940a08bb4::t_be05720c76742b 73-75
+  s_424af7b1aaa96b::t_44f184a3703754 1-2,10-68,76-243
+__tests__/integration/ingestion-orchestrator.integration.test.ts
+  s_692ee940a08bb4::t_34bc6f8bf3af0d 2-21
+  s_692ee940a08bb4::t_35a2f2ab370e3e 1
+  s_692ee940a08bb4::t_e72a090a7a049e 22
+__tests__/observability.test.ts
+  s_692ee940a08bb4::t_4ecb55aaca3ecf 1-339
+__tests__/unit/queue-producer.test.ts
+  s_692ee940a08bb4::t_cf6c706882c8c1 5-7
+  s_692ee940a08bb4::t_35bfbaa52f4fcc 2-4
+  s_692ee940a08bb4::t_4551b0f32d52c9 8
+  s_82cf5f72ec0f48::t_fb6ded2533c724 1
+src/queue/producer.ts
+  s_692ee940a08bb4::t_01c95c3a1bdc41 55
+  s_692ee940a08bb4::t_957f7a5d992a1c 1
+  s_659aefbaf5fabf::t_3b2af43d7e08cf 2-54,56-107
+__tests__/unit/reverse-image-extractor.test.ts
+  s_692ee940a08bb4::t_78be0e83e2a7ac 136,293-306
+  s_692ee940a08bb4::t_abc9d0397c3049 310
+  s_659aefbaf5fabf::t_b1e404cc57c833 1-135,137-292,307-309
+logs/runtime/README.md
+  s_1c4d69115e72f8::t_50d70f8d55410d 1-22
+src/extractors/ReverseImageSearchExtractor.ts
+  s_692ee940a08bb4::t_6dec3be2b50147 2,42-44,69-70,82,87-90,92
+  s_692ee940a08bb4::t_84fb3ec456c4a1 1,3,27,236-237
+  s_692ee940a08bb4::t_d9cc41bb06053a 4-26,28-41,45-68,71-81,83-86,91,93-235
+src/sections/types.ts
+  s_692ee940a08bb4::t_4cd51e350c956b 9
+  s_659aefbaf5fabf::t_5cf811bf1cc9c2 1-8,10-40
+__tests__/unit/orchestrator.test.ts
+  s_692ee940a08bb4::t_c97524526ccd9e 2-20
+  s_692ee940a08bb4::t_b4ae102f554f57 1
+  s_692ee940a08bb4::t_3d7b2dddfcd86c 21
+src/orchestrator/__tests__/pipeline.test.ts
+  s_692ee940a08bb4::t_cadebd981536a3 254-261
+  s_692ee940a08bb4::t_6fef80bc264840 1-253,262-476
+src/extractors/registry.ts
+  s_659aefbaf5fabf::t_8f0e23fccd8b78 1-130
+test-output.txt
+  s_659aefbaf5fabf::t_43a4e0cdc38dd0 1-16
+__tests__/e2e/phase2-skeleton-ingest.test.ts
+  s_692ee940a08bb4::t_199f9d494f97fe 1-3
+__tests__/e2e/phase2-skeleton-learning.test.ts
+  s_692ee940a08bb4::t_96c40447d34437 1-3
+__tests__/queue-dlq.test.ts
+  s_12153d04a6e69a::t_0548cac47c34d2 1-371
+__tests__/queue-producer.test.ts
+  s_12153d04a6e69a::t_770055ea4de9af 1-247
+__tests__/sections.test.ts
+  s_709b59554dfb80::t_c5b016e67c3aad 1-379
+__tests__/unit/extractor-registry.test.ts
+  s_424af7b1aaa96b::t_e3572b9f7bab4b 1-175
+jest.config.cjs
+  s_82cf5f72ec0f48::t_6113345eb4526e 2-21,24-29
+package-lock.json
+  s_82cf5f72ec0f48::t_af822f24de8dfe 1-4202
+src/extractors/IExtractor.ts
+  s_692ee940a08bb4::t_34ae98afe103b3 1-5
+src/lib/__tests__/drift.test.ts
+  s_12153d04a6e69a::t_4daee80701fb43 1-467
+src/lib/drift.ts
+  s_424af7b1aaa96b::t_e014370cfa7200 1-261
+src/lib/logger.ts
+  s_692ee940a08bb4::t_58f939ae033d8c 1
+src/lib/metrics.ts
+  s_ac0af15c4393e8::t_0f0fd8ef7b33da 1-84
+src/memory/interfaces.ts
+  s_692ee940a08bb4::t_89217b04dd0757 1-4
+src/queue/dlq.ts
+  s_424af7b1aaa96b::t_a7a7fe2c49e07b 1-126
+src/schemas/index.ts
+  s_692ee940a08bb4::t_886279d74ab4e0 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "81fd8e59122e93819f659d2f0f1b0bafe4afb006",
+  "prompts": {},
+  "sessions": {
+    "s_12153d04a6e69a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-abd4745d72396f5be",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_1c4d69115e72f8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf82daf4-0894-43b2-b27e-084c92dd3848",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_424af7b1aaa96b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a48ac6747e7f6a122",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_659aefbaf5fabf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "154d4d74-8bba-4a86-af10-c33faf83fe81",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_692ee940a08bb4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7ce40ef2-3f3b-44cb-8082-782e623311bd",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_709b59554dfb80": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a7622465733c1381f",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_82cf5f72ec0f48": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aa6964eec3b23645f",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_ac0af15c4393e8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a675b89e0bc570938",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+src/autonomy/DriftCorrelationGraph.ts
+  s_9df6068d39c023::t_0026c15a38b7b5 1-360
+src/autonomy/g.drift.correlation.graph.yaml
+  s_9df6068d39c023::t_a9c8320c064ecd 1-200
+src/autonomy/DriftCorrelationGraph.test.ts
+  s_9df6068d39c023::t_a071a04dcedde5 463-467
+  s_9df6068d39c023::t_c671192d50f61e 120-127
+  s_9df6068d39c023::t_8dfb98cb165892 79-86
+  s_9df6068d39c023::t_3c5497fa35f079 1-78,87-119,128-430,438-462,468-471
+  s_9df6068d39c023::t_03983aff171f47 431-437
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "4f61f5a3cb46355f503ddf8494a47949acf32d7b",
+  "prompts": {},
+  "sessions": {
+    "s_9df6068d39c023": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "bd3a8b0d-47f8-4f0f-a511-393c978880be",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

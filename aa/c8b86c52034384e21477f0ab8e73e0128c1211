@@ -1,0 +1,24 @@
+__tests__/governance/cohort-promotion-engine.test.ts
+  s_970389637ddcef::t_c7e779c486c26e 293
+  s_970389637ddcef::t_1456f627c2e760 290-292
+  s_970389637ddcef::t_2094e3ab00b5ea 294-296
+  s_970389637ddcef::t_6337975da214c1 1-289,297-566
+src/governance/cohort-promotion-engine.ts
+  s_970389637ddcef::t_8f27c9d1e2f815 1-396
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "aac8b86c52034384e21477f0ab8e73e0128c1211",
+  "prompts": {},
+  "sessions": {
+    "s_970389637ddcef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31370f92-89b8-4321-b817-d1500000411c",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+__tests__/governance.test.ts
+  s_659aefbaf5fabf::t_65b21759f44f00 1-5,10,60-354
+  s_659aefbaf5fabf::t_d6f54f72ad5cd8 6,9
+  s_659aefbaf5fabf::t_18713b41269a0a 7-8,11-59
+src/governance/promotion-engine.ts
+  s_659aefbaf5fabf::t_e6fb75ef6f4ddc 49-65,68-70,77-79,121,127
+  s_659aefbaf5fabf::t_76e1b1cf43cc44 48
+  s_659aefbaf5fabf::t_ed7703548cddd0 2,4-17,25-28,30-47,66-67,71-76,80-101
+  s_659aefbaf5fabf::t_ae51cd3a066fe6 102-111,114,131
+  s_659aefbaf5fabf::t_16cc17e687df4f 119-120,122-126,128-130,132-133,136
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "4d1e883ff930b6b5da264c62622668fc156248d6",
+  "prompts": {},
+  "sessions": {
+    "s_659aefbaf5fabf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "154d4d74-8bba-4a86-af10-c33faf83fe81",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

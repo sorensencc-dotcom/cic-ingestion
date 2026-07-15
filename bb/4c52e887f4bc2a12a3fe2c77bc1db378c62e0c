@@ -1,0 +1,34 @@
+src/autonomy/routes/search.ts
+  s_5c65f57dc4faee::t_54fde6ab547207 1-6,9-20,22-61
+  s_5c65f57dc4faee::t_7ae3647738de8b 7
+  s_5c65f57dc4faee::t_de6259d3d56145 21
+  s_5c65f57dc4faee::t_ebc41888676b38 8
+src/types/search.ts
+  s_5c65f57dc4faee::t_a35c9fb7bf02fd 1-41
+src/services/torquequery/TorqueQueryClient.ts
+  s_5c65f57dc4faee::t_659a197f6f43c0 8
+  s_5c65f57dc4faee::t_af5c2a80b479c1 185-200
+  s_5c65f57dc4faee::t_2bee5c1d24060e 5
+  s_5c65f57dc4faee::t_31e18abd9c7024 9
+  s_5c65f57dc4faee::t_e2e92593d9f9f1 184
+tests/phase-27-cic-query.test.ts
+  s_5c65f57dc4faee::t_0bb4034be03010 1-313
+src/autonomy/AutonomyAPIServer.ts
+  s_5c65f57dc4faee::t_3e93b2c4c35b6b 13,24-28,139-142,148,188,240
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "bb4c52e887f4bc2a12a3fe2c77bc1db378c62e0c",
+  "prompts": {},
+  "sessions": {
+    "s_5c65f57dc4faee": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2498d9db-e36b-479e-8c22-bd7a1a7341c5",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

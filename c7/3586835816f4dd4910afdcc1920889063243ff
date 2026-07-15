@@ -1,0 +1,55 @@
+src/governance/proposal-validator.ts
+  s_659aefbaf5fabf::t_ebd20804a34ebb 1-60
+src/governance/governance-engine.ts
+  s_659aefbaf5fabf::t_156e77cf0b7ea9 1-31
+src/governance/index.ts
+  s_659aefbaf5fabf::t_127dc14e8f5d16 1-4
+package.json
+  s_56316cbd7e618a::t_84a9ac98ba1a08 9
+src/governance/promotion-engine.ts
+  s_51b8ea6c66a7f7::t_0e797c7592e3cc 1-37
+src/tests/phase4-governance-e2e.test.ts
+  s_59f1e4be6d850d::t_5040cf6d8e758c 17-24
+src/governance/canary-engine.ts
+  s_659aefbaf5fabf::t_582afb4af3e9ab 1-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "c73586835816f4dd4910afdcc1920889063243ff",
+  "prompts": {},
+  "sessions": {
+    "s_51b8ea6c66a7f7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a867c0963ea804cdc",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_56316cbd7e618a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a338713f8205d7ec8",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_59f1e4be6d850d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a40bafd08b8d989fd",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_659aefbaf5fabf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "154d4d74-8bba-4a86-af10-c33faf83fe81",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

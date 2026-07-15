@@ -1,0 +1,27 @@
+src/__tests__/multi-cohort-engine.test.ts
+  s_970389637ddcef::t_b8afe8b9ab6427 1-473
+src/governance/multi-cohort-engine.ts
+  s_970389637ddcef::t_07cbcc60c3ffde 317,321,323-336
+  s_970389637ddcef::t_294e20fb51f209 148-149
+  s_970389637ddcef::t_3d967d0e4befe2 200,218-219
+  s_970389637ddcef::t_c1273f093baa7c 1-143,145-147,150-199,201-214,220-294,297-302,305-316,318-320,322,337-338
+  s_970389637ddcef::t_630672cc93dcc5 144
+  s_970389637ddcef::t_4c0e6d5f9a6689 295-296,303-304
+  s_970389637ddcef::t_a58bc0380d555b 215-217
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "209df280436497f587f3ab967fef79d7941ab3f3",
+  "prompts": {},
+  "sessions": {
+    "s_970389637ddcef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31370f92-89b8-4321-b817-d1500000411c",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

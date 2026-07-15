@@ -1,0 +1,24 @@
+src/ingestion/quarantineReview.ts
+  s_eaf7b68a8592fd::t_b2a0f9ac36d60f 1-109
+src/ingestion/quarantineReview.test.ts
+  s_eaf7b68a8592fd::t_b76dcffd9dd230 1-139
+src/ingestion/ingestion-quarantine-cli-gate.ts
+  s_eaf7b68a8592fd::t_289c85808c14df 1-8,10-14,16-176
+  s_eaf7b68a8592fd::t_121c60d79de702 9,15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "8697d0b6a410184278698929797566ebdcba6901",
+  "prompts": {},
+  "sessions": {
+    "s_eaf7b68a8592fd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0547e723-ba1b-434f-bf82-37e8f88c2262",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

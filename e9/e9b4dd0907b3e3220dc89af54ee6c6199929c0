@@ -1,0 +1,26 @@
+src/autonomy/routes/console.ts
+  s_df2e6afa516d1b::t_509fbd668e26d4 374,378-384,404,419-427
+  s_df2e6afa516d1b::t_3285c6068f133f 34-38,46-48
+  s_df2e6afa516d1b::t_05eac2b80cac0d 49
+src/ingestion/jobs/docsManagerJob.ts
+  s_df2e6afa516d1b::t_c8ba21cbb84a46 336-337,339-341,343-345,350-395,397
+  s_df2e6afa516d1b::t_c77e29e319d4c9 154-182
+  s_df2e6afa516d1b::t_0064854447f4a9 91-100,115-119
+  s_df2e6afa516d1b::t_c3715b09302a12 120-121
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.5",
+  "base_commit_sha": "e9e9b4dd0907b3e3220dc89af54ee6c6199929c0",
+  "prompts": {},
+  "sessions": {
+    "s_df2e6afa516d1b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4a2e1852-b897-4d5c-bdd0-12ea7d0cb831",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

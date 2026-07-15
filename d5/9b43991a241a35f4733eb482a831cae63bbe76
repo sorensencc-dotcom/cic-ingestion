@@ -1,0 +1,21 @@
+src/adapters/grok/GrokHardenedAdapter.ts
+  s_cb9cc0072317a2::t_7e39ef3a1a145a 1-11,13-231,233-243
+  s_cb9cc0072317a2::t_3356e5d3444e2b 12
+  s_cb9cc0072317a2::t_2a0514bbef17cd 232
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.8",
+  "base_commit_sha": "d59b43991a241a35f4733eb482a831cae63bbe76",
+  "prompts": {},
+  "sessions": {
+    "s_cb9cc0072317a2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2b9e4418-e9b7-4f47-8b0a-fa70e19169d1",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+src/governance/ab-test-engine.ts
+  s_970389637ddcef::t_32b32afbc2da10 1-328
+__tests__/governance/ab-test-engine.test.ts
+  s_970389637ddcef::t_cdbeeaecd268b8 1-371
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "33bee4006c8cb5b4b390e6e01ff61c9d65f997d4",
+  "prompts": {},
+  "sessions": {
+    "s_970389637ddcef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31370f92-89b8-4321-b817-d1500000411c",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

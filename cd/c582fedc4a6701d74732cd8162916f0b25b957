@@ -1,0 +1,23 @@
+__tests__/governance/multi-cohort-rollout-pipeline.test.ts
+  s_970389637ddcef::t_a85504923f3688 19
+  s_970389637ddcef::t_b741bb6af4fb85 1-18,20-535
+src/governance/multi-cohort-rollout-pipeline.ts
+  s_970389637ddcef::t_789dd3294dd2b3 512,515,518,520-528
+  s_970389637ddcef::t_62930871c6b084 1-511,513-514,516-517,519,529-530
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "cdc582fedc4a6701d74732cd8162916f0b25b957",
+  "prompts": {},
+  "sessions": {
+    "s_970389637ddcef": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "31370f92-89b8-4321-b817-d1500000411c",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

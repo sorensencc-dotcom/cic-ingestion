@@ -1,0 +1,89 @@
+src/tests/phase6-rollback-execution-e2e.test.ts
+  s_31fbaa890cfd27::t_3fb9a82a7ef352 15-22
+src/rollback/health-check-gate.ts
+  s_31fbaa890cfd27::t_c7aa4313a37544 1-195
+src/tests/phase7-featureflag-rollback-e2e.test.ts
+  s_31fbaa890cfd27::t_1040dff44a853d 1-131
+src/tests/phase7-health-check-gate-e2e.test.ts
+  s_31fbaa890cfd27::t_18e701589b2ea8 1-297
+src/governance/snapshot-capture.ts
+  s_31fbaa890cfd27::t_77fd2433d0468b 1-67
+src/tests/phase7-config-rollback-e2e.test.ts
+  s_31fbaa890cfd27::t_e1243768e1cbef 1-134
+src/governance/rollback-executor.ts
+  s_31fbaa890cfd27::t_0138eae72052a7 290-291,293-296,299-302,309-311,316-317,322
+  s_31fbaa890cfd27::t_56bcacfb361b10 17-20
+  s_31fbaa890cfd27::t_47c7c238676e72 312-315,318-321
+  s_31fbaa890cfd27::t_2343dbd82b7f09 266-267,278-279
+  s_31fbaa890cfd27::t_adfbbd133c8779 458-462,466-470
+  s_31fbaa890cfd27::t_d0d7f4ff33d2b1 250-265,268-277
+  s_31fbaa890cfd27::t_4446e0914ae93b 1-16,21-249,280-289,292,297-298,303-308,323-344,347-349,354-367,382-389,410-457,463-465,471-532
+  s_31fbaa890cfd27::t_bed0041110e658 345-346,350-353,368-381,390-393,401-403,405-409
+  s_31fbaa890cfd27::t_03b0fafb9794fc 394-400,404
+.planning/5/PATTERNS.md
+  s_38c0e0c5eaedf2::t_2ab1ef549a5bfa 1-36
+src/rollback/config-rollback.ts
+  s_31fbaa890cfd27::t_3a8f710b7cb944 1-115
+src/rollback/featureflag-rollback.ts
+  s_31fbaa890cfd27::t_1c252f4b4a0b21 1-129
+.planning/codebase/ARCHITECTURE.md
+  s_69b8f84d1b6609::t_52df03b599d232 1-65
+.planning/codebase/STACK.md
+  s_9e92bef23b0969::t_0f59d4895fd198 1-32
+src/governance/multi-cohort-rollout-pipeline.ts
+  s_3a8d215e7d44b9::t_b409102d99e6c1 25,141-145,352-353,355-358,367-368,370-388
+.planning/codebase/CONCERNS.md
+  s_31fbaa890cfd27::t_923aabc526e5e9 1-55
+.planning/codebase/CONVENTIONS.md
+  s_31fbaa890cfd27::t_28f038cdde3ced 1-30
+.planning/codebase/ENTRY-POINTS.md
+  s_31fbaa890cfd27::t_af4291849cde4f 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.13",
+  "base_commit_sha": "297ee14cdee5ddc89ad917da7225c45de42a056d",
+  "prompts": {},
+  "sessions": {
+    "s_31fbaa890cfd27": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3e54e9bb-ce71-40ed-801a-923fd76ed9be",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_38c0e0c5eaedf2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e9ff065d-a791-426c-ae97-1a2b3a863982",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_3a8d215e7d44b9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-a89df5727e69f00c6",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_69b8f84d1b6609": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-af5df8f15c2aff132",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_9e92bef23b0969": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-ad4e27b43b2c2b96d",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,20 @@
+src/tests/phase2-adapter-sandbox-integration.test.ts
+  s_19e803433dc32b::t_ce0a0c1286d7f7 540-541
+  s_19e803433dc32b::t_cf2859fc957c0b 1-539,542-552
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "ae0a536e2bf4eb3fc8070cba3d60fad5d413657c",
+  "prompts": {},
+  "sessions": {
+    "s_19e803433dc32b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "00bcb37e-9e4c-47df-9f18-83402dbc5734",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+src/tests/phase7-snapshot-capture-precondition.test.ts
+  s_31fbaa890cfd27::t_fc6f19b344821e 1-284
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "3d64d33729c6c02cb6b7fdfd5bb31637e920e038",
+  "prompts": {},
+  "sessions": {
+    "s_31fbaa890cfd27": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3e54e9bb-ce71-40ed-801a-923fd76ed9be",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}

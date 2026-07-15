@@ -1,0 +1,43 @@
+src/governance/GovernanceReplayHarness.ts
+  s_62ab85d7a21222::t_2b048ffd8ad459 1-107
+src/metrics/MetricsEngine.ts
+  s_62ab85d7a21222::t_0ebea2d3841d4b 1-141
+src/metrics/PrometheusExporter.ts
+  s_62ab85d7a21222::t_c0e65814345e9c 1-83
+src/metrics/phase6-cron-setup.sh
+  s_62ab85d7a21222::t_92c6fbd466086d 1-74
+src/metrics/NightlyMetricsPipeline.ts
+  s_62ab85d7a21222::t_2d4588b3d994ee 1-38
+docs/PHASE6-ANALYTICS.md
+  s_62ab85d7a21222::t_42fb973b6b9afe 1-278
+tests/phase6-e2e.test.ts
+  s_62ab85d7a21222::t_9a7e406d156790 1-158
+postgres/phase6/001_governance_envelope.sql
+  s_62ab85d7a21222::t_e10b8a4a93bc2f 1-23
+postgres/phase6/004_governance_envelope_triggers.sql
+  s_62ab85d7a21222::t_5198fbd9ae4cca 1-119
+postgres/phase6/003_nightly_metrics.sql
+  s_62ab85d7a21222::t_779f1000bbc12b 1-62
+postgres/phase6/002_audit_log.sql
+  s_62ab85d7a21222::t_9bbde8f713b413 1-43
+src/drift/DriftDetectorEngine.ts
+  s_62ab85d7a21222::t_18eacdcb0a867b 1-91
+src/governance/GovernanceEnvelopeCache.ts
+  s_62ab85d7a21222::t_77812cda543409 1-110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.4",
+  "base_commit_sha": "4170d6c459becc593b5af06cceaa55b12478c6c8",
+  "prompts": {},
+  "sessions": {
+    "s_62ab85d7a21222": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "4e203350-bc20-46f6-a14e-f0545f73a12a",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
