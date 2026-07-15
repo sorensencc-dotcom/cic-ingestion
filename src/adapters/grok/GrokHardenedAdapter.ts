@@ -1,7 +1,7 @@
 import { BaseAdapter, AdapterConfig, AdapterInput, AdapterOutput } from "../BaseAdapter.ts";
 import { GrokProvider } from "./grok-provider.ts";
-import { ragSearchCache, ragContextCache, RagCache } from "src/cache/ragCache.ts";
-import { HardeningOrchestrator, HardeningRegistry } from "src/resilience/hardeningOrchestrator.ts";
+import { ragSearchCache, ragContextCache, RagCache } from "../../cache/ragCache";
+import { HardeningOrchestrator, HardeningRegistry } from "../../resilience/hardeningOrchestrator";
 
 /**
  * Hardened Grok adapter with:

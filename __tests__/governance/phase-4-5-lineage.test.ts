@@ -67,7 +67,7 @@ describe('Phase 4→5 Lineage Verification', () => {
     };
 
     // Step 4: Create Cohort Decision (CohortPromotionEngine)
-    const metrics: AggregatedMetric[] = Object.freeze([
+    const metrics: readonly AggregatedMetric[] = Object.freeze([
       { metric_name: 'error_rate', value: 0.01, status: 'pass' },
       { metric_name: 'cost_delta', value: 0.05, status: 'pass' },
     ]);
@@ -156,7 +156,7 @@ describe('Phase 4→5 Lineage Verification', () => {
         assignment_id: 'assign-1',
         decision: 'promote' as const,
         metrics: Object.freeze([
-          { metric_name: 'error_rate', value: 0.01, status: 'pass' },
+          { metric_name: 'error_rate', value: 0.01, status: 'pass' as const },
         ]),
         reason: 'First cohort metrics pass',
         observation_duration_ms: 1800000,
@@ -172,7 +172,7 @@ describe('Phase 4→5 Lineage Verification', () => {
         assignment_id: 'assign-2',
         decision: 'promote' as const,
         metrics: Object.freeze([
-          { metric_name: 'error_rate', value: 0.015, status: 'pass' },
+          { metric_name: 'error_rate', value: 0.015, status: 'pass' as const },
         ]),
         reason: 'Second cohort metrics pass',
         observation_duration_ms: 1800000,
@@ -188,7 +188,7 @@ describe('Phase 4→5 Lineage Verification', () => {
         assignment_id: 'assign-3',
         decision: 'hold' as const,
         metrics: Object.freeze([
-          { metric_name: 'error_rate', value: 0.025, status: 'fail' },
+          { metric_name: 'error_rate', value: 0.025, status: 'fail' as const },
         ]),
         reason: 'Error rate exceeded threshold',
         observation_duration_ms: 1800000,

@@ -3,7 +3,6 @@
  * HTTP POST request with JSON payload
  */
 
-import fetch from 'node-fetch';
 import { BaseAdapter } from '../BaseAdapter';
 import { SandboxHandle, ExecutionOptions } from '../../types';
 import { JSONSchema7 } from 'json-schema';
@@ -80,15 +79,23 @@ export class HttpPostAdapter extends BaseAdapter {
     }
 
     try {
-      const response = await fetch(url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          ...headerValidation.filtered
-        },
-        body: bodyString,
-        timeout
-      });
+      const controller = new AbortController();
+      const timeoutHandle = setTimeout(() => controller.abort(), timeout);
+
+      let response;
+      try {
+        response = await fetch(url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            ...headerValidation.filtered
+          },
+          body: bodyString,
+          signal: controller.signal
+        });
+      } finally {
+        clearTimeout(timeoutHandle);
+      }
 
       const responseBody = await response.text();
       const responseHeaders = Object.fromEntries(response.headers);

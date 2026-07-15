@@ -33,7 +33,7 @@ export class PromotionEngine {
    * Rollback: error_rate >= 5% OR cost_delta >= 0.5%
    * Hold: else (metrics ambiguous)
    */
-  decide(result: CanaryResult): PromotionRecord {
+  decide(result: CanaryMetrics | CanaryResult): PromotionRecord {
     const decision = this.evaluateMetrics(result);
     const phase_next = this.getNextPhase(decision);
 
@@ -48,7 +48,7 @@ export class PromotionEngine {
   /**
    * Evaluate canary metrics against heal thresholds
    */
-  private evaluateMetrics(result: CanaryResult): 'promote' | 'rollback' | 'hold' {
+  private evaluateMetrics(result: CanaryMetrics | CanaryResult): 'promote' | 'rollback' | 'hold' {
     const errorRateThresholdPromote = 0.02; // 2%
     const errorRateThresholdRollback = 0.05; // 5%
     const costDeltaThresholdPromote = 0.002; // 0.2%

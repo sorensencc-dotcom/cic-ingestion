@@ -1,5 +1,6 @@
 import { Proposal } from './proposal-validator';
-import { GovernanceDecision } from '../core/maal/governance/GovernanceDecisions';
+import { GovernanceDecision } from './governance-engine';
+import { GovernanceDecision as CoreGovernanceDecision } from '../core/maal/governance/GovernanceDecisions';
 
 /**
  * Result of canary execution: metrics and decision
@@ -44,7 +45,7 @@ export interface CanaryMetrics {
  *   - latency_p99_ms: < 500ms
  */
 export class CanaryEngine {
-  execute(proposal: Proposal, approval: GovernanceDecision): CanaryResult {
+  execute(proposal: Proposal, approval: GovernanceDecision | CoreGovernanceDecision): CanaryResult {
     // Simulate deterministic metrics for 10% cohort test
     // For tests: simulate success (pass all thresholds)
     const errorRate = this.simulateErrorRate();

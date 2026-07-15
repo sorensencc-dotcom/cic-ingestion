@@ -3,7 +3,6 @@
  * HTTP GET request
  */
 
-import fetch from 'node-fetch';
 import { BaseAdapter } from '../BaseAdapter';
 import { SandboxHandle, ExecutionOptions } from '../../types';
 import { JSONSchema7 } from 'json-schema';
@@ -61,11 +60,19 @@ export class HttpGetAdapter extends BaseAdapter {
     }
 
     try {
-      const response = await fetch(url, {
-        method: 'GET',
-        headers: headerValidation.filtered,
-        timeout
-      });
+      const controller = new AbortController();
+      const timeoutHandle = setTimeout(() => controller.abort(), timeout);
+
+      let response;
+      try {
+        response = await fetch(url, {
+          method: 'GET',
+          headers: headerValidation.filtered,
+          signal: controller.signal
+        });
+      } finally {
+        clearTimeout(timeoutHandle);
+      }
 
       const body = await response.text();
       const responseHeaders = Object.fromEntries(response.headers);

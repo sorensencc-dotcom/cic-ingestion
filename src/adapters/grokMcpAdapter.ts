@@ -6,7 +6,6 @@
  * Semver: 1.0.0
  */
 
-import fetch from 'node-fetch';
 import { CloudModelRequest, CloudModelResponse, CloudProviderAdapter } from './cloudProviderAdapter.ts';
 
 export class GrokMcpAdapter implements CloudProviderAdapter {

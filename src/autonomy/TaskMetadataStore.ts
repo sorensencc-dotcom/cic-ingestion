@@ -181,7 +181,7 @@ export class TaskMetadataStore {
    */
   exportAuditLog(taskId?: string): string {
     const records = taskId
-      ? [this.getExecution(taskId)].filter((r) => r !== null)
+      ? [this.getExecution(taskId)].filter((r): r is NonNullable<typeof r> => r !== null)
       : this.getAllExecutions();
 
     return JSON.stringify(

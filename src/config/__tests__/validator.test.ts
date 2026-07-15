@@ -2,7 +2,7 @@
  * Tests for ConfigValidator
  */
 
-import { validateConfig } from '../ConfigValidator.ts';
+import { validateConfig } from '../ConfigValidator';
 import { describe, it, expect } from '@jest/globals';
 
 describe('ConfigValidator', () => {

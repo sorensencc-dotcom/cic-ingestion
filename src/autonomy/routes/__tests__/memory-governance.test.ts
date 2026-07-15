@@ -4,8 +4,8 @@
  */
 
 import { describe, it, expect } from '@jest/globals';
-import { createMemoryRouter } from '../memory.ts';
-import { createGovernanceRouter } from '../governance.ts';
+import { createMemoryRouter } from '../memory';
+import { createGovernanceRouter } from '../governance';
 
 describe('Memory Router (Phase 5b)', () => {
   it('should be defined and exported', () => {

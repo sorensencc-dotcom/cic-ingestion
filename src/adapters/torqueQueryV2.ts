@@ -7,7 +7,6 @@
  * Semver: 2.0.0
  */
 
-import fetch from 'node-fetch';
 
 export interface TorqueQueryV2SearchRequest {
   query: string;

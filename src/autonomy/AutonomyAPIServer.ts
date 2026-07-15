@@ -22,10 +22,10 @@ import { createExecuteRouter } from "../routes/execute.ts";
 import { UsageLedger } from "../lib/usage/UsageLedger.ts";
 import { generateCicCostComputeReport } from "../lib/report/CicCostComputeReport.ts";
 import { TorqueQueryClient } from "../services/torquequery/TorqueQueryClient";
-import { HardeningRegistry } from "../../../src/resilience/hardeningOrchestrator";
-import { CircuitBreakerRegistry } from "../../../src/resilience/circuitBreaker";
-import { RateLimiterRegistry } from "../../../src/resilience/rateLimiter";
-import { ResilientMetricsCollector } from "../../../src/observability/resilientMetricsCollector";
+import { HardeningRegistry } from "../resilience/hardeningOrchestrator";
+import { CircuitBreakerRegistry } from "../resilience/circuitBreaker";
+import { RateLimiterRegistry } from "../resilience/rateLimiter";
+import { ResilientMetricsCollector } from "../observability/resilientMetricsCollector";
 
 export interface AutonomyAPIServerConfig {
   port?: number;
@@ -315,6 +315,7 @@ export class AutonomyAPIServer {
           resolve();
         }
       });
+      this.server.closeAllConnections();
     });
   }
 

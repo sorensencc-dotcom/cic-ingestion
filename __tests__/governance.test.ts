@@ -3,11 +3,12 @@
  * Focus: PromotionEngine promotion decision logic
  */
 
+import * as crypto from 'crypto';
 import { describe, it, expect, beforeEach } from '@jest/globals';
 import { GovernanceEngine } from '../src/governance/governance-engine';
 import { Proposal, ProposalValidator } from '../src/governance/proposal-validator';
-import { PromotionEngine, PromotionRecord, CanaryResult } from '../src/governance/promotion-engine';
-import { CanaryMetrics, CanaryEngine } from '../src/governance/canary-engine';
+import { PromotionEngine, PromotionRecord } from '../src/governance/promotion-engine';
+import { CanaryMetrics, CanaryEngine, CanaryResult } from '../src/governance/canary-engine';
 import { ProposalCreation, AuditRecord } from '../src/governance/proposal-creation';
 import { GovernanceLog, GovernanceLogEntry } from '../src/governance/governance-log';
 

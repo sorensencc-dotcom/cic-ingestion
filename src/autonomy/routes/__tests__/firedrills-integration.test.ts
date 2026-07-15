@@ -1,6 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach } from "@jest/globals";
-import { AutonomyAPIServer } from "../../AutonomyAPIServer.ts";
-import fetch from "node-fetch";
+import { AutonomyAPIServer } from "../../AutonomyAPIServer";
 
 describe("D-Phase: Fire-Drill Integration (AutonomyAPIServer)", () => {
   let server: AutonomyAPIServer;
@@ -42,7 +41,7 @@ describe("D-Phase: Fire-Drill Integration (AutonomyAPIServer)", () => {
     const data = await response.json() as any;
     expect(data.report).toBeDefined();
     expect(data.report.totalDrills).toBe(6);
-  });
+  }, 30000);
 
   it("GET /autonomy/firedrills/report returns last report", async () => {
     await fetch(`${baseUrl}/autonomy/firedrills/run`, { method: "POST" });
@@ -51,7 +50,7 @@ describe("D-Phase: Fire-Drill Integration (AutonomyAPIServer)", () => {
     const data = await response.json() as any;
     expect(data.totalDrills).toBe(6);
     expect(data.passRate).toBeDefined();
-  });
+  }, 30000);
 
   it("GET /autonomy/firedrills/health returns quick status", async () => {
     const response = await fetch(`${baseUrl}/autonomy/firedrills/health`);

@@ -54,7 +54,7 @@ export interface CohortDecision {
   proposal_id: string;
   assignment_id: string;
   decision: 'promote' | 'rollback' | 'hold' | 'idle';
-  metrics: AggregatedMetric[];
+  metrics: readonly AggregatedMetric[];
   reason: string;
   observation_duration_ms: number;
   elapsed_duration_ms: number;
