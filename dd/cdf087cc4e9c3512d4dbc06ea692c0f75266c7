@@ -1,0 +1,25 @@
+.github/workflows/phase-1-gate.yml
+  s_0dcbf3d517c0f9::t_702620060f2a02 11,133-134
+.github/workflows/dashboard.yml
+  s_0dcbf3d517c0f9::t_702620060f2a02 10
+.github/workflows/nightly-validate.yml
+  s_0dcbf3d517c0f9::t_702620060f2a02 10
+.github/workflows/bootstrap.yml
+  s_0dcbf3d517c0f9::t_702620060f2a02 7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "ddcdf087cc4e9c3512d4dbc06ea692c0f75266c7",
+  "prompts": {},
+  "sessions": {
+    "s_0dcbf3d517c0f9": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "94e5400c-ecb6-4961-9927-b33cf2b5f59a",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
