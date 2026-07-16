@@ -8,7 +8,7 @@ on:
 
 jobs:
   phase-1-validation:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -130,4 +130,5 @@ jobs:
           echo "✓ No forbidden directories detected"
 
       - name: Report Status
-        run: echo "✅ Phase 1 Contract Gate: PASS"
+        run: |
+          echo "✅ Phase 1 Contract Gate: PASS"
