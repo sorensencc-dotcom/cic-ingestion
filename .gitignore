@@ -18,6 +18,9 @@
 node_modules/
 dist/
 .venv/
+
+# Research/ingest source material — lives in C:/dev/cic-research-vault/, synced to Google Drive, not git
+pdf/
 coverage/
 *.log
 .env
