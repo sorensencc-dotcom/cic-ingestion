@@ -1,0 +1,24 @@
+src/services/torquequery/test_torque_query_v2.py
+  s_19b6035df5cd47::t_9c5c38b3dd9877 15-23
+  s_19b6035df5cd47::t_e905b89b9b69b1 200-202,205,207-213,236-253
+src/services/torquequery/TorqueQueryV2Server.py
+  s_19b6035df5cd47::t_b5fce13912b419 17-31
+  s_19b6035df5cd47::t_d4515999e53d4d 45
+  s_19b6035df5cd47::t_a1f463388c5ae7 79-92,96-98,102-106,121-123,201-212
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "a6db805f317156581ab3c197484ec2e68567aef7",
+  "prompts": {},
+  "sessions": {
+    "s_19b6035df5cd47": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "feb35b8b-3e13-4d8b-b3c2-79b5c0ac19b5",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
