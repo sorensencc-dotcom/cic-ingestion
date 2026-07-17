@@ -1,0 +1,3 @@
+import { emit, loadJson, scan, sha256 } from './_runtime.js';
+export function run(): void { const m = loadJson('repo_integrity_manifest.json') as any; const expected = new Set(m.canonical_files); const roots = ['governance','lineage','packets','registry','runtime','specs','artifacts/treatment']; const actual = roots.flatMap((root) => scan(root)); const drift = actual.filter((p) => !expected.has(p)); const hashDrift = Object.keys(m.hashes ?? {}).filter((p) => actual.includes(p) && sha256(p) !== m.hashes[p]).map((p) => `HASH:${p}`); const all = [...drift, ...hashDrift]; emit({ drift_auto_patcher: { status: all.length ? 'FAIL' : 'PASS', drift: all } }, all.length > 0); }
+if (process.argv[1]?.endsWith('drift_auto_patcher.ts')) run();

@@ -1,0 +1,3 @@
+import { emit, runTool } from './_runtime.js';
+export function run(): void { const tools = ['governance_activation_validator.ts','multi_actor_concurrency_validator.ts','lineage_replay_auditor.ts','corruption_quarantine_auditor.ts','governance_closure_sequencer.ts','activation_ratification_pipeline.ts']; const results = tools.map((t) => runTool(t)); const failures = results.filter((r) => r.status === 'FAIL'); emit({ enforcement_harness: { status: failures.length ? 'FAIL' : 'PASS', results, failures: failures.map((f) => f.step) } }, failures.length > 0); }
+if (process.argv[1]?.endsWith('enforcement_harness.ts')) run();

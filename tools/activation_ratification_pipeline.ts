@@ -1,0 +1,3 @@
+import { emit, loadJson } from './_runtime.js';
+export function run(): void { const amendments = (loadJson('governance/amendments.json') as any).amendments; const actors = new Set((loadJson('registry/actors.json') as any).actors.map((a: any) => a.actor_id)); const violations = amendments.flatMap((a: any) => a.status === 'RATIFIED' && (a.signers ?? []).every((s: string) => actors.has(s)) ? [] : [`AMENDMENT:${a.amendment_id}`]); emit({ activation_ratification: { status: violations.length ? 'FAIL' : 'PASS', violations } }, violations.length > 0); }
+if (process.argv[1]?.endsWith('activation_ratification_pipeline.ts')) run();

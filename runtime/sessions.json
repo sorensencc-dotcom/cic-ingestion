@@ -1,0 +1,1 @@
+{"version":"1.0.0","sessions":[{"session_id":"SESSION-0001","actor_id":"ACTOR-001","lineage_id":"LINEAGE-0002","claims":["GOVERNANCE-SURFACE-001"],"state":"ACTIVE"},{"session_id":"SESSION-0002","actor_id":"ACTOR-002","lineage_id":"LINEAGE-0001","claims":["GOVERNANCE-SURFACE-002"],"state":"ACTIVE"}]}

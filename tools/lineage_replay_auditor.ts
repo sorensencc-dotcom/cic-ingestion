@@ -1,0 +1,3 @@
+import { emit, loadJson, scan } from './_runtime.js';
+export function run(): void { const entries = scan('lineage').map((p) => loadJson(p) as any).sort((a, b) => a.sequence - b.sequence); const violations: string[] = []; entries.forEach((e, i) => { if (e.sequence !== i + 1) violations.push(`SEQUENCE:${e.lineage_id}`); if (i === 0 ? e.parent_lineage_id !== null : e.parent_lineage_id !== entries[i - 1].lineage_id) violations.push(`PARENT:${e.lineage_id}`); if (i > 0 && e.previous_hash !== entries[i - 1].hash) violations.push(`HASH:${e.lineage_id}`); }); emit({ lineage_replay: { status: violations.length ? 'FAIL' : 'PASS', entries: entries.map((e) => e.lineage_id), violations } }, violations.length > 0); }
+if (process.argv[1]?.endsWith('lineage_replay_auditor.ts')) run();

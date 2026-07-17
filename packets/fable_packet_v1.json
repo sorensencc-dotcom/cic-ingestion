@@ -1,0 +1,1 @@
+{"$schema":"https://json-schema.org/draft/2020-12/schema","$id":"fable_packet_v1","type":"object","required":["packet_id","version","payload","lineage_id"],"properties":{"packet_id":{"type":"string","minLength":1},"version":{"const":"1.0"},"payload":{"type":"object"},"lineage_id":{"type":"string","minLength":1}},"additionalProperties":false}

@@ -1,0 +1,3 @@
+import { emit, loadJson } from './_runtime.js';
+export function run(): void { const s = loadJson('specs/ingestion_pipeline_spec.json') as any; const f = loadJson('packets/fable_packet_v1.json') as any; const c = loadJson('packets/compressed_packet_v1.json') as any; const violations: string[] = []; if (s.failure_mode !== 'FAIL_CLOSED') violations.push('SPEC:FAIL_CLOSED'); for (const p of [f,c]) if (p.type !== 'object' || !Array.isArray(p.required) || p.required.length === 0) violations.push(`PACKET:${p.$id ?? 'UNKNOWN'}`); emit({ ingestion_orchestration: { status: violations.length ? 'FAIL' : 'PASS', stages: s.stages, packet_schemas: [f.$id,c.$id], violations } }, violations.length > 0); }
+if (process.argv[1]?.endsWith('orchestrate_ingestion_pipeline.ts')) run();

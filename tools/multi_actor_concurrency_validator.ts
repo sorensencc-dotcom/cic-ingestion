@@ -1,0 +1,3 @@
+import { emit, loadJson } from './_runtime.js';
+export function run(): void { const actors = (loadJson('registry/actors.json') as any).actors; const sessions = (loadJson('runtime/sessions.json') as any).sessions; const ids = new Set(actors.map((a: any) => a.actor_id)); const claims = new Map<string, string>(); const violations: string[] = []; for (const s of sessions) { if (!ids.has(s.actor_id)) violations.push(`ACTOR:${s.session_id}`); for (const c of s.claims ?? []) { if (claims.has(c)) violations.push(`CONFLICT:${c}`); claims.set(c, s.actor_id); } } emit({ multi_actor_concurrency: { status: violations.length ? 'FAIL' : 'PASS', violations } }, violations.length > 0); }
+if (process.argv[1]?.endsWith('multi_actor_concurrency_validator.ts')) run();

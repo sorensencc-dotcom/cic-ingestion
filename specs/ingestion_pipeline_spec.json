@@ -1,0 +1,1 @@
+{"spec_id":"ingestion_pipeline_spec","version":"1.0.0","stages":["validate","normalize","enqueue"],"required_input_fields":["sourceType","payload"],"required_output_fields":["jobId"],"failure_mode":"FAIL_CLOSED"}
