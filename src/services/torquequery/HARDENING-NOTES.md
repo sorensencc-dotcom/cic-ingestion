@@ -111,7 +111,10 @@ without touching any existing caller.
   `uvicorn src.main:app` process discovered during verification — flagged,
   not touched.
 
-This is pre-decision hardening — no governance or naming decision was made
-as part of this work; see
+**Tier 1 decision APPROVED 2026-07-17** (Option i, split and rename): this
+service keeps the name "TorqueQuery"; the documentation-RAG service was
+renamed "torque-query-docs". See
 docs/meta/phases/torquequery-reconciliation-charter.md in the main c:\dev
-repo for the pending Tier 1 decision.
+repo for the full decision record. The fast-path determinism bug documented
+above was fixed the same day, in a separate follow-up commit — see
+TorqueQueryV2Server.py's module docstring.

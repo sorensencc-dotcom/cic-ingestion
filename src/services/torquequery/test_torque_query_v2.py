@@ -1,10 +1,11 @@
 """
 Tests for TorqueQueryV2Server.py — the memory/drift semantic search service
-(CIC + MAAL). This is explicitly NOT the documentation-RAG service also
-informally called "TorqueQuery" in a different repo; these tests exercise
-memory/drift-search behavior only, per the pending Tier 1 naming decision
-(see docs/meta/phases/torquequery-reconciliation-charter.md in the main
-C:/dev repo).
+(CIC + MAAL). Per Tier 1 decision 2026-07-17 (Option i, split and rename),
+this service keeps the name "TorqueQuery"; the documentation-RAG service that
+used to informally share this name was renamed "torque-query-docs" in a
+different repo. These tests exercise memory/drift-search behavior only (see
+docs/meta/phases/torquequery-reconciliation-charter.md in the main C:/dev
+repo for the full decision record).
 
 Ground truth this file encodes (see CANARY-VERIFICATION-2026-07-17.md for
 the full writeup):

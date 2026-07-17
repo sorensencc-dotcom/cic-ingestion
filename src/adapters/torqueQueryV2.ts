@@ -5,6 +5,14 @@
  * File: torqueQueryV2.ts
  * Date: 2026-07-02
  * Semver: 2.0.0
+ *
+ * Scope, confirmed per Tier 1 decision 2026-07-17 (Option i, split and
+ * rename): this adapter talks ONLY to the memory/drift search service at
+ * src/services/torquequery/TorqueQueryV2Server.py, which keeps the name
+ * "TorqueQuery". It must never be repointed at or merged with the unrelated
+ * documentation-RAG service ("torque-query-docs", in a different repo,
+ * rewrite-docs/castironforge/torque-query-docs) — that service has its own
+ * client (TorqueQueryDocsClient.ts) and is not wired into CIC via this file.
  */
 
 

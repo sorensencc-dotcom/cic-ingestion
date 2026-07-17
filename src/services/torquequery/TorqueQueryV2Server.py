@@ -2,12 +2,13 @@
 TorqueQuery v2 — the memory/drift semantic search service (CIC + MAAL).
 Supports fast-path (no MMR) and slow-path (full MMR/RRF).
 
-This is explicitly NOT the same service as the documentation-RAG service
-also informally called "TorqueQuery" in a different repo. No naming/owner
-decision has been made across the two services as of this writing; see
-docs/meta/phases/torquequery-reconciliation-charter.md in the main
-C:/dev repo for the pending Tier 1 decision. This module makes no claim to be
-"the" TorqueQuery.
+This is explicitly NOT the documentation-RAG service that used to informally
+share this name in a different repo. Tier 1 decision 2026-07-17 (Option i,
+split and rename): this service keeps the name "TorqueQuery"; the doc-RAG
+service was renamed to "torque-query-docs"
+(rewrite-docs/castironforge/torque-query-docs). See
+docs/meta/phases/torquequery-reconciliation-charter.md in the main C:/dev
+repo for the full decision record.
 
 IMPORTANT — architecture reality check: compute_embedding() and the
 fast_path_search()/full_search() scoring functions below are a
@@ -189,8 +190,9 @@ def health():
         "service": SERVICE_IDENTITY,
         "service_description": (
             "the memory/drift semantic search service (CIC + MAAL); "
-            "distinct from the documentation-RAG service also informally "
-            "called TorqueQuery in a different repo"
+            "keeps the name TorqueQuery per Tier 1 decision 2026-07-17, "
+            "distinct from the documentation-RAG service, renamed "
+            "torque-query-docs in a different repo"
         ),
         "dependency_checks": dep_checks,
         "backing_store": "simulated",

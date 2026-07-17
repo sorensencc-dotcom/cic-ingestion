@@ -3,10 +3,14 @@
 Scope: this document is about `TorqueQueryV2Server.py` in this repo, the
 **memory/drift semantic search service** (CIC + MAAL). It is explicitly not
 about, and makes no claim regarding, the separate documentation-RAG service
-also informally called "TorqueQuery" in a different repo. No naming/owner
-decision has been made between the two services; see
+that used to informally share this name in a different repo. Tier 1 decision
+2026-07-17 (Option i, split and rename): this service keeps the name
+"TorqueQuery"; the other was renamed "torque-query-docs". See
 `docs/meta/phases/torquequery-reconciliation-charter.md` in the main
-`C:/dev` repo for the pending Tier 1 decision.
+`C:/dev` repo for the full decision record. The fast-path determinism gap
+this document originally reported was fixed the same day, in a separate
+follow-up commit — see `TorqueQueryV2Server.py`'s module docstring and
+`HARDENING-NOTES.md`.
 
 ## Why this document exists
 
