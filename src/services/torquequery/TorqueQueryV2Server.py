@@ -14,8 +14,21 @@ fast_path_search()/full_search() scoring functions below are a
 determinism-math simulation, not a working search engine. There is no
 real corpus, vector store, or encoder behind this service today. See
 HARDENING-NOTES.md and CANARY-VERIFICATION-2026-07-17.md in this directory
-for a full account of what is and isn't real, and a documented determinism
-gap in the fast-path branch when callers supply their own embedding.
+for a full account of what is and isn't real.
+
+FIXED 2026-07-17 (see CANARY-VERIFICATION-2026-07-17.md for the original
+finding): fast_path_search()/full_search() used to draw straight from
+numpy's global RNG state with no seeding of their own when a caller
+supplied normalized_embedding directly -- the real call pattern used by
+TorqueQueryClient.ts / torqueQueryV2.ts -- making fast-path results
+non-deterministic once other requests interleaved. They now derive their
+own local RNG seed from the embedding's content itself (sha256 over the
+raw bytes), so determinism holds for both the server-computed and
+caller-supplied embedding paths, and no longer depends on ambient global
+RNG state or on Python's per-process-randomized hash(). compute_embedding()
+was similarly switched from Python's hash() to hashlib.sha256(), so
+server-computed-embedding determinism now also holds across process
+restarts without requiring PYTHONHASHSEED to be pinned.
 
 File: TorqueQueryV2Server.py
 Date: 2026-07-02
@@ -29,6 +42,7 @@ import numpy as np
 import json
 import logging
 import os
+import hashlib
 
 # ========== Logging ==========
 
@@ -62,16 +76,34 @@ class SearchResponse(BaseModel):
 
 # ========== Search Logic ==========
 
+def _seed_from_embedding(embedding: np.ndarray) -> int:
+    """
+    Derive a stable seed from embedding content itself (not from Python's
+    randomized-per-process hash(), and not from ambient global RNG state).
+    sha256 over the raw float64 bytes means the same embedding vector always
+    yields the same seed, regardless of process, restart, or interleaved
+    requests -- this is what makes fast_path_search()/full_search()
+    deterministic below, whether the embedding was server-computed or
+    supplied directly by the caller.
+    """
+    as_bytes = np.ascontiguousarray(embedding, dtype=np.float64).tobytes()
+    digest = hashlib.sha256(as_bytes).digest()
+    return int.from_bytes(digest[:4], "big")
+
 def compute_embedding(text: str) -> np.ndarray:
     """Deterministic embedding computation (placeholder for real encoder)."""
     # In production: use sentence-transformers or similar
-    np.random.seed(hash(text) % (2**32))
-    return np.random.rand(4096)
+    seed = int.from_bytes(hashlib.sha256(text.encode("utf-8")).digest()[:4], "big")
+    rng = np.random.default_rng(seed)
+    return rng.random(4096)
 
 def fast_path_search(embedding: np.ndarray, candidate_pool: int, top_k: int) -> List[SearchResult]:
     """Fast-path: deterministic top-k without MMR/diversity scoring."""
-    # Simulate candidate scoring (deterministic by embedding seed)
-    scores = np.random.rand(candidate_pool)
+    # Local RNG seeded from the embedding's own content -- deterministic
+    # regardless of whether the embedding was server-computed or supplied
+    # directly by the caller, and independent of any other request's state.
+    rng = np.random.default_rng(_seed_from_embedding(embedding))
+    scores = rng.random(candidate_pool)
     idx = np.argsort(scores)[::-1][:top_k]
 
     results = []
@@ -86,9 +118,9 @@ def fast_path_search(embedding: np.ndarray, candidate_pool: int, top_k: int) -> 
 
 def full_search(embedding: np.ndarray, candidate_pool: int, top_k: int) -> List[SearchResult]:
     """Full-path: deterministic MMR/RRF with diversity scoring."""
-    # Simulate full MMR pipeline
-    scores = np.random.rand(candidate_pool)
-    diversity = np.random.rand(candidate_pool) * 0.1
+    rng = np.random.default_rng(_seed_from_embedding(embedding))
+    scores = rng.random(candidate_pool)
+    diversity = rng.random(candidate_pool) * 0.1
     final = scores - diversity
     idx = np.argsort(final)[::-1][:top_k]
 
@@ -166,18 +198,18 @@ def health():
         "determinism": {
             "hash_seed_pinned": hash_seed_pinned,
             "note": (
-                "compute_embedding() seeds numpy's RNG from hash(text) % 2**32. "
-                "Python's str hash is randomized per process unless PYTHONHASHSEED "
-                "is fixed, so determinism holds only within a single running "
-                "process/session, not across restarts, unless hash_seed_pinned "
-                "is true. Separately: when a caller supplies normalized_embedding "
-                "directly (the real fast-path call pattern used by "
-                "TorqueQueryClient.ts / torqueQueryV2.ts), compute_embedding() is "
-                "never invoked and no seeding occurs in that branch at all -- "
-                "fast-path results then depend on whatever global numpy RNG state "
-                "happens to be ambient, and are NOT guaranteed deterministic "
-                "across repeated identical calls once other requests interleave. "
-                "See CANARY-VERIFICATION-2026-07-17.md for a reproduced example."
+                "Fixed 2026-07-17: compute_embedding() and fast_path_search()/"
+                "full_search() now seed via hashlib.sha256 over stable byte "
+                "content (query text, or the embedding vector itself), each "
+                "using their own local np.random.default_rng() instance rather "
+                "than numpy's global RNG state. Determinism now holds within a "
+                "process, across process restarts, and for both the "
+                "server-computed and caller-supplied normalized_embedding "
+                "paths -- including the real fast-path call pattern used by "
+                "TorqueQueryClient.ts / torqueQueryV2.ts. hash_seed_pinned/"
+                "PYTHONHASHSEED are no longer load-bearing for determinism; "
+                "reported here only for historical/debugging visibility. See "
+                "CANARY-VERIFICATION-2026-07-17.md for the original finding."
             ),
         },
     }

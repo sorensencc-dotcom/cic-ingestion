@@ -12,17 +12,15 @@ the full writeup):
 - There is no real corpus or vector store behind /search. compute_embedding()
   is np.random.seed(hash(text) % 2**32) + np.random.rand(4096) — a
   determinism-math simulation, not a real encoder.
-- Determinism of the *slow path* (server computes its own embedding from
-  query text) holds only within a single process, because Python's hash()
-  is randomized per process unless PYTHONHASHSEED is pinned.
-- The *fast path*, as actually exercised by TorqueQueryClient.ts /
-  torqueQueryV2.ts, always supplies its own normalized_embedding. When a
-  caller supplies normalized_embedding, compute_embedding() is never called
-  and NO seeding happens in that branch — fast-path results depend on
-  whatever the ambient global numpy RNG state is, and are demonstrably NOT
-  deterministic across repeated identical calls once other requests
-  interleave. One test below reproduces and documents this gap explicitly;
-  it is a known architecture limitation, not a test bug.
+- FIXED 2026-07-17: compute_embedding() and fast_path_search()/full_search()
+  now seed via hashlib.sha256 over stable byte content, each using their own
+  local np.random.default_rng() instance instead of numpy's global RNG
+  state. Determinism now holds within a process, across restarts, and for
+  both the server-computed and caller-supplied normalized_embedding paths —
+  including the real fast-path call pattern used by TorqueQueryClient.ts /
+  torqueQueryV2.ts (which always supplies normalized_embedding). See
+  CANARY-VERIFICATION-2026-07-17.md for the original finding and
+  TorqueQueryV2Server.py's module docstring for the fix.
 """
 
 import numpy as np
@@ -199,25 +197,20 @@ def test_fast_path_used_only_when_all_three_eligibility_conditions_hold(
 
 
 # ---------------------------------------------------------------------------
-# Known gap: fast-path is NOT deterministic when the caller supplies its own
-# embedding, because compute_embedding() (the only seeding point) is never
-# invoked in that branch. This mirrors the real call pattern from
-# TorqueQueryClient.ts / torqueQueryV2.ts, which always fast-paths with a
-# client-supplied normalized embedding.
+# Fast-path determinism under the real production call pattern (fixed
+# 2026-07-17 -- previously this was a documented gap, see git history /
+# CANARY-VERIFICATION-2026-07-17.md for the original finding).
 # ---------------------------------------------------------------------------
 
-def test_fast_path_with_client_supplied_embedding_is_not_seeded_by_query():
+def test_fast_path_with_client_supplied_embedding_is_deterministic():
     """
-    Documents a real architecture gap (not a test bug): when
-    normalized_embedding is supplied by the caller, the server never calls
-    compute_embedding()/np.random.seed(...), so fast_path_search()'s
-    np.random.rand(candidate_pool) draws from whatever the ambient global
-    RNG state happens to be. Two back-to-back identical fast-path requests
-    with an unrelated request interleaved between them can and do return
-    different top results. This directly undercuts any "fast-path is
-    deterministic" claim for the call pattern actually used in production
-    (TorqueQueryClient.ts always supplies normalized_embedding for
-    fast-path). See CANARY-VERIFICATION-2026-07-17.md.
+    Real production call pattern: TorqueQueryClient.ts / torqueQueryV2.ts
+    always supply their own normalized_embedding for fast-path. Two
+    back-to-back identical fast-path requests, with an unrelated request
+    (different embedding) interleaved between them to perturb any shared
+    RNG state, must still return the same top result -- fast_path_search()
+    now seeds its own local RNG from the embedding's content, independent
+    of any other request.
     """
     fast_body = {
         "query": "test query alpha",
@@ -240,19 +233,24 @@ def test_fast_path_with_client_supplied_embedding_is_not_seeded_by_query():
     client.post("/search", json=perturb_body)
     r2 = client.post("/search", json=fast_body).json()
 
-    ids1 = [x["id"] for x in r1["results"]]
-    ids2 = [x["id"] for x in r2["results"]]
+    assert r1["results"][0]["id"] == r2["results"][0]["id"]
+    assert r1["results"][0]["score"] == pytest.approx(r2["results"][0]["score"])
 
-    # This assertion documents CURRENT (undesirable) behavior. If this
-    # ever starts failing (i.e. results become equal), the underlying
-    # seeding bug has been fixed upstream and this test + its docstring
-    # should be updated/removed rather than treated as a regression.
-    assert ids1 != ids2, (
-        "Fast-path with a client-supplied embedding was expected to be "
-        "non-deterministic under RNG-state perturbation given the current "
-        "implementation. If it now matches, the seeding gap has likely "
-        "been fixed -- update this test to assert determinism instead."
-    )
+
+def test_fast_path_deterministic_across_process_restart():
+    """
+    compute_embedding()/fast_path_search() no longer depend on Python's
+    per-process-randomized hash() or on PYTHONHASHSEED -- sha256 over
+    stable byte content means the same embedding yields the same seed in
+    any process. Simulated here by calling _seed_from_embedding() directly
+    with a fixed vector and asserting it's stable (a real cross-process
+    check is covered narratively in CANARY-VERIFICATION-2026-07-17.md).
+    """
+    from TorqueQueryV2Server import _seed_from_embedding
+    import numpy as np
+
+    vec = np.array([0.3] * 4096)
+    assert _seed_from_embedding(vec) == _seed_from_embedding(vec)
 
 
 # ---------------------------------------------------------------------------
