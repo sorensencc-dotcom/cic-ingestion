@@ -1,0 +1,19 @@
+.gitignore
+  s_9d35dd302e8fd8::t_8aa2d9f4eb5eac 21-23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "9d7883cb7789dff18d912559645b82eb6f961efa",
+  "prompts": {},
+  "sessions": {
+    "s_9d35dd302e8fd8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "43186584-9fe7-4ccc-86ff-7210873adc78",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
