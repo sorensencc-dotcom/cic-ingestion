@@ -1,6 +1,21 @@
 """
-TorqueQuery v2 — Deterministic semantic search service.
-Supports fast-path (no MMR) and slow-path (full MMR/RRF) for CIC + MAAL.
+TorqueQuery v2 — the memory/drift semantic search service (CIC + MAAL).
+Supports fast-path (no MMR) and slow-path (full MMR/RRF).
+
+This is explicitly NOT the same service as the documentation-RAG service
+also informally called "TorqueQuery" in a different repo. No naming/owner
+decision has been made across the two services as of this writing; see
+docs/meta/phases/torquequery-reconciliation-charter.md in the main
+C:/dev repo for the pending Tier 1 decision. This module makes no claim to be
+"the" TorqueQuery.
+
+IMPORTANT — architecture reality check: compute_embedding() and the
+fast_path_search()/full_search() scoring functions below are a
+determinism-math simulation, not a working search engine. There is no
+real corpus, vector store, or encoder behind this service today. See
+HARDENING-NOTES.md and CANARY-VERIFICATION-2026-07-17.md in this directory
+for a full account of what is and isn't real, and a documented determinism
+gap in the fast-path branch when callers supply their own embedding.
 
 File: TorqueQueryV2Server.py
 Date: 2026-07-02
@@ -13,6 +28,7 @@ from typing import List, Optional
 import numpy as np
 import json
 import logging
+import os
 
 # ========== Logging ==========
 
@@ -95,9 +111,76 @@ def full_search(embedding: np.ndarray, candidate_pool: int, top_k: int) -> List[
 
 app = FastAPI(title="TorqueQuery v2", version="2.0.0")
 
+SERVICE_IDENTITY = "torquequery-memory-drift-search"
+
+
+def _self_test_dependencies() -> dict:
+    """
+    Cheap, in-process checks of the things this service actually depends on.
+    No network calls, no filesystem I/O, no claims about infrastructure
+    this service doesn't have (there is no vector store or corpus to ping).
+    """
+    checks = {}
+
+    try:
+        _ = np.random.rand(4)
+        checks["numpy"] = "ok"
+    except Exception as e:  # pragma: no cover - defensive
+        checks["numpy"] = f"error: {e}"
+
+    try:
+        _ = SearchRequest(query="healthcheck-selftest")
+        checks["pydantic_schema"] = "ok"
+    except Exception as e:  # pragma: no cover - defensive
+        checks["pydantic_schema"] = f"error: {e}"
+
+    return checks
+
+
 @app.get("/health")
 def health():
-    return {"status": "ok", "version": "2.0.0"}
+    """
+    Single source of truth for "is this service alive and internally
+    consistent." Deliberately does NOT report a fake "vector store:
+    connected" — there is no vector store. Fields below describe the
+    actual current architecture, including known determinism caveats.
+    """
+    dep_checks = _self_test_dependencies()
+    healthy = all(v == "ok" for v in dep_checks.values())
+
+    hash_seed_env = os.environ.get("PYTHONHASHSEED")
+    hash_seed_pinned = hash_seed_env not in (None, "", "random")
+
+    return {
+        "status": "ok" if healthy else "degraded",
+        "version": "2.0.0",
+        "service": SERVICE_IDENTITY,
+        "service_description": (
+            "the memory/drift semantic search service (CIC + MAAL); "
+            "distinct from the documentation-RAG service also informally "
+            "called TorqueQuery in a different repo"
+        ),
+        "dependency_checks": dep_checks,
+        "backing_store": "simulated",
+        "embedding_backend": "simulated-deterministic-hash-seed",
+        "determinism": {
+            "hash_seed_pinned": hash_seed_pinned,
+            "note": (
+                "compute_embedding() seeds numpy's RNG from hash(text) % 2**32. "
+                "Python's str hash is randomized per process unless PYTHONHASHSEED "
+                "is fixed, so determinism holds only within a single running "
+                "process/session, not across restarts, unless hash_seed_pinned "
+                "is true. Separately: when a caller supplies normalized_embedding "
+                "directly (the real fast-path call pattern used by "
+                "TorqueQueryClient.ts / torqueQueryV2.ts), compute_embedding() is "
+                "never invoked and no seeding occurs in that branch at all -- "
+                "fast-path results then depend on whatever global numpy RNG state "
+                "happens to be ambient, and are NOT guaranteed deterministic "
+                "across repeated identical calls once other requests interleave. "
+                "See CANARY-VERIFICATION-2026-07-17.md for a reproduced example."
+            ),
+        },
+    }
 
 @app.post("/search", response_model=SearchResponse)
 def search(req: SearchRequest):
