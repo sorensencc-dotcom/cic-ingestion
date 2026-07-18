@@ -165,6 +165,7 @@ describe('Suite 2: Single Check Failures', () => {
       flagValidator: passingValidator(),
     });
 
+    const rollbackLog = completeRollbackLog();
     const realDateNow = Date.now;
     let call = 0;
     Date.now = () => {
@@ -174,7 +175,7 @@ describe('Suite 2: Single Check Failures', () => {
     };
 
     try {
-      const result = await gate.validateRollback(PROPOSAL_ID, VARIANT_ID, completeRollbackLog());
+      const result = await gate.validateRollback(PROPOSAL_ID, VARIANT_ID, rollbackLog);
       expect(result.passed).toBe(false);
       expect(result.checks.latency_ok?.passed).toBe(false);
     } finally {
