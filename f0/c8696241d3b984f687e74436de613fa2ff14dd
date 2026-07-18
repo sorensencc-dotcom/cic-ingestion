@@ -1,0 +1,24 @@
+tools/treatment_regression_harness.ts
+  s_3e5d58d3fdd8c4::t_26b40279827bee 3-4
+tools/_runtime.ts
+  s_3e5d58d3fdd8c4::t_905436bb850b41 5
+  s_3e5d58d3fdd8c4::t_b9801a9f8a180d 7
+tools/artifact_change_diff_reporter.ts
+  s_3e5d58d3fdd8c4::t_eaead0a736e3e3 2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "f0c8696241d3b984f687e74436de613fa2ff14dd",
+  "prompts": {},
+  "sessions": {
+    "s_3e5d58d3fdd8c4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f9959fa1-4b91-4a6c-b913-92e744119cfa",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
