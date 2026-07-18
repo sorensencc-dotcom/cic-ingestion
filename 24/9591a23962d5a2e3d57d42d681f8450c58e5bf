@@ -1,0 +1,27 @@
+__tests__/e2e/phase2-skeleton-ingest.test.ts
+  s_fda856bf205e0d::t_b457072b3c3bb1 1-79
+__tests__/e2e/phase2-skeleton-learning.test.ts
+  s_fda856bf205e0d::t_9e406dad3c532d 1-96
+__tests__/unit/orchestrator.test.ts
+  s_fda856bf205e0d::t_19029684482927 1-10,12-121,123-124,126-129
+src/tests/phase7-health-check-gate-e2e.test.ts
+  s_fda856bf205e0d::t_98a7313fe9371f 168,178
+jest.config.cjs
+  s_fda856bf205e0d::t_b7f6dd2b667106 8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "249591a23962d5a2e3d57d42d681f8450c58e5bf",
+  "prompts": {},
+  "sessions": {
+    "s_fda856bf205e0d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "77d54c09-1b77-4d8b-b6fa-44351f19c78d",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
