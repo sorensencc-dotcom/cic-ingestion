@@ -1,0 +1,19 @@
+src/core/maal/codesign/ProposalParser.ts
+  s_3e5d58d3fdd8c4::t_64f05997a52333 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "415cebf647fe9d0eed3a41d8a548d7780430f664",
+  "prompts": {},
+  "sessions": {
+    "s_3e5d58d3fdd8c4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f9959fa1-4b91-4a6c-b913-92e744119cfa",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
