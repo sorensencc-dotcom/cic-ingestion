@@ -101,7 +101,7 @@ jobs:
               exit 1
             fi
 
-            if grep -qE "INSERT|UPDATE|DELETE|CREATE INDEX" "$file"; then
+            if grep -qE "\bINSERT\b|\bUPDATE\b|\bDELETE\b" "$file"; then
               echo "❌ SQL file contains non-DDL statements: $file"
               exit 1
             fi
