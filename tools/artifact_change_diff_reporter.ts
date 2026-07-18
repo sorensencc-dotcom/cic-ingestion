@@ -1,6 +1,6 @@
 import { execFileSync } from 'node:child_process';
+import { ROOT as root } from './_runtime.js';
 
-const root = 'C:/dev/cic-ingestion';
 const tracked = [
   'artifacts/treatment',
   'packets',

@@ -2,8 +2,9 @@ import { createHash } from 'node:crypto';
 import { existsSync, readdirSync, readFileSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
-export const ROOT = 'C:/dev/cic-ingestion';
+export const ROOT = fileURLToPath(new URL('..', import.meta.url)).replace(/[\\/]$/, '').replaceAll('\\', '/');
 export const json = (value: unknown): string => JSON.stringify(value);
 export function required(paths: string[]): string[] { return paths.filter((p) => !existsSync(join(ROOT, p))); }
 export function emit(result: unknown, failed: boolean): never { process.stdout.write(`${json(result)}\n`); process.exit(failed ? 1 : 0); }
