@@ -19,7 +19,7 @@ export class ProposalParser {
    * Accepts JSON with structure:
    * {
    *   "proposalId": "prop_123",
-   *   "submittedBy": "spl_service",
+   *   "submittedBy": "external_actor",
    *   "rationale": "reason",
    *   "deltas": [
    *     { "type": "regime", "regimeId": "r1", ... },
