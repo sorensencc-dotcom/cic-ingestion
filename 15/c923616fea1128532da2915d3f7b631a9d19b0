@@ -1,0 +1,21 @@
+docs/PHASE4-MONITORING.md
+  s_da9e171b5de231::t_feaa7eb6ca64a8 1-236
+docs/PHASE4-RUNBOOK.md
+  s_da9e171b5de231::t_b424ef0f44703b 1-323
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "15c923616fea1128532da2915d3f7b631a9d19b0",
+  "prompts": {},
+  "sessions": {
+    "s_da9e171b5de231": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e27a7023-39e0-4852-b719-638e31b8ee55",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
