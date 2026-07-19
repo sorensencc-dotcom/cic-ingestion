@@ -1,0 +1,29 @@
+PHASE3-BASELINE.json
+  s_da9e171b5de231::t_d03e8485ca61c9 1-25
+src/services/imageAnalysis/observability.ts
+  s_da9e171b5de231::t_e024733597649e 1-137
+docs/PHASE3-INTEGRATION.md
+  s_da9e171b5de231::t_7b59fbe117797e 1-234
+src/__tests__/imageAnalysis.phase3-load.ts
+  s_da9e171b5de231::t_df1929e1b9b79b 1-234
+src/__tests__/imageAnalysis.e2e.test.ts
+  s_da9e171b5de231::t_7ce7d194eaa5d0 1-211
+package.json
+  s_da9e171b5de231::t_4fdcb094072be4 10-11,21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "59b65304eefcf87311a5a34b5a73999cd08b2475",
+  "prompts": {},
+  "sessions": {
+    "s_da9e171b5de231": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e27a7023-39e0-4852-b719-638e31b8ee55",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
