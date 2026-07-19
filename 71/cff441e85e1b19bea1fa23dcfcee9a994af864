@@ -1,0 +1,46 @@
+src/services/imageAnalysis/ImageAnalysisService.ts
+  s_da9e171b5de231::t_402f09a019f92a 1-6,8-11,13,20-35,38-138
+  s_da9e171b5de231::t_40eee1cb417020 7,12,14-19
+  s_da9e171b5de231::t_53e73d6ccaf71b 36-37
+src/__tests__/imageAnalysis.test.ts
+  s_da9e171b5de231::t_cb0f9f05c090e1 1-9,11-21,23-45,47-65,67-112
+  s_da9e171b5de231::t_acf392c2a06b59 66
+  s_da9e171b5de231::t_6dd5c7360b8ab6 10
+  s_da9e171b5de231::t_0eab14370bc720 22,46
+src/services/imageAnalysis/providers/GoogleVisionProvider.ts
+  s_da9e171b5de231::t_d049c13694d79b 1-2,20,23
+  s_da9e171b5de231::t_59344988a18c8d 3-19,21-22,24-43
+.env.example
+  s_da9e171b5de231::t_d9a6c557b83c29 1-15
+src/services/imageAnalysis/index.ts
+  s_da9e171b5de231::t_c18019c3ea66f2 1-12
+src/autonomy/AutonomyAPIServer.ts
+  s_da9e171b5de231::t_ab094f45197eb7 151-155
+  s_da9e171b5de231::t_85138a54906f00 22
+src/services/imageAnalysis/types.ts
+  s_da9e171b5de231::t_5af12505b50e54 1-33
+src/services/imageAnalysis/config.ts
+  s_da9e171b5de231::t_232936f53344c0 1-10
+package.json
+  s_da9e171b5de231::t_eed0be260a06b4 13,16,24-26,29,31,33-35
+src/services/imageAnalysis/router.ts
+  s_da9e171b5de231::t_6d8dae02f58fa6 1-50
+tsconfig.json
+  s_da9e171b5de231::t_8500c564bbc26f 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "71cff441e85e1b19bea1fa23dcfcee9a994af864",
+  "prompts": {},
+  "sessions": {
+    "s_da9e171b5de231": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e27a7023-39e0-4852-b719-638e31b8ee55",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
