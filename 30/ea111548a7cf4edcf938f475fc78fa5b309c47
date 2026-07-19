@@ -1,0 +1,19 @@
+PROJECT-SUMMARY.md
+  s_da9e171b5de231::t_b25396750a0973 1-302
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "30ea111548a7cf4edcf938f475fc78fa5b309c47",
+  "prompts": {},
+  "sessions": {
+    "s_da9e171b5de231": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e27a7023-39e0-4852-b719-638e31b8ee55",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
