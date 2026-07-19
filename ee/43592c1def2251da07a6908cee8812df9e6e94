@@ -1,0 +1,21 @@
+docs/PHASE4-ROLLOUT.md
+  s_da9e171b5de231::t_492887f291aad6 1-204
+PHASE3-BASELINE.json
+  s_da9e171b5de231::t_e434523b4663b7 3-5,7-10,13-15,17-20,23-29,31-32
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "ee43592c1def2251da07a6908cee8812df9e6e94",
+  "prompts": {},
+  "sessions": {
+    "s_da9e171b5de231": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e27a7023-39e0-4852-b719-638e31b8ee55",
+        "model": "claude-haiku-4-5-20251001"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
