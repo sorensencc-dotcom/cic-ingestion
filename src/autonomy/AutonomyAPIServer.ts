@@ -19,6 +19,7 @@ import { GrokMcpClient } from "../adapters/grok/grok-mcp-client.ts";
 import { GrokModelClient } from "../adapters/grok/grok-model-client.ts";
 import { ConsoleMetricsAdapter } from "../adapters/metrics/ConsoleMetricsAdapter.ts";
 import { createExecuteRouter } from "../routes/execute.ts";
+import { createImageAnalysisRouter, loadConfig as loadImageAnalysisConfig } from "../services/imageAnalysis/index.ts";
 import { UsageLedger } from "../lib/usage/UsageLedger.ts";
 import { generateCicCostComputeReport } from "../lib/report/CicCostComputeReport.ts";
 import { TorqueQueryClient } from "../services/torquequery/TorqueQueryClient";
@@ -146,6 +147,11 @@ export class AutonomyAPIServer {
     this.app.use("/autonomy", memoryRouter);
     this.app.use("/autonomy", governanceRouter);
     this.app.use("/autonomy", searchRouter);
+
+    // Image Analysis service (Vision API integration)
+    const imageAnalysisConfig = loadImageAnalysisConfig();
+    const imageAnalysisRouter = createImageAnalysisRouter(imageAnalysisConfig);
+    this.app.use("/api", imageAnalysisRouter);
 
     // Grok Hardened Adapter (Phase A+B+C: Cache + Hardening)
     const adapterRegistry = new AdapterRegistry();
