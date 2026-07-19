@@ -1,0 +1,25 @@
+{
+  "phase": 3,
+  "status": "not-yet-captured",
+  "capturedAt": null,
+  "config": {
+    "concurrency": 50,
+    "imageSizeBytes": 1048576,
+    "requestTimeoutMs": 5000
+  },
+  "metrics": {
+    "totalRequests": 0,
+    "successfulRequests": 0,
+    "errorRequests": 0,
+    "latencies": {
+      "mean": 0,
+      "p50": 0,
+      "p95": 0,
+      "p99": 0
+    },
+    "errorRate": 0,
+    "visionApiUsageRatio": 0,
+    "fallbackRatio": 1
+  },
+  "notes": "Baseline will be captured after Phase 2 integration complete + load test passes SLA. See PHASE3-INTEGRATION.md for procedure."
+}
