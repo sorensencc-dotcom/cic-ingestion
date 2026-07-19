@@ -9,7 +9,9 @@
     "test": "npx jest",
     "test:e2e": "npx jest --testPathPattern=e2e",
     "test:load:phase3": "ts-node src/__tests__/imageAnalysis.phase3-load.ts",
-    "start": "node dist/index.js"
+    "start": "node dist/index.js",
+    "start:dev": "ts-node --esm src/server.ts",
+    "start:test-server": "ts-node src/__tests__/test-server.ts"
   },
   "dependencies": {
     "@google-cloud/vision": "5.3.7",
@@ -18,7 +20,7 @@
     "express": "4.18.2",
     "fs-extra": "11.2.0",
     "node-cron": "3.0.3",
-    "node-fetch": "3.3.2",
+    "node-fetch": "^3.3.2",
     "uuid": "9.0.1"
   },
   "devDependencies": {
