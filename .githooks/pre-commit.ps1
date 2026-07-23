@@ -41,4 +41,11 @@ foreach ($file in $stagedFiles) {
   }
 }
 
+# Secret-scan gate
+& bash scripts/secret-scan-hook.sh
+if ($LASTEXITCODE -ne 0) {
+  Write-Host "❌ Commit blocked: secret scan failed"
+  exit 1
+}
+
 Write-Host "✓ Phase 1 gate passed. Committing..."
