@@ -7,6 +7,7 @@
   "scripts": {
     "build": "tsc --project tsconfig.json",
     "test": "npx jest",
+    "pre-flight": "npm test",
     "test:e2e": "npx jest --testPathPattern=e2e",
     "test:load:phase3": "ts-node src/__tests__/imageAnalysis.phase3-load.ts",
     "start": "node dist/index.js",
