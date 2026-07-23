@@ -28,3 +28,5 @@ coverage/
 __pycache__/
 .pytest_cache/
 *.pyc
+.performance-report.json
+.validation-report.json
