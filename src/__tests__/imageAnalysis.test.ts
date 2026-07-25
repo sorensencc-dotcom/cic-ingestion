@@ -109,4 +109,87 @@ describe('ImageAnalysisService', () => {
     expect(result).toHaveProperty('matches');
     expect(result).toHaveProperty('metadata');
   });
+
+  it.each([
+    ['GIF', [0x47, 0x49, 0x46, 0x38], 'gif'],
+    ['WebP', [0x52, 0x49, 0x46, 0x46, 0, 0, 0, 0, 0x57, 0x45, 0x42, 0x50], 'webp'],
+  ])('detects %s magic bytes', async (_name, bytes, expectedFormat) => {
+    const result = await service.analyze({
+      imageBuffer: Buffer.from(bytes).toString('base64'),
+    });
+
+    expect(result.metadata.format).toBe(expectedFormat);
+  });
+
+  it('uses the request format when bytes are not recognized', async () => {
+    const result = await service.analyze({
+      imageBuffer: Buffer.from([0x00, 0x01, 0x02]).toString('base64'),
+      format: 'tiff',
+    });
+
+    expect(result.metadata.format).toBe('tiff');
+  });
+
+  it('uses unknown format when bytes and request format are absent', async () => {
+    const result = await service.analyze({
+      imageBuffer: Buffer.from([0x00, 0x01, 0x02]).toString('base64'),
+    });
+
+    expect(result.metadata.format).toBe('unknown');
+  });
+
+  it('returns transformed Vision matches and caches the provider', async () => {
+    const visionService = new ImageAnalysisService({ visionApiKey: 'test-key' });
+    const analyzeImage = jest.fn().mockResolvedValue({
+      labels: [],
+      web: {
+        fullMatchingImages: [
+          { url: 'https://example.com/full.jpg', score: 0.876 },
+          { url: 'https://example.com/no-score.jpg' },
+        ],
+      },
+    });
+    const provider = { analyzeImage };
+    const getProvider = jest.spyOn(visionService as any, 'getOrInitializeProvider')
+      .mockReturnValue(provider);
+    const imageBuffer = Buffer.from([0x89, 0x50, 0x4e, 0x47]);
+
+    const first = await visionService.analyze({ imageBuffer: imageBuffer.toString('base64') });
+    const second = await visionService.analyze({ imageBuffer: imageBuffer.toString('base64') });
+
+    expect(first.metadata).toMatchObject({ visionApiUsed: true, apiProvider: 'google_vision', format: 'png' });
+    expect(first.matches).toEqual([
+      { url: 'https://example.com/full.jpg', similarity: 88, source: 'google_vision' },
+      { url: 'https://example.com/no-score.jpg', similarity: 0, source: 'google_vision' },
+    ]);
+    expect(second.metadata.visionApiUsed).toBe(true);
+    expect(analyzeImage).toHaveBeenCalledTimes(2);
+    expect(getProvider).toHaveBeenCalledTimes(2);
+  });
+
+  it('falls back to mock results when Vision API fails', async () => {
+    const visionService = new ImageAnalysisService({ visionApiKey: 'test-key' });
+    const error = new Error('Vision unavailable');
+    jest.spyOn(visionService as any, 'getOrInitializeProvider').mockReturnValue({
+      analyzeImage: jest.fn().mockRejectedValue(error),
+    });
+    const mockResults = {
+      matches: [{ url: 'mock', similarity: 1, source: 'mock' }],
+      metadata: {
+        format: 'jpeg', size: 3, processedAt: 'now', visionApiUsed: false,
+        latencyMs: 1, apiProvider: 'mock',
+      },
+    };
+    const mock = jest.spyOn(visionService as any, '_generateMockResults').mockReturnValue(mockResults);
+    const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+    const result = await visionService.analyze({
+      imageBuffer: Buffer.from([0xff, 0xd8, 0xff, 0xe0]).toString('base64'),
+    });
+
+    expect(result).toBe(mockResults);
+    expect(mock).toHaveBeenCalledWith(expect.any(Buffer), 'jpeg');
+    expect(log).toHaveBeenCalledWith(expect.stringContaining('Vision API failed: Vision unavailable'));
+    log.mockRestore();
+  });
 });
