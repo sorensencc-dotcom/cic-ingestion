@@ -1,0 +1,69 @@
+src/governance/phase-4-5-lineage.ts
+  s_0704e88a1f3df3::t_6720bbc95e1a87 39,60,228,264
+.ijfw/.dream-state-v2.json
+  s_e0edbb5b6ad50b::t_3ce27fac40a38f 3-4,8-11,15-16,21-22,27-29,33-34
+.ijfw/.dream-state.json
+  s_e0edbb5b6ad50b::t_d476ee776964ef 1
+.ijfw/.session-edits.jsonl
+  s_da9e171b5de231::t_136f35d361904f 3
+.ijfw/sessions/session_2026-07-25_20-02-21.md
+  s_8487996f397e42::t_62203d5c890f77 1-5
+.ijfw/.profile-derive-cursor.json
+  s_e0edbb5b6ad50b::t_5e32e58f6f1a63 1
+.ijfw/.session-counter
+  s_e0edbb5b6ad50b::t_4e0a278ff27969 1
+.ijfw/.session-counter-id
+  s_e0edbb5b6ad50b::t_642838f253e009 1
+.ijfw/.session-marker-ts
+  s_e0edbb5b6ad50b::t_2229ec42a37340 1
+.ijfw/memory/project-journal.md
+  s_e0edbb5b6ad50b::t_faeeb9451a8876 4-6
+.ijfw/metrics/.transcript-cursor.json
+  s_e0edbb5b6ad50b::t_4890d24a04cc73 1
+.ijfw/metrics/sessions.jsonl
+  s_e0edbb5b6ad50b::t_c34810150a93f8 3-10
+.ijfw/sessions/session_2026-07-25_01-11-13.md
+  s_e0edbb5b6ad50b::t_ca85e41c3b735c 1-5
+.ijfw/sessions/session_2026-07-25_21-04-01.md
+  s_e0edbb5b6ad50b::t_4d79089921c3e8 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "abea7d4587e032dabbc11957970070a40dbd88df",
+  "prompts": {},
+  "sessions": {
+    "s_0704e88a1f3df3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "de2f1c5c-6819-41a4-9422-e6d06c50274d",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_8487996f397e42": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019f9adb-5a78-7233-9416-108140a9c5e8",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_da9e171b5de231": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e27a7023-39e0-4852-b719-638e31b8ee55",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_e0edbb5b6ad50b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "47da2b69-f21c-4825-afc7-f62ba763fc94",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
