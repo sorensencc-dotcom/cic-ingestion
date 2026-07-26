@@ -36,7 +36,7 @@ export interface LineageChain {
 /**
  * Decision audit record: immutable record of a decision with verification
  */
-export interface AuditRecord {
+export interface DecisionAuditRecord {
   decision_id: string;
   proposal_id: string;
   cohort_id: string;
@@ -57,7 +57,7 @@ export interface AuditTrailVerification {
   immutable_decisions: number;
   order_violations: number;
   errors: string[];
-  audit_records: AuditRecord[];
+  audit_records: DecisionAuditRecord[];
 }
 
 /**
@@ -225,7 +225,7 @@ export class Phase45LineageVerifier {
     proposalId: string
   ): AuditTrailVerification {
     const errors: string[] = [];
-    const auditRecords: AuditRecord[] = [];
+    const auditRecords: DecisionAuditRecord[] = [];
 
     // Verify ordering first
     const orderingCheck = this.verifyAuditTrailOrdering(decisions);
@@ -261,7 +261,7 @@ export class Phase45LineageVerifier {
       }
 
       // Create audit record
-      const auditRecord: AuditRecord = {
+      const auditRecord: DecisionAuditRecord = {
         decision_id: decision.decision_id,
         proposal_id: decision.proposal_id,
         cohort_id: decision.cohort_id,
