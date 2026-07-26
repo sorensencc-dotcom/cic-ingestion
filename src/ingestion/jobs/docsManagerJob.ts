@@ -98,23 +98,21 @@ interface SegmentIndex {
   lastUpdated: number;
 }
 
-const STATE_FILE = path.join(
+const STATE_FILE = path.resolve(
   process.cwd(),
-  "cic-ingestion",
   "state",
   "docs_manager_state.json"
 );
 
-const JSONL_PATH = path.join(
+const JSONL_PATH = path.resolve(
   process.cwd(),
-  "cic-ingestion",
   "logs",
   "docs_manager.jsonl"
 );
 
 const LOGS_DIR = path.dirname(JSONL_PATH);
 
-const SEGMENT_INDEX_PATH = path.join(
+const SEGMENT_INDEX_PATH = path.resolve(
   path.dirname(STATE_FILE),
   "docs_manager_index.json"
 );

@@ -9,14 +9,12 @@ describe("Phase 27 Ingestion Profiles", () => {
   let ajv: InstanceType<typeof Ajv>;
 
   beforeAll(() => {
-    const profilesPath = path.join(
-      __dirname,
-      "ingestionProfiles.json"
-    );
-    const schemaPath = path.join(
-      __dirname,
-      "ingestionProfiles.schema.json"
-    );
+    const profilesPath = fs.existsSync(path.join(__dirname, "ingestionProfiles.json"))
+      ? path.join(__dirname, "ingestionProfiles.json")
+      : path.resolve(process.cwd(), "src/ingestion/ingestionProfiles.json");
+    const schemaPath = fs.existsSync(path.join(__dirname, "ingestionProfiles.schema.json"))
+      ? path.join(__dirname, "ingestionProfiles.schema.json")
+      : path.resolve(process.cwd(), "src/ingestion/ingestionProfiles.schema.json");
 
     profiles = JSON.parse(fs.readFileSync(profilesPath, "utf-8"));
     schema = JSON.parse(fs.readFileSync(schemaPath, "utf-8"));
