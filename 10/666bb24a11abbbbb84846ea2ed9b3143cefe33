@@ -1,0 +1,21 @@
+.ijfw/metrics/baseline.json
+  s_a06ef2bbc680e7::t_77e5cd2d26f717 1-31
+.ijfw/memory/handoff.md
+  s_a06ef2bbc680e7::t_4ff72a080d20c6 41-44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "10666bb24a11abbbbb84846ea2ed9b3143cefe33",
+  "prompts": {},
+  "sessions": {
+    "s_a06ef2bbc680e7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0a494a8b-02a6-43ca-9ef9-72788e831d5a",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
