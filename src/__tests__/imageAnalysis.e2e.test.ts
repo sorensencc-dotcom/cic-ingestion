@@ -1,7 +1,6 @@
-import { spawn, ChildProcess } from 'child_process';
-import fetch from 'node-fetch';
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import express from 'express';
+import type { Server } from 'http';
+import { createImageAnalysisRouter, loadConfig } from '../services/imageAnalysis/index.ts';
 
 /**
  * E2E tests: Service running + real HTTP calls (no mocks)
@@ -10,8 +9,6 @@ import { join } from 'path';
  */
 
 const SERVICE_URL = process.env.SERVICE_URL || 'http://localhost:3000';
-const SERVICE_STARTUP_TIMEOUT = 10000; // 10s to start
-const REQUEST_TIMEOUT = 5000; // 5s per request
 
 interface E2ETestContext {
   serviceRunning: boolean;
@@ -22,6 +19,74 @@ const context: E2ETestContext = {
   serviceRunning: false,
   baseLatency: 0,
 };
+
+let server: Server | null = null;
+
+beforeAll(async () => {
+  let isAlive = false;
+  try {
+    const res = await fetch(`${SERVICE_URL}/health`, { signal: AbortSignal.timeout(1000) });
+    if (res.ok || res.status === 404 || res.status === 200) {
+      isAlive = true;
+    }
+  } catch {
+    isAlive = false;
+  }
+
+  if (!isAlive) {
+    const app = express();
+    app.use(express.json({ limit: '100mb' }));
+
+    app.get('/health', (_req, res) => {
+      res.json({
+        status: 'ok',
+        service: 'cic-imageanalysis-test',
+        uptime: process.uptime(),
+        timestamp: new Date().toISOString(),
+      });
+    });
+
+    const config = loadConfig();
+    const router = createImageAnalysisRouter(config);
+    app.use('/api', router);
+
+    app.use((req, res) => {
+      res.status(404).json({ error: 'Not found', path: req.path });
+    });
+
+    await new Promise<void>((resolve, reject) => {
+      const urlObj = new URL(SERVICE_URL);
+      const port = urlObj.port ? parseInt(urlObj.port, 10) : 3000;
+
+      const s = app.listen(port, '0.0.0.0', () => {
+        server = s;
+        resolve();
+      });
+      s.on('error', reject);
+    });
+  }
+
+  // Warm-up request to ensure route and V8 JIT initialization
+  try {
+    await fetch(`${SERVICE_URL}/api/analyze/image`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ imageBuffer: Buffer.from([0x89, 0x50, 0x4e, 0x47]).toString('base64') }),
+    });
+  } catch {
+    // Ignore warm-up errors
+  }
+
+  context.serviceRunning = true;
+}, 15000);
+
+afterAll(async () => {
+  if (server) {
+    await new Promise<void>((resolve) => {
+      server!.close(() => resolve());
+    });
+  }
+});
 
 describe('ImageAnalysis E2E Tests', () => {
   describe('Scenario 1: Valid small image (PNG)', () => {
@@ -39,7 +104,7 @@ describe('ImageAnalysis E2E Tests', () => {
 
       expect(response.status).toBe(200);
 
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
       expect(data).toHaveProperty('matches');
       expect(data).toHaveProperty('metadata');
       expect(data.metadata.format).toBe('png');
@@ -59,7 +124,7 @@ describe('ImageAnalysis E2E Tests', () => {
       });
 
       expect(response.status).toBe(200);
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
       expect(data.metadata.format).toBe('jpeg');
     });
   });
@@ -73,7 +138,7 @@ describe('ImageAnalysis E2E Tests', () => {
       });
 
       expect(response.status).toBe(400);
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
       expect(data).toHaveProperty('error');
       expect(data.error).toContain('required');
     });
@@ -91,9 +156,8 @@ describe('ImageAnalysis E2E Tests', () => {
 
   describe('Scenario 4: Size validation (>50MB)', () => {
     it('should reject images exceeding 50MB', async () => {
-      // Create a base64 string that represents >50MB (66MB base64)
-      // Each 'A' is 1 base64 char ≈ 0.75 bytes, so ~88M chars = 66MB
-      const largeBase64 = 'A'.repeat(66 * 1024 * 1024);
+      // Create a base64 string that represents >50MB (70MB base64)
+      const largeBase64 = 'A'.repeat(70 * 1024 * 1024);
 
       const response = await fetch(`${SERVICE_URL}/api/analyze/image`, {
         method: 'POST',
@@ -102,7 +166,7 @@ describe('ImageAnalysis E2E Tests', () => {
       });
 
       expect(response.status).toBe(400);
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
       expect(data.error).toContain('too large');
     });
   });
@@ -119,7 +183,7 @@ describe('ImageAnalysis E2E Tests', () => {
       });
 
       expect(response.status).toBe(200);
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
       // visionApiUsed should be false (no real API key configured in test env)
       expect(data.metadata.visionApiUsed).toBe(false);
       // Should still return valid matches structure
@@ -138,7 +202,7 @@ describe('ImageAnalysis E2E Tests', () => {
         body: JSON.stringify({ imageBuffer: base64 }),
       });
 
-      const data = await response.json() as any;
+      const data = (await response.json()) as any;
 
       // Validate response structure
       expect(data).toHaveProperty('matches');
@@ -204,7 +268,6 @@ describe('ImageAnalysis E2E Tests', () => {
       });
 
       // Service should accept and correlate the requestId
-      // (currently it generates one if not provided; should accept provided one in Phase 3)
       expect(response.status).toBe(200);
     });
   });
