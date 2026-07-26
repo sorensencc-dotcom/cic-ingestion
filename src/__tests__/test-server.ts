@@ -11,7 +11,7 @@ const port = parseInt(process.env.CIC_INGESTION_PORT || '3000', 10);
 async function startTestServer() {
   const app = express();
 
-  app.use(express.json({ limit: '10mb' }));
+  app.use(express.json({ limit: '100mb' }));
 
   // Health check
   app.get('/health', (req, res) => {
