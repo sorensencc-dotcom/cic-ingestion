@@ -1,0 +1,33 @@
+src/ingestion/ingestionProfiles.test.ts
+  s_bf425cfb5dd902::t_ad187805fdf084 12-17
+src/ingestion/jobs/docsManagerEmitter.test.ts
+  s_fda856bf205e0d::t_9ba38287fbee65 7,13,15-23
+src/ingestion/jobs/docsManagerJob.test.ts
+  s_bf425cfb5dd902::t_1740af1392ec21 12,18
+src/ingestion/jobs/docsManagerJob.ts
+  s_bf425cfb5dd902::t_83ec8ce48d3c31 101,107,115
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "1a831809f247958f4ef16bbd09d200e0997d899e",
+  "prompts": {},
+  "sessions": {
+    "s_bf425cfb5dd902": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d0bddb46-1770-430a-a668-ee0f4c688ce6",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_fda856bf205e0d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "77d54c09-1b77-4d8b-b6fa-44351f19c78d",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
