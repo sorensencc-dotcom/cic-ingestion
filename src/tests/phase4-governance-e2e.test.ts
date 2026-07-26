@@ -221,14 +221,12 @@ describe('Phase 4: Governance E2E — Proposal → Validation → Review → Can
         version: '1.0.0',
       };
 
-      const metrics = await canaryEngine.executeCanary(proposal);
+      const metrics = canaryEngine.execute(proposal, governanceEngine.review(proposal));
 
       expect(metrics.proposal_id).toBe(proposal.proposal_id);
-      expect(metrics.cohort_size).toBe(0.1);
-      expect(metrics.observation_window_minutes).toBe(30);
-      expect(metrics.error_rate).toBeGreaterThanOrEqual(0);
-      expect(metrics.error_rate).toBeLessThanOrEqual(0.05);
-      expect(['continue', 'promote']).toContain(metrics.decision);
+      expect(metrics.metrics.error_rate).toBeGreaterThanOrEqual(0);
+      expect(metrics.metrics.error_rate).toBeLessThanOrEqual(0.05);
+      expect(['rollback', 'promote', 'hold']).toContain(metrics.decision);
     });
 
     it('measures cost delta', async () => {
@@ -242,11 +240,11 @@ describe('Phase 4: Governance E2E — Proposal → Validation → Review → Can
         version: '1.0.0',
       };
 
-      const metrics = await canaryEngine.executeCanary(proposal);
+      const metrics = canaryEngine.execute(proposal, governanceEngine.review(proposal));
 
-      expect(typeof metrics.cost_delta).toBe('number');
-      expect(metrics.cost_delta).toBeGreaterThanOrEqual(-0.01);
-      expect(metrics.cost_delta).toBeLessThanOrEqual(0.01);
+      expect(typeof metrics.metrics.cost_delta).toBe('number');
+      expect(metrics.metrics.cost_delta).toBeGreaterThanOrEqual(-0.01);
+      expect(metrics.metrics.cost_delta).toBeLessThanOrEqual(0.01);
     });
   });
 
@@ -262,7 +260,7 @@ describe('Phase 4: Governance E2E — Proposal → Validation → Review → Can
         version: '1.0.0',
       };
 
-      const metrics = await canaryEngine.executeCanary(proposal);
+      const metrics = canaryEngine.execute(proposal, governanceEngine.review(proposal));
       const decision = promotionEngine.promote(proposal, metrics);
 
       expect(decision.proposal_id).toBe(proposal.proposal_id);
@@ -325,7 +323,7 @@ describe('Phase 4: Governance E2E — Proposal → Validation → Review → Can
       }
 
       // Step 3: Canary
-      const metrics = await canaryEngine.executeCanary(proposal);
+      const metrics = canaryEngine.execute(proposal, review);
       expect(metrics.proposal_id).toBe(proposal.proposal_id);
 
       // Step 4: Promotion
@@ -365,7 +363,7 @@ describe('Phase 4: Governance E2E — Proposal → Validation → Review → Can
         if (!validation.passed) continue;
 
         const review = governanceEngine.review(proposal);
-        const metrics = await canaryEngine.executeCanary(proposal);
+        const metrics = canaryEngine.execute(proposal, review);
         const promotion = promotionEngine.promote(proposal, metrics);
 
         results.push({
@@ -442,7 +440,7 @@ describe('Phase 4: Governance E2E — Proposal → Validation → Review → Can
 
       const validation = validator.validate(proposal);
       const review = governanceEngine.review(proposal);
-      const metrics = await canaryEngine.executeCanary(proposal);
+      const metrics = canaryEngine.execute(proposal, review);
       const promotion = promotionEngine.promote(proposal, metrics);
 
       // Verify lineage preserved
