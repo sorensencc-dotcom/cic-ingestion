@@ -1,0 +1,34 @@
+src/services/imageAnalysis/index.ts
+  s_bf425cfb5dd902::t_8f4810284355fa 10-12
+src/services/imageAnalysis/providers/GoogleVisionProvider.ts
+  s_bf425cfb5dd902::t_7ff152cf8372e3 43-52
+src/services/imageAnalysis/router.ts
+  s_bf425cfb5dd902::t_cbd78b7b272ca5 3
+  s_bf425cfb5dd902::t_e4317e6536180a 49-73
+  s_bf425cfb5dd902::t_af15b19020a173 74-76
+  s_bf425cfb5dd902::t_88161d66691f18 77-80
+src/services/imageAnalysis/types.ts
+  s_bf425cfb5dd902::t_d1e1085ced5e4e 34-52
+src/services/imageAnalysis/__tests__/router.test.ts
+  s_bf425cfb5dd902::t_476c0a546a852d 141-253
+src/services/imageAnalysis/ImageAnalysisService.ts
+  s_bf425cfb5dd902::t_cdc1ff1cc00569 68-116
+  s_bf425cfb5dd902::t_1fd5119720a8f8 1
+  s_bf425cfb5dd902::t_daf7a34ff015d7 117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "b41c3055030e3ba8817faf9c86f919074d0d25f7",
+  "prompts": {},
+  "sessions": {
+    "s_bf425cfb5dd902": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d0bddb46-1770-430a-a668-ee0f4c688ce6",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
