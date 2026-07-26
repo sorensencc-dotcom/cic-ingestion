@@ -1,0 +1,31 @@
+{
+  "_purpose": "Per-session token/cost baseline for growth comparison. Compare each session's turn-1 vs turn-N against these figures; flag if turn-over-turn delta exceeds flag_threshold_pct.",
+  "created": "2026-07-26",
+  "source": ".ijfw/metrics/sessions.jsonl",
+  "flag_threshold_pct": 10,
+  "sessions": {
+    "1": {
+      "session_id": "e27a7023-39e0-4852-b719-638e31b8ee55",
+      "turn_1": { "output_tokens": 110675, "cost_usd": 1.7844 },
+      "turn_5": { "output_tokens": 570026, "cost_usd": 11.9596 },
+      "growth_pct": 415,
+      "note": "Uncontrolled growth within single session, all 5 turns. No compaction/reset triggered. Flagged 2026-07-26."
+    },
+    "2": {
+      "session_id": "f1f7bf8b-761c-45e2-96e7-9703d4ac9325",
+      "turn_1": { "output_tokens": 18897, "cost_usd": 2.2262 }
+    },
+    "3": {
+      "session_id": "47da2b69-f21c-4825-afc7-f62ba763fc94",
+      "turn_1": { "output_tokens": 32688, "cost_usd": 6.5192 },
+      "turn_3": { "output_tokens": 38300, "cost_usd": 7.394 },
+      "growth_pct": 13.4
+    },
+    "4": {
+      "session_id": "de2f1c5c-6819-41a4-9422-e6d06c50274d",
+      "turn_1": { "output_tokens": 7640, "cost_usd": 1.3832 },
+      "turn_2": { "output_tokens": 9969, "cost_usd": 2.1525 },
+      "growth_pct": 30.5
+    }
+  }
+}
