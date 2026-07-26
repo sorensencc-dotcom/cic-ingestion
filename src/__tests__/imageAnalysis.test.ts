@@ -78,6 +78,46 @@ describe('ImageAnalysisService', () => {
     ).rejects.toThrow('Image exceeds max size');
   });
 
+  it('should succeed when buffer size is exactly equal to maxImageSizeBytes', async () => {
+    const config: ImageAnalysisConfig = {
+      maxImageSizeBytes: 1000,
+    };
+    const exactService = new ImageAnalysisService(config);
+    const exactBuffer = Buffer.alloc(1000);
+    const base64 = exactBuffer.toString('base64');
+
+    const result = await exactService.analyze({
+      imageBuffer: base64,
+    });
+
+    expect(result.metadata.size).toBe(1000);
+  });
+
+  it('should reject when buffer size is maxImageSizeBytes + 1', async () => {
+    const config: ImageAnalysisConfig = {
+      maxImageSizeBytes: 1000,
+    };
+    const boundaryService = new ImageAnalysisService(config);
+    const overBuffer = Buffer.alloc(1001);
+    const base64 = overBuffer.toString('base64');
+
+    await expect(
+      boundaryService.analyze({
+        imageBuffer: base64,
+      }),
+    ).rejects.toThrow('Image exceeds max size');
+  });
+
+  it('should handle malformed base64 payload gracefully by throwing error', async () => {
+    const malformedBase64 = '!!!invalid_base64_payload_123!!!';
+
+    await expect(
+      service.analyze({
+        imageBuffer: malformedBase64,
+      }),
+    ).rejects.toThrow(/base64/i);
+  });
+
   it('should return mock results when no API key configured', async () => {
     const noKeyConfig: ImageAnalysisConfig = {
       visionApiKey: undefined,
@@ -113,6 +153,9 @@ describe('ImageAnalysisService', () => {
   it.each([
     ['GIF', [0x47, 0x49, 0x46, 0x38], 'gif'],
     ['WebP', [0x52, 0x49, 0x46, 0x46, 0, 0, 0, 0, 0x57, 0x45, 0x42, 0x50], 'webp'],
+    ['BMP', [0x42, 0x4d, 0x00, 0x00], 'bmp'],
+    ['TIFF (Intel)', [0x49, 0x49, 0x2a, 0x00], 'tiff'],
+    ['TIFF (Motorola)', [0x4d, 0x4d, 0x00, 0x2a], 'tiff'],
   ])('detects %s magic bytes', async (_name, bytes, expectedFormat) => {
     const result = await service.analyze({
       imageBuffer: Buffer.from(bytes).toString('base64'),

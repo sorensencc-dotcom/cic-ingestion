@@ -20,6 +20,10 @@ export class ImageAnalysisService {
   }
 
   async analyze(request: AnalyzeImageRequest): Promise<AnalyzeImageResponse> {
+    if (typeof request.imageBuffer !== 'string' || !/^[A-Za-z0-9+/=\s]+$/.test(request.imageBuffer)) {
+      throw new Error('Malformed base64 payload');
+    }
+
     const imageBuffer = Buffer.from(request.imageBuffer, 'base64');
 
     // Validate size
@@ -62,6 +66,22 @@ export class ImageAnalysisService {
   }
 
   private _detectFormat(buffer: Buffer): string | null {
+    // Magic bytes for 2-byte headers (BMP, TIFF)
+    if (buffer.length >= 2) {
+      // BMP: 42 4D ("BM")
+      if (buffer[0] === 0x42 && buffer[1] === 0x4d) {
+        return 'bmp';
+      }
+
+      // TIFF: 49 49 ("II", Intel) or 4D 4D ("MM", Motorola)
+      if (
+        (buffer[0] === 0x49 && buffer[1] === 0x49) ||
+        (buffer[0] === 0x4d && buffer[1] === 0x4d)
+      ) {
+        return 'tiff';
+      }
+    }
+
     // Magic bytes for common image formats
     if (buffer.length >= 4) {
       const bytes = buffer.slice(0, 4);
