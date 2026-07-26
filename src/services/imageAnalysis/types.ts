@@ -31,3 +31,22 @@ export interface ImageAnalysisConfig {
   visionApiProvider?: string;
   maxImageSizeBytes?: number;
 }
+
+export interface OcrRequest {
+  imageBuffer: string; // base64-encoded image
+  format?: string;
+  apiKey?: string;
+  requestId?: string;
+}
+
+export interface OcrMetadata {
+  format: string;
+  size: number;
+  processedAt: string;
+  latencyMs: number;
+}
+
+export interface OcrResponse {
+  text: string;
+  metadata: OcrMetadata;
+}

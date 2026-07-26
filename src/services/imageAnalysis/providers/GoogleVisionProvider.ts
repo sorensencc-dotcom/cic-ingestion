@@ -40,4 +40,14 @@ export class GoogleVisionProvider {
       web: result.webDetection || {},
     };
   }
+
+  async ocrImage(imageBuffer: Buffer): Promise<string> {
+    const request = {
+      image: { content: imageBuffer },
+      features: [{ type: 'DOCUMENT_TEXT_DETECTION' }],
+    };
+
+    const [result] = await this.client.annotateImage(request);
+    return result.fullTextAnnotation?.text || '';
+  }
 }

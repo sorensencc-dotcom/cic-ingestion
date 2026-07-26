@@ -1,4 +1,4 @@
-import { AnalyzeImageRequest, AnalyzeImageResponse, ImageMatch, ImageAnalysisConfig } from './types';
+import { AnalyzeImageRequest, AnalyzeImageResponse, ImageMatch, ImageAnalysisConfig, OcrRequest, OcrResponse } from './types';
 import { GoogleVisionProvider, VisionResult } from './providers/GoogleVisionProvider';
 
 export class ImageAnalysisService {
@@ -63,6 +63,56 @@ export class ImageAnalysisService {
       // No API key: return mock results
       return this._generateMockResults(imageBuffer, format);
     }
+  }
+
+  async ocr(request: OcrRequest): Promise<OcrResponse> {
+    if (typeof request.imageBuffer !== 'string' || !/^[A-Za-z0-9+/=\s]+$/.test(request.imageBuffer)) {
+      throw new Error('Malformed base64 payload');
+    }
+
+    const imageBuffer = Buffer.from(request.imageBuffer, 'base64');
+
+    if (imageBuffer.length > this.maxImageSizeBytes) {
+      throw new Error(`Image exceeds max size of ${this.maxImageSizeBytes} bytes`);
+    }
+
+    const format = this._detectFormat(imageBuffer) || request.format || 'unknown';
+
+    if (this.visionApiKey) {
+      try {
+        const startTime = Date.now();
+        const provider = this.getOrInitializeProvider();
+        const text = await provider.ocrImage(imageBuffer);
+        const latencyMs = Date.now() - startTime;
+
+        return {
+          text,
+          metadata: {
+            format,
+            size: imageBuffer.length,
+            processedAt: new Date().toISOString(),
+            latencyMs,
+          },
+        };
+      } catch (error) {
+        console.log(`Vision API OCR failed: ${(error as Error).message}, falling back to mock`);
+        return this._generateMockOcrResult(imageBuffer, format);
+      }
+    } else {
+      return this._generateMockOcrResult(imageBuffer, format);
+    }
+  }
+
+  private _generateMockOcrResult(imageBuffer: Buffer, format: string): OcrResponse {
+    return {
+      text: '',
+      metadata: {
+        format,
+        size: imageBuffer.length,
+        processedAt: new Date().toISOString(),
+        latencyMs: Math.random() * 50 + 10,
+      },
+    };
   }
 
   private _detectFormat(buffer: Buffer): string | null {
