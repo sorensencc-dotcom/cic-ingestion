@@ -217,6 +217,7 @@ describe('Phase 2: E2E Integration — Ingestion → Routing → Audit', () => {
         const verification: VerificationResult = {
           passed: true,
           errors: [],
+          cost: 0,
         };
         const cost: Cost = {
           extractorCost: decision.extractors.length * 0.0005,
@@ -280,6 +281,7 @@ describe('Phase 2: E2E Integration — Ingestion → Routing → Audit', () => {
         const verification: VerificationResult = {
           passed: true,
           errors: [],
+          cost: 0,
         };
         const cost: Cost = {
           extractorCost: 0.001,

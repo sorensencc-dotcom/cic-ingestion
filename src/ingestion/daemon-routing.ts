@@ -6,7 +6,7 @@
 import fs from "fs";
 import path from "path";
 import readline from "readline";
-import { CICStateStore, BackendId } from "src/server/cicStateStore.ts";
+import { CICStateStore, BackendId } from "../server/cicStateStore.ts";
 import { clientSessionExtractor } from "../extractors/clientSessionExtractor.ts";
 import { processClientSession } from "../harness/replayHarness.ts";
 import { decayDriftScores } from "../drift/driftEngine.ts";

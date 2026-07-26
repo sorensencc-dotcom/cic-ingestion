@@ -76,7 +76,7 @@ function testWaveATypes(): void {
   assert(record.lane === "fast", "Lane field is correct type");
   assert(Array.isArray(record.extractorsRun), "extractorsRun is array");
   assert(record.verification.passed === true, "Verification structure valid");
-  assert(record.cost.totalCost === 15, "Cost calculation correct");
+  assert(record.cost?.totalCost === 15, "Cost calculation correct");
 }
 
 // ============================================================================

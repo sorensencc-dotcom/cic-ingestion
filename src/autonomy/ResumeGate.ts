@@ -35,7 +35,7 @@ export interface RevisedPlan {
   scope: string[];
   expectedFiles: string[];
   maxFileChanges: number;
-  maxDuplicates: number;
+  maxDuplicates?: number;
   dependencies?: string[];
   timestamp: number;
 }
@@ -219,7 +219,7 @@ export class ResumeGate {
 
     // Contradiction 5: Dependency justifications vs detected creep
     const hasDependencyCreep = vectors.some(
-      (v) => v.failureMode === 'WRONG_ABSTRACTION' && v.details?.newDependencies
+      (v) => v.failureMode === 'WRONG_ABSTRACTION' && 'details' in v && (v as CorrelatedDriftVector & { details?: { newDependencies?: unknown } }).details?.newDependencies
     );
     if (hasDependencyCreep && Object.keys(criteria.dependencyJustifications || {}).length === 0) {
       contradictions.push('Dependency creep detected but no justifications provided');
@@ -239,7 +239,7 @@ export class ResumeGate {
    * Validate negative test cases present
    */
   private validateNegativeTests(criteria: RevisedCriteria): boolean {
-    return criteria && criteria.negativeTestCases && criteria.negativeTestCases > 0;
+    return Boolean(criteria && criteria.negativeTestCases > 0);
   }
 
   /**

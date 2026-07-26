@@ -92,7 +92,7 @@ export class AnthropicClient {
       });
 
       // Extract text from response
-      const textContent = response.content.find(c => c.type === 'text');
+      const textContent = response.content.find((c: { type: string; text?: string }) => c.type === 'text');
       const text = textContent && 'text' in textContent ? textContent.text : '';
 
       const inputTokens = response.usage?.input_tokens ?? 0;

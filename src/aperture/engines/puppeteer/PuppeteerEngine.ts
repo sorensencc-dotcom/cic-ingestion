@@ -28,7 +28,7 @@ export class PuppeteerEngine {
       await this.checkAndRestart();
     }
 
-    return this.browser;
+    return this.browser!;
   }
 
   /**

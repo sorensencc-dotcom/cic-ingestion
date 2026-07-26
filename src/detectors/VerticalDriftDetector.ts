@@ -37,10 +37,22 @@ export class VerticalDriftDetector {
     }
 
     if (result.score !== undefined) {
+      if (adapterId && this.baselineScores.has(adapterId)) {
+        const baseline = this.baselineScores.get(adapterId)!;
+        const drift = Math.abs(result.score - baseline) / baseline;
+        if (drift > this.driftThreshold) {
+          return {
+            type: "SCHEMA_MISMATCH",
+            severity: "MEDIUM",
+            details: { current: result.score, baseline, drift: (drift * 100).toFixed(2) + "%" },
+            timestamp: result.timestamp,
+          };
+        }
+      }
       if (result.score < this.confidenceThreshold) {
         return {
           type: "CONFIDENCE_DROP",
-          severity: result.score < 0.2 ? "CRITICAL" : "HIGH",
+            severity: result.score <= 0.2 ? "CRITICAL" : "HIGH",
           details: {
             score: result.score,
             threshold: this.confidenceThreshold,
@@ -49,23 +61,6 @@ export class VerticalDriftDetector {
         };
       }
 
-      if (adapterId && this.baselineScores.has(adapterId)) {
-        const baseline = this.baselineScores.get(adapterId)!;
-        const drift = Math.abs(result.score - baseline) / baseline;
-
-        if (drift > this.driftThreshold) {
-          return {
-            type: "SCHEMA_MISMATCH",
-            severity: "MEDIUM",
-            details: {
-              current: result.score,
-              baseline,
-              drift: (drift * 100).toFixed(2) + "%",
-            },
-            timestamp: result.timestamp,
-          };
-        }
-      }
     }
 
     if (adapterId) {

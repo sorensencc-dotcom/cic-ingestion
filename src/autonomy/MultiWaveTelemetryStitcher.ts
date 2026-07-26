@@ -61,9 +61,9 @@ export interface G1Telemetry {
 
 export interface G2Telemetry {
   stage: 'G.2';
-  vectors: CorrelatedDriftVector[];
-  correlationPatterns: string[];
-  rootCauseWaves: Set<string>;
+  vectors: any[];
+  correlationPatterns: any[];
+  rootCauseWaves: Set<any>;
   timestamp: number;
 }
 

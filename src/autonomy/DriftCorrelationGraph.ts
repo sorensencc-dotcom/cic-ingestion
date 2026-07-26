@@ -22,6 +22,7 @@ export interface CorrelationEdge {
 }
 
 export interface CorrelatedDriftVector {
+  details?: { newDependencies?: string[]; [key: string]: unknown };
   sourceWave: 'B' | 'C' | 'D' | 'E' | 'F';
   failureMode: 'KITCHEN_SINK' | 'WRONG_ABSTRACTION' | 'OPTIMISTIC_PATH' | 'RUNAWAY_REFACTOR';
   severity: number; // 0.0–1.0 (computed)

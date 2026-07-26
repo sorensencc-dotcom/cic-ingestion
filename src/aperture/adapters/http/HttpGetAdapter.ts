@@ -75,7 +75,7 @@ export class HttpGetAdapter extends BaseAdapter {
       }
 
       const body = await response.text();
-      const responseHeaders = Object.fromEntries(response.headers);
+      const responseHeaders = Object.fromEntries(response.headers as unknown as Iterable<readonly [PropertyKey, unknown]>);
 
       return {
         status: response.status,

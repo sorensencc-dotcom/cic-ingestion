@@ -249,7 +249,7 @@ export class ExecutionPolicyAutoHealing {
     const hasCriteria = revisedCriteria && revisedCriteria.trim().length > 0;
     const hasConstraints = Object.keys(constraints).length > 0;
 
-    return hasPlan && hasCriteria && hasConstraints;
+    return Boolean(hasPlan && hasCriteria && hasConstraints);
   }
 
   /**

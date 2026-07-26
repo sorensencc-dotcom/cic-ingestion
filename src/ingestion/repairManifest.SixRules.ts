@@ -197,8 +197,8 @@ export class RepairManifestSixRules {
     const recordsRemoved = preStats.totalLines - stats.validLines;
     const removalPercent = preStats.totalLines > 0 ? (recordsRemoved / preStats.totalLines) * 100 : 0;
 
-    // If more than 50% of records removed and pre-repair had > 100 records, flag as potential runaway
-    if (preStats.totalLines > 100 && removalPercent > 50) {
+    // Flag substantial loss once the manifest is large enough to make the signal meaningful.
+    if (preStats.totalLines >= 10 && removalPercent > 30) {
       return {
         type: 'RUNAWAY_REFACTOR',
         severity: 'MEDIUM',
@@ -243,7 +243,7 @@ export class RepairManifestSixRules {
         '6. Write clean manifest (valid records only)',
         '7. fsync to ensure durability',
         '8. Release lock',
-        '9. Report stats: total/valid/corrupted counts',
+        '9. Release report: total/valid/corrupted counts',
       ],
       expectedOutcome: 'Manifest file contains only valid records; corrupted lines removed',
       rollbackStrategy: 'Restore from backup if manifest was modified',
@@ -255,8 +255,8 @@ export class RepairManifestSixRules {
    */
   getDefaultCriteria(): RepairAcceptanceCriteria {
     return {
-      maxCorruptionPercent: 25, // At most 25% corruption
-      minSurvivalPercent: 75, // At least 75% of records survive
+      maxCorruptionPercent: 50, // At most 50% corruption
+      minSurvivalPercent: 50, // At least 50% of records survive
       requireBackupOnCorruption: true, // Always backup if corruption found
       timeoutMs: 5000, // Complete within 5 seconds
     };

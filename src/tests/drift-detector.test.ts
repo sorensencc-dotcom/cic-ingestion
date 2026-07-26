@@ -184,4 +184,24 @@ describe("VerticalDriftDetector", () => {
     expect(signal?.details.baseline).toBe(0.85);
     expect(signal?.details.drift).toBeDefined();
   });
+
+  it("prioritizes schema drift over confidence classification for baselined adapters", () => {
+    detector.check({ success: true, data: {}, score: 0.9, timestamp: Date.now() }, "priority-test");
+
+    const signal = detector.check(
+      { success: true, data: {}, score: 0.2, timestamp: Date.now() },
+      "priority-test"
+    );
+
+    expect(signal?.type).toBe("SCHEMA_MISMATCH");
+    expect(signal?.details.current).toBe(0.2);
+    expect(signal?.details.baseline).toBe(0.9);
+  });
+
+  it("treats the critical confidence boundary as critical", () => {
+    const signal = detector.check({ success: true, data: {}, score: 0.2, timestamp: Date.now() });
+
+    expect(signal?.type).toBe("CONFIDENCE_DROP");
+    expect(signal?.severity).toBe("CRITICAL");
+  });
 });

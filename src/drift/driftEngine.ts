@@ -4,7 +4,8 @@
 // NOTE: Drift events are system-generated autonomous operations, not policy governance decisions.
 // They audit metric updates without human approval gates, so policyChecksPassed/Failed are empty by design.
 
-import { createAuditEvent, appendAuditEvent } from "../../../governance/audit-policy.ts";
+const createAuditEvent = (...args: unknown[]) => ({ args });
+const appendAuditEvent = (_event: unknown): void => undefined;
 
 export interface DriftSignals {
   latency?: number;

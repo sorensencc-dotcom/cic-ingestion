@@ -11,6 +11,7 @@
     "esModuleInterop": true,
     "resolveJsonModule": true,
     "allowImportingTsExtensions": true,
+    "noEmit": true,
     "skipLibCheck": true,
     "noEmitOnError": false,
     "lib": ["ES2022", "DOM"],
@@ -26,5 +27,6 @@
     }
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["dist", "node_modules", "src/rag/grok-rag-optimized.ts", "src/aperture/__tests__/**"]
+  "exclude": ["dist", "node_modules", "src/rag/grok-rag-optimized.ts", "src/aperture/__tests__/**"],
+  "ts-node": { "experimentalResolver": true }
 }

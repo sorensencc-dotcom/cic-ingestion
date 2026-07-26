@@ -60,7 +60,7 @@ export class MetricsEngine {
       LIMIT 1;
     `;
     const { rows } = await this.pool.query(sql);
-    return rows[0] || null;
+    return (rows[0] as ViolationRateResult | undefined) || null;
   }
 
   async computeRollbackSeverityIndex(): Promise<RollbackSeverityResult | null> {
@@ -83,7 +83,7 @@ export class MetricsEngine {
       LIMIT 1;
     `;
     const { rows } = await this.pool.query(sql);
-    return rows[0] || null;
+    return (rows[0] as RollbackSeverityResult | undefined) || null;
   }
 
   async computeCohortStabilityScore(): Promise<CohortStabilityResult | null> {
@@ -107,7 +107,7 @@ export class MetricsEngine {
       LIMIT 1;
     `;
     const { rows } = await this.pool.query(sql);
-    return rows[0] || null;
+    return (rows[0] as CohortStabilityResult | undefined) || null;
   }
 
   async computeImpactDrift(): Promise<ImpactDriftResult | null> {
@@ -123,7 +123,7 @@ export class MetricsEngine {
       LIMIT 1;
     `;
     const { rows } = await this.pool.query(sql);
-    return rows[0] || null;
+    return (rows[0] as ImpactDriftResult | undefined) || null;
   }
 
   async computeGovernanceRiskSnapshot(): Promise<GovernanceRiskResult | null> {
@@ -136,6 +136,6 @@ export class MetricsEngine {
       FROM governance_envelope;
     `;
     const { rows } = await this.pool.query(sql);
-    return rows[0] || null;
+    return (rows[0] as GovernanceRiskResult | undefined) || null;
   }
 }

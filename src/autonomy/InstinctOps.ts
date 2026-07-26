@@ -234,15 +234,15 @@ export class InstinctOps {
   enforceAll(context: InstinctContext, input: Record<string, any>): InstinctResult[] {
     const results: InstinctResult[] = [];
 
-    if (input.tests !== undefined) results.push(this.beforeFix(context, input));
-    if (input.criteria !== undefined) results.push(this.beforePlan(context, input));
-    if (input.errorReproduced !== undefined) results.push(this.beforeFix_Debugging(context, input));
-    if (input.depName !== undefined) results.push(this.beforeDependencyAdd(context, input));
-    if (input.confident !== undefined) results.push(this.surfaceUncertainty(context, input));
-    if (input.driftScore !== undefined) results.push(this.failureModeSelfRecognition(context, input));
-    if (input.filesModified !== undefined) results.push(this.beforeRefactor(context, input));
-    if (input.plan !== undefined) results.push(this.beforeCode(context, input));
-    if (input.totalTests !== undefined) results.push(this.negativeCaseAwareness(context, input));
+    if (input.tests !== undefined) results.push(this.beforeFix(context, input as { tests: string[]; failingTests: string[] }));
+    if (input.criteria !== undefined) results.push(this.beforePlan(context, input as { criteria?: string; request: string }));
+    if (input.errorReproduced !== undefined) results.push(this.beforeFix_Debugging(context, input as { errorReproduced: boolean; changesMade: number }));
+    if (input.depName !== undefined) results.push(this.beforeDependencyAdd(context, input as { depName: string; justification?: string; version?: string }));
+    if (input.confident !== undefined) results.push(this.surfaceUncertainty(context, input as { confident: boolean; uncertainty?: string }));
+    if (input.driftScore !== undefined) results.push(this.failureModeSelfRecognition(context, input as { driftScore: number; driftType?: string }));
+    if (input.filesModified !== undefined) results.push(this.beforeRefactor(context, input as { filesModified: number; justification?: string }));
+    if (input.plan !== undefined) results.push(this.beforeCode(context, input as { plan?: string; planSteps?: number }));
+    if (input.totalTests !== undefined) results.push(this.negativeCaseAwareness(context, input as { totalTests: number; negativeTests: number; acceptanceCriteriaErrors?: number }));
 
     return results;
   }

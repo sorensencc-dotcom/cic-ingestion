@@ -7,7 +7,7 @@
  * - ExecutionPolicyAutoHealing (plan recovery)
  */
 
-export {
+export type {
   CodeLevelDriftDetector,
   DriftSignal,
   CodeLevelInput,
@@ -17,10 +17,11 @@ export {
   DependencyRecord,
 } from '../drift/CodeLevelDriftDetector.js';
 
-export { InstinctOps, InstinctHook, InstinctContext, InstinctResult, getInstinctOps } from './InstinctOps.js';
+export { InstinctOps, getInstinctOps } from './InstinctOps.js';
+export type { InstinctHook, InstinctContext, InstinctResult } from './InstinctOps.js';
 
 export {
   ExecutionPolicyAutoHealing,
-  HealingOutput,
   getExecutionPolicyAutoHealing,
 } from './ExecutionPolicyInterceptor.AutoHealing.js';
+export type { HealingOutput } from './ExecutionPolicyInterceptor.AutoHealing.js';
