@@ -1,0 +1,19 @@
+src/__tests__/test-server.ts
+  s_da9e171b5de231::t_e48f7d235f7804 14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "c35f35cc64ebc7585d3f24aa5d9018132447242a",
+  "prompts": {},
+  "sessions": {
+    "s_da9e171b5de231": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e27a7023-39e0-4852-b719-638e31b8ee55",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
