@@ -1,0 +1,62 @@
+src/ingestion/daemon-routing.test.ts
+  s_fda856bf205e0d::t_559f4f75ef8992 7
+src/ingestion/ingestion-durability-gate.test.ts
+  s_fda856bf205e0d::t_130e068f02b3f5 221-239
+src/ingestion/ingestion-wave-f-master-gate.test.ts
+  s_fda856bf205e0d::t_97d422df1a4e13 410-419,421,423-429
+src/ingestion/ingestionManifest.test.ts
+  s_fda856bf205e0d::t_e185002874e8a0 338,340,344
+src/ingestion/ingestionManifest.ts
+  s_fda856bf205e0d::t_7722177afbed56 23-24,27,135,137
+src/ingestion/jobs/docsManagerIntegration.test.ts
+  s_fda856bf205e0d::t_3f97bef55e046d 8,14
+src/tests/phase5-ab-testing-e2e.test.ts
+  s_fda856bf205e0d::t_b5be00c91c6537 370
+src/aperture/__tests__/tool-execution-docker.test.ts
+  s_659aefbaf5fabf::t_a2a93399f93435 113
+src/aperture/adapters/ValidationUtils.ts
+  s_659aefbaf5fabf::t_110601e0e36c06 63-68
+src/aperture/adapters/file/FileWriteAdapter.ts
+  s_659aefbaf5fabf::t_4fa2d24ff1a57b 90-91
+src/aperture/orchestrator/ExecutionOrchestrator.ts
+  s_659aefbaf5fabf::t_fa1071e41a4eb2 175,177-188,239-241,265,267-279
+src/services/imageAnalysis/ImageAnalysisService.ts
+  s_bf425cfb5dd902::t_5ba4edc88f5e67 23
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "73083455f89a3ef2eea1642673fc7cffd9e6e773",
+  "prompts": {},
+  "humans": {
+    "h_8285d1e5d54e81": {
+      "author": "Soren <sorensencc@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_659aefbaf5fabf": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "154d4d74-8bba-4a86-af10-c33faf83fe81",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_bf425cfb5dd902": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d0bddb46-1770-430a-a668-ee0f4c688ce6",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_fda856bf205e0d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "77d54c09-1b77-4d8b-b6fa-44351f19c78d",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
