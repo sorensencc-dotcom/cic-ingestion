@@ -60,7 +60,12 @@ export class ValidationUtils {
     const sandboxAbs = path.resolve(sandboxDir);
 
     // Check if resolved path is within sandbox
-    if (!safePath.startsWith(sandboxAbs)) {
+    const isWindows = process.platform === 'win32';
+    const match = isWindows
+      ? safePath.toLowerCase().startsWith(sandboxAbs.toLowerCase())
+      : safePath.startsWith(sandboxAbs);
+
+    if (!match) {
       return {
         valid: false,
         error: `Path traversal detected: ${userPath} escapes sandbox`

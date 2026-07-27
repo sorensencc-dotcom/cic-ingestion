@@ -1,10 +1,3 @@
-#!/usr/bin/env node
-/**
- * ingestion-wave-f-master-gate.test.ts
- * Phase 27 Wave F: Master validation gate
- * Validates complete ingestion pipeline (Waves A-E)
- */
-
 import * as fs from "fs";
 import * as path from "path";
 import { recordIngestion } from "./ingestionManifest";
@@ -414,38 +407,23 @@ function cleanup(): void {
   }
 }
 
-// ============================================================================
-// RUN GATES
-// ============================================================================
+describe("ingestion-wave-f-master-gate", () => {
+  test("Phase 27 Wave F: Complete Pipeline", () => {
+    try {
+      testWaveATypes();
+      testWaveBRouting();
+      testWaveCDaemonRouting();
+      testWaveDQuarantine();
+      testWaveEDurability();
+      testWaveFEndToEnd();
+      testRecoveryScenarios();
 
-console.log("=========================================");
-console.log("ingestion-wave-f-master-gate");
-console.log("Phase 27 Wave F: Complete Pipeline");
-console.log("=========================================");
+      cleanup();
 
-try {
-  testWaveATypes();
-  testWaveBRouting();
-  testWaveCDaemonRouting();
-  testWaveDQuarantine();
-  testWaveEDurability();
-  testWaveFEndToEnd();
-  testRecoveryScenarios();
-
-  cleanup();
-
-  console.log("\n=========================================");
-  console.log(`Results: ${passCount} passed, ${failCount} failed`);
-  console.log("=========================================");
-
-  if (failCount > 0) {
-    process.exit(1);
-  } else {
-    console.log("✓ All gates passed");
-    process.exit(0);
-  }
-} catch (e) {
-  console.error("Gate execution failed:", e);
-  cleanup();
-  process.exit(1);
-}
+      expect(failCount).toBe(0);
+    } catch (e) {
+      cleanup();
+      throw e;
+    }
+  });
+});

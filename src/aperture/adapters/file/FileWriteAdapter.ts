@@ -87,8 +87,8 @@ export class FileWriteAdapter extends BaseAdapter {
       // Write file
       await fs.writeFile(safePath, content, encoding as BufferEncoding);
 
-      // Set mode if specified
-      if (mode) {
+      // Set mode if specified (non-Windows only)
+      if (mode && process.platform !== 'win32') {
         await fs.chmod(safePath, mode);
       }
 

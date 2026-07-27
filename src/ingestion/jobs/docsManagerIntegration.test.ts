@@ -5,16 +5,14 @@ import * as fs from "fs";
 import * as path from "path";
 import { runDocsManagerIngestionJob, getDocsManagerMetrics } from "./docsManagerJob";
 
-const JSONL_PATH = path.join(
+const JSONL_PATH = path.resolve(
   process.cwd(),
-  "cic-ingestion",
   "logs",
   "docs_manager.jsonl"
 );
 
-const STATE_FILE = path.join(
+const STATE_FILE = path.resolve(
   process.cwd(),
-  "cic-ingestion",
   "state",
   "docs_manager_state.json"
 );

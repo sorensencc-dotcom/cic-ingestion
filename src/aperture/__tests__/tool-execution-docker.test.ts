@@ -110,7 +110,7 @@ describe('Phase A: Docker Tool Execution', () => {
       );
 
       if (result.receipt.status !== 'success') {
-        console.log('Write error:', result.receipt.error);
+        console.log('Write error receipt:', JSON.stringify(result.receipt, null, 2));
       }
 
       expect(result.receipt.status).toBe('success');

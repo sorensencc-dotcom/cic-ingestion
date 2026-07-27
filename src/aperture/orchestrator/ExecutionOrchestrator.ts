@@ -172,16 +172,20 @@ export class ExecutionOrchestrator {
         }
       }
 
-      // Step 6: Create sandbox
+      // Step 6: Create or reuse sandbox
       try {
-        const policy = this.policyEngine.getPolicyForAgent(context.agent);
-        sandboxHandle = await this.sandboxRuntime.create({
-          agent: context.agent,
-          policy: policy || ({} as any),
-          memoryQuotaMb: 256,
-          cpuQuotaPercent: 50,
-          ephemeralOnly: true
-        });
+        if (context.sandbox) {
+          sandboxHandle = context.sandbox;
+        } else {
+          const policy = this.policyEngine.getPolicyForAgent(context.agent);
+          sandboxHandle = await this.sandboxRuntime.create({
+            agent: context.agent,
+            policy: policy || ({} as any),
+            memoryQuotaMb: 256,
+            cpuQuotaPercent: 50,
+            ephemeralOnly: true
+          });
+        }
       } catch (err: any) {
         return this.createFailedResult(
           receiptId,
@@ -232,7 +236,9 @@ export class ExecutionOrchestrator {
         const status = isTimeout ? 'timeout' : 'failed';
         const errorCode = isTimeout ? 'TIMEOUT' : 'EXECUTION_FAILED';
 
-        await sandboxHandle.cleanup();
+        if (!context.sandbox && sandboxHandle) {
+          await sandboxHandle.cleanup();
+        }
 
         return this.createFailedResult(
           receiptId,
@@ -256,19 +262,21 @@ export class ExecutionOrchestrator {
       this.policyEngine.incrementLimit(context.agent, 'calls', 1);
       this.policyEngine.incrementLimit(context.agent, 'bytes', outputSize);
 
-      // Step 10: Cleanup sandbox
+      // Step 10: Cleanup sandbox (only if created internally, not caller-owned)
       let cleanupStatus: 'success' | 'failed' = 'success';
-      try {
-        await sandboxHandle.cleanup();
-      } catch (err: any) {
-        cleanupStatus = 'failed';
-        this.emitEvent({
-          event_type: 'sandbox_error',
-          sandbox_id: sandboxHandle?.id,
-          agent: context.agent,
-          error: err.message,
-          timestamp: new Date().toISOString()
-        });
+      if (!context.sandbox && sandboxHandle) {
+        try {
+          await sandboxHandle.cleanup();
+        } catch (err: any) {
+          cleanupStatus = 'failed';
+          this.emitEvent({
+            event_type: 'sandbox_error',
+            adapter: adapterId,
+            agent: context.agent,
+            reason: `Sandbox cleanup failed: ${err.message}`,
+            timestamp: new Date().toISOString()
+          });
+        }
       }
 
       // Step 11: Create success receipt

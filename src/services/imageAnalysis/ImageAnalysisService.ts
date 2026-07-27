@@ -20,7 +20,7 @@ export class ImageAnalysisService {
   }
 
   async analyze(request: AnalyzeImageRequest): Promise<AnalyzeImageResponse> {
-    if (typeof request.imageBuffer !== 'string' || !/^[A-Za-z0-9+/=\s]+$/.test(request.imageBuffer)) {
+    if (typeof request.imageBuffer !== 'string' || (request.imageBuffer.length > 0 && !/^[A-Za-z0-9+/=\s]+$/.test(request.imageBuffer))) {
       throw new Error('Malformed base64 payload');
     }
 

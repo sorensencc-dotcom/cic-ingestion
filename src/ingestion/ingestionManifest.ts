@@ -20,10 +20,11 @@ export function recordIngestion(
   decision: RoutedIngestionDecision,
   verification: VerificationResult,
   cost: Cost,
-  routingVersion?: string
+  routingVersion?: string,
+  lockTimeoutMs: number = LOCK_TIMEOUT_MS
 ): void {
   // Acquire lock with timeout
-  const lockAcquired = acquireLock();
+  const lockAcquired = acquireLock(lockTimeoutMs);
   if (!lockAcquired) {
     throw new FileLockedError(
       `Failed to acquire manifest lock after ${LOCK_TIMEOUT_MS}ms`
@@ -131,9 +132,9 @@ export function backfillFromProcessedLines(
   }
 }
 
-function acquireLock(): boolean {
+function acquireLock(timeoutMs: number = LOCK_TIMEOUT_MS): boolean {
   const startTime = Date.now();
-  while (Date.now() - startTime < LOCK_TIMEOUT_MS) {
+  while (Date.now() - startTime < timeoutMs) {
     try {
       fs.writeFileSync(LOCK_PATH, "", { flag: "wx" });
       return true;

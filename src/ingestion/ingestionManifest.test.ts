@@ -335,13 +335,13 @@ describe("Phase 27 Ingestion Manifest", () => {
       fs.writeFileSync(LOCK_PATH, "");
 
       try {
-        recordIngestion(entry1, decision, verification, cost);
+        recordIngestion(entry1, decision, verification, cost, undefined, 100);
         // If we get here, lock wasn't detected
-        fs.unlinkSync(LOCK_PATH);
+        if (fs.existsSync(LOCK_PATH)) fs.unlinkSync(LOCK_PATH);
         done(new Error("Expected FileLockedError"));
       } catch (err: any) {
         expect(err).toBeInstanceOf(FileLockedError);
-        fs.unlinkSync(LOCK_PATH);
+        if (fs.existsSync(LOCK_PATH)) fs.unlinkSync(LOCK_PATH);
         done();
       }
     });

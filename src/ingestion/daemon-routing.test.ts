@@ -4,7 +4,7 @@ import * as path from "path";
 import { IngestionDaemonRouting } from "./daemon-routing";
 
 // Mock dependencies
-jest.mock("src/server/cicStateStore.js");
+jest.mock("../server/cicStateStore.js");
 jest.mock("../extractors/clientSessionExtractor.js");
 jest.mock("../harness/replayHarness.js");
 jest.mock("../drift/driftEngine.js");

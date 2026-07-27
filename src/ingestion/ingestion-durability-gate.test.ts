@@ -1,4 +1,3 @@
-#!/usr/bin/env node
 /**
  * ingestion-durability-gate.ts
  * Phase 27 Wave E: Verify repair & prune operations work
@@ -219,37 +218,22 @@ function cleanup(): void {
   }
 }
 
-// ============================================================================
-// RUN GATE
-// ============================================================================
+describe("ingestion-durability-gate", () => {
+  test("Phase 27 Wave E: Repair & Prune validation", () => {
+    try {
+      testRepairDetectsCorruption();
+      testRepairRemovesCorruption();
+      testPruneDetectsOldRecords();
+      testPruneArchivesOldRecords();
+      testCombinedRepairAndPrune();
+      testPruneDateFormats();
 
-console.log("=========================================");
-console.log("ingestion-durability-gate");
-console.log("Phase 27 Wave E: Repair & Prune validation");
-console.log("=========================================");
+      cleanup();
 
-try {
-  testRepairDetectsCorruption();
-  testRepairRemovesCorruption();
-  testPruneDetectsOldRecords();
-  testPruneArchivesOldRecords();
-  testCombinedRepairAndPrune();
-  testPruneDateFormats();
-
-  cleanup();
-
-  console.log("\n=========================================");
-  console.log(`Results: ${passCount} passed, ${failCount} failed`);
-  console.log("=========================================");
-
-  if (failCount > 0) {
-    process.exit(1);
-  } else {
-    console.log("✓ All gates passed");
-    process.exit(0);
-  }
-} catch (e) {
-  console.error("Gate execution failed:", e);
-  cleanup();
-  process.exit(1);
-}
+      expect(failCount).toBe(0);
+    } catch (e) {
+      cleanup();
+      throw e;
+    }
+  });
+});

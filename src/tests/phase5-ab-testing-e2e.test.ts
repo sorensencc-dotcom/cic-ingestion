@@ -367,7 +367,7 @@ describe('Phase 5: A/B Testing E2E Flow', () => {
       name: 'cost_delta',
       type: 'gauge',
       threshold: 0.002,
-      operator: '<',
+      operator: '<=',
       unit: 'ratio',
     });
     metricsEngine.registerMetric({
