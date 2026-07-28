@@ -1,0 +1,24 @@
+src/autonomy/AutonomyAPIServer.ts
+  s_460e92f1dfc3ea::t_596cde58e4884f 58
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.16",
+  "base_commit_sha": "0d0344b0e67e7e5dbee9a538bc01db3374cbee55",
+  "prompts": {},
+  "humans": {
+    "h_8285d1e5d54e81": {
+      "author": "Soren <sorensencc@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_460e92f1dfc3ea": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a743383-e073-4c39-b97e-99ef106c56fc",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
