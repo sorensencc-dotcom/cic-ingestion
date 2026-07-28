@@ -55,7 +55,7 @@ export class AutonomyAPIServer {
   }
 
   private setupMiddleware(): void {
-    this.app.use(express.json({ limit: "10mb" }));
+    this.app.use(express.json({ limit: "25mb" }));
 
     this.app.use((req: Request, res: Response, next: NextFunction) => {
       res.header("Access-Control-Allow-Origin", "*");
