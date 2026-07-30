@@ -7,8 +7,11 @@ export class ImageAnalysisService {
   private googleVisionProvider: GoogleVisionProvider | null = null;
 
   constructor(config: ImageAnalysisConfig) {
-    this.visionApiKey = config.visionApiKey;
+    this.visionApiKey = config.visionApiKey || process.env.VISION_API_KEY || process.env.GOOGLE_APPLICATION_CREDENTIALS;
     this.maxImageSizeBytes = config.maxImageSizeBytes || 50 * 1024 * 1024;
+    if (!this.visionApiKey && !process.env.GOOGLE_APPLICATION_CREDENTIALS) {
+      console.warn('Vision: MOCK mode, no API key (set VISION_API_KEY or GOOGLE_APPLICATION_CREDENTIALS)');
+    }
   }
 
   private getOrInitializeProvider(): GoogleVisionProvider {

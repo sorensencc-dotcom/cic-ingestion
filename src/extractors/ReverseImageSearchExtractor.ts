@@ -29,7 +29,10 @@ export class ReverseImageSearchExtractor extends IExtractor {
 
   constructor(apiKey?: string) {
     super();
-    this.visionApiKey = apiKey || process.env.VISION_API_KEY;
+    this.visionApiKey = apiKey || process.env.VISION_API_KEY || process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    if (!this.visionApiKey) {
+      console.warn('Vision: MOCK mode, no API key (set VISION_API_KEY or GOOGLE_APPLICATION_CREDENTIALS)');
+    }
   }
 
   /**

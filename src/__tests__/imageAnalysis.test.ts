@@ -235,4 +235,34 @@ describe('ImageAnalysisService', () => {
     expect(log).toHaveBeenCalledWith(expect.stringContaining('Vision API failed: Vision unavailable'));
     log.mockRestore();
   });
+
+  describe('Vision API key warning logging', () => {
+    let warnSpy: jest.SpyInstance;
+    const origCreds = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+    const origVisionKey = process.env.VISION_API_KEY;
+
+    beforeEach(() => {
+      delete process.env.GOOGLE_APPLICATION_CREDENTIALS;
+      delete process.env.VISION_API_KEY;
+      warnSpy = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+    });
+
+    afterEach(() => {
+      if (origCreds) process.env.GOOGLE_APPLICATION_CREDENTIALS = origCreds;
+      if (origVisionKey) process.env.VISION_API_KEY = origVisionKey;
+      warnSpy.mockRestore();
+    });
+
+    it('logs a loud warning on startup when no Vision API key or credentials set', () => {
+      new ImageAnalysisService({ maxImageSizeBytes: 5000 });
+      expect(warnSpy).toHaveBeenCalledWith(
+        'Vision: MOCK mode, no API key (set VISION_API_KEY or GOOGLE_APPLICATION_CREDENTIALS)'
+      );
+    });
+
+    it('does not log warning when visionApiKey is provided in config', () => {
+      new ImageAnalysisService({ visionApiKey: 'my-test-key' });
+      expect(warnSpy).not.toHaveBeenCalled();
+    });
+  });
 });

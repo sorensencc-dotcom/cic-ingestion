@@ -306,5 +306,34 @@ describe("ReverseImageSearchExtractor", () => {
         }
       }
     });
+
+    test("logs warning when created without API key", () => {
+      const origCreds = process.env.GOOGLE_APPLICATION_CREDENTIALS;
+      const origKey = process.env.VISION_API_KEY;
+      delete process.env.GOOGLE_APPLICATION_CREDENTIALS;
+      delete process.env.VISION_API_KEY;
+      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+
+      try {
+        new ReverseImageSearchExtractor(undefined);
+        expect(warnSpy).toHaveBeenCalledWith(
+          "Vision: MOCK mode, no API key (set VISION_API_KEY or GOOGLE_APPLICATION_CREDENTIALS)"
+        );
+      } finally {
+        if (origCreds) process.env.GOOGLE_APPLICATION_CREDENTIALS = origCreds;
+        if (origKey) process.env.VISION_API_KEY = origKey;
+        warnSpy.mockRestore();
+      }
+    });
+
+    test("does not log warning when API key is provided", () => {
+      const warnSpy = jest.spyOn(console, "warn").mockImplementation(() => {});
+      try {
+        new ReverseImageSearchExtractor("test-key-123");
+        expect(warnSpy).not.toHaveBeenCalled();
+      } finally {
+        warnSpy.mockRestore();
+      }
+    });
   });
 });
