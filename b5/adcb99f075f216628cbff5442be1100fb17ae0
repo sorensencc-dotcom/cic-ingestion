@@ -1,0 +1,54 @@
+src/extractors/ReverseImageSearchExtractor.ts
+  s_ba176f58c8cfe8::t_aee92b133ca6c9 32-35
+__tests__/unit/reverse-image-extractor.test.ts
+  s_fda856bf205e0d::t_b5b471c485f506 309-337
+src/__tests__/imageAnalysis.test.ts
+  s_da9e171b5de231::t_6d1e9ccc71d4fe 238-267
+src/services/imageAnalysis/ImageAnalysisService.ts
+  s_bf425cfb5dd902::t_897fd412cb1e86 10,12-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "b5adcb99f075f216628cbff5442be1100fb17ae0",
+  "prompts": {},
+  "humans": {
+    "h_8285d1e5d54e81": {
+      "author": "Soren <sorensencc@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_ba176f58c8cfe8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "20010702-fe7c-41dc-87b3-d5296da4fbb2",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_bf425cfb5dd902": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d0bddb46-1770-430a-a668-ee0f4c688ce6",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_da9e171b5de231": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e27a7023-39e0-4852-b719-638e31b8ee55",
+        "model": "unknown"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_fda856bf205e0d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "77d54c09-1b77-4d8b-b6fa-44351f19c78d",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
