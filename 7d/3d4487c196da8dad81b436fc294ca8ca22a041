@@ -1,0 +1,12 @@
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "7d3d4487c196da8dad81b436fc294ca8ca22a041",
+  "prompts": {},
+  "humans": {
+    "h_8285d1e5d54e81": {
+      "author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
