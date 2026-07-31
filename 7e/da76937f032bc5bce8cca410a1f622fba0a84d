@@ -1,0 +1,38 @@
+src/autonomy/ExecutionPolicyInterceptor.AutoHealing.test.ts
+  s_00d135f05ed507::t_9446213c600e50 1-173
+src/drift/CodeLevelDriftDetector.test.ts
+  s_00d135f05ed507::t_9446213c600e50 1-199
+src/autonomy/DriftCorrelationGraph.test.ts
+  s_fda856bf205e0d::t_075d59f2872aa2 471-506,508
+src/autonomy/MultiWaveTelemetryStitcherResumeGate.integration.test.ts
+  s_00d135f05ed507::t_61eb738c9102be 1-163
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.18",
+  "base_commit_sha": "7eda76937f032bc5bce8cca410a1f622fba0a84d",
+  "prompts": {},
+  "humans": {
+    "h_8285d1e5d54e81": {
+      "author": "Soren <sorensencc@gmail.com>"
+    }
+  },
+  "sessions": {
+    "s_00d135f05ed507": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f4bb51ba-5872-43ae-8c28-6c4818b108b8",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_fda856bf205e0d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "77d54c09-1b77-4d8b-b6fa-44351f19c78d",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
