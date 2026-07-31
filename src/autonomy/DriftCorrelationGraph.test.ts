@@ -468,4 +468,41 @@ describe('DriftCorrelationGraph', () => {
       }
     });
   });
+
+  describe('Token/Cost Blast-Radius Guard', () => {
+    test('detects synthetic run with cost/token spike exceeding 10% threshold and asserts halt/flagging', () => {
+      // Incident simulation: 415% uncontrolled cost growth vs 10% threshold (baseline.json)
+      const costSpikeEvent: WaveDriftEvent = {
+        wave: 'F',
+        failureMode: 'RUNAWAY_REFACTOR',
+        severity: 'CRITICAL',
+        details: {
+          tokenGrowthPercent: 415,
+          costIncreasePercent: 415,
+          baselineThresholdPercent: 10,
+          reason: 'Uncontrolled token/cost growth blast-radius violation',
+          filesModified: 8,
+        },
+        timestamp: Date.now(),
+      };
+
+      graph.recordEvent(costSpikeEvent);
+      const correlated = graph.correlate();
+
+      expect(correlated.length).toBeGreaterThan(0);
+      const vector = correlated[0];
+
+      // Assert high severity (>= 0.75 / CRITICAL)
+      expect(vector.severity).toBeGreaterThanOrEqual(0.75);
+
+      // Assert required primitive recommendations to halt and contain blast radius
+      expect(vector.recommendedPrimitives).toContain('heal.enforce_surgical_diff');
+      expect(vector.recommendedPrimitives).toContain('heal.freeze_architecture');
+
+      // Assert vector confidence and description accurately record the critical drift
+      expect(vector.confidence).toBeGreaterThanOrEqual(0.6);
+      expect(vector.description).toContain('RUNAWAY_REFACTOR');
+    });
+  });
 });
+
