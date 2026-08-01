@@ -40,6 +40,7 @@ export class AutonomyAPIServer {
   private config: AutonomyAPIServerConfig;
   private server: any = null;
   private cronJobs: cron.ScheduledTask[] = [];
+  private adapterServices: AdapterIntegrationService[] = [];
 
   constructor(config: AutonomyAPIServerConfig = {}) {
     this.config = {
@@ -202,7 +203,9 @@ export class AutonomyAPIServer {
     adapterRegistry.register("console-metrics", consoleMetricsAdapter);
 
     // Mount console router
-    const consoleRouter = createConsoleRouter(torqueQueryClient, new AdapterIntegrationService(adapterRegistry));
+    const consoleAdapterService = new AdapterIntegrationService(adapterRegistry);
+    this.adapterServices.push(consoleAdapterService);
+    const consoleRouter = createConsoleRouter(torqueQueryClient, consoleAdapterService);
     this.app.use("/", consoleRouter);
 
     // Expose metrics endpoint for Prometheus scraping (Phase C observability)
@@ -211,6 +214,7 @@ export class AutonomyAPIServer {
     });
 
     const adapterService = new AdapterIntegrationService(adapterRegistry);
+    this.adapterServices.push(adapterService);
     const executeRouter = createExecuteRouter(adapterService);
     this.app.use("/", executeRouter);
 
@@ -307,6 +311,10 @@ export class AutonomyAPIServer {
       this.cronJobs.forEach(job => job.stop());
       this.cronJobs = [];
       console.log(`[${new Date().toISOString()}] Cron jobs stopped`);
+
+      // Stop warm-pool cleanup intervals
+      this.adapterServices.forEach(service => service.destroy());
+      this.adapterServices = [];
 
       if (!this.server) {
         resolve();

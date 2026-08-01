@@ -43,6 +43,10 @@ export class AdapterIntegrationService {
     this.registry.register(name, adapter);
   }
 
+  destroy(): void {
+    this.warmPool.destroy();
+  }
+
   async execute(
     adapterName: string,
     payload: any
