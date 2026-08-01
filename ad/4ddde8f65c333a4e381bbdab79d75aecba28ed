@@ -1,0 +1,57 @@
+src/harvester/index.test.ts
+  s_66da035b11c6c8::t_969dbcf010b271 1-17
+src/autonomy/InstinctOps.test.ts
+  s_58ecee46464e33::t_c192376dc5c6c2 1-314
+src/autonomy/routes/__tests__/search.test.ts
+  s_58ecee46464e33::t_c192376dc5c6c2 1-133
+src/autonomy/routes/__tests__/execution.test.ts
+  s_58ecee46464e33::t_c192376dc5c6c2 1-179
+src/autonomy/routes/__tests__/console.test.ts
+  s_58ecee46464e33::t_c192376dc5c6c2 1-297
+src/autonomy/TaskMetadataStore.test.ts
+  s_58ecee46464e33::t_c192376dc5c6c2 7-173,194,202
+  s_58ecee46464e33::t_eeece7bdc5a184 1-6,174-193,195-201,203
+src/autonomy/AutonomyAPIServer.test.ts
+  s_58ecee46464e33::t_8c987e4cd629ac 10,14-15,117,123-124
+  s_58ecee46464e33::t_c192376dc5c6c2 1-9,11-13,16-116,118-122,125-130
+src/autonomy/routes/__tests__/consoleMappers.test.ts
+  s_58ecee46464e33::t_c192376dc5c6c2 1-152
+src/webhooks/SLOViolationWebhook.test.ts
+  s_66da035b11c6c8::t_b2afb31243e186 5-6,30,45
+  s_66da035b11c6c8::t_969dbcf010b271 1-4,7-29,31-44,46-49
+src/autonomy/adapters/MemoryStoreAdapter.test.ts
+  s_58ecee46464e33::t_8c987e4cd629ac 1-52
+src/autonomy/FireDrillManager.test.ts
+  s_58ecee46464e33::t_c192376dc5c6c2 1-80
+src/resilience/hardeningOrchestrator.test.ts
+  s_66da035b11c6c8::t_5c74ee8dec257e 12,33
+  s_66da035b11c6c8::t_cd027ca69ef726 21
+  s_66da035b11c6c8::t_cd234365202f75 1-11,13-20,22-32,34-45
+src/resilience/fallbackChain.test.ts
+  s_66da035b11c6c8::t_b2afb31243e186 8-9,30
+  s_66da035b11c6c8::t_969dbcf010b271 1-7,10-29,31-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.19",
+  "base_commit_sha": "ad4ddde8f65c333a4e381bbdab79d75aecba28ed",
+  "prompts": {},
+  "sessions": {
+    "s_58ecee46464e33": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1038b9b8-c589-496d-91af-e058d3be5ca7",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    },
+    "s_66da035b11c6c8": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fbd64-7bf5-77c3-9018-1966c80aac21",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
