@@ -30,3 +30,4 @@ __pycache__/
 *.pyc
 .performance-report.json
 .validation-report.json
+.worktrees/
