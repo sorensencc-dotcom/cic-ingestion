@@ -1,0 +1,19 @@
+.gitignore
+  s_d92a162c4798dd::t_06bf44e2bc4677 33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "10231377fc8eac5807407ee2f7ba47eae0d82843",
+  "prompts": {},
+  "sessions": {
+    "s_d92a162c4798dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "360deef7-8c42-43b7-bd32-1c055da8344d",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
