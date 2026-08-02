@@ -1,0 +1,20 @@
+devops/automation/ci/pipeline.yml
+  s_9b04e33689e249::t_28ceec551a0849 18
+  s_9b04e33689e249::t_9bc777a095aa6f 13,16,30,48,68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "ced95794eb07c2e06b50a5469c65ec0ebd9ee3fa",
+  "prompts": {},
+  "sessions": {
+    "s_9b04e33689e249": {
+      "agent_id": {
+        "tool": "codex",
+        "id": "019fc2cc-b74c-7c20-b39b-9af6e9ee68b9",
+        "model": "gpt-5.6-luna"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
