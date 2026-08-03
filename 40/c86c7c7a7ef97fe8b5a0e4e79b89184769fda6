@@ -1,0 +1,27 @@
+src/services/imageAnalysis/ImageAnalysisService.ts
+  s_d92a162c4798dd::t_ec978b6f81e42a 48-53
+src/services/imageAnalysis/index.ts
+  s_d92a162c4798dd::t_39afe4bbc9ab71 8,16
+src/__tests__/imageAnalysis.test.ts
+  s_d92a162c4798dd::t_0529ba06c6f9c8 237
+  s_d92a162c4798dd::t_b64822ccedf8b2 223
+  s_d92a162c4798dd::t_9f943ddfb9e361 188
+  s_d92a162c4798dd::t_051b1417244c3c 209
+  s_d92a162c4798dd::t_f5c9af0fb9693c 137
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.20",
+  "base_commit_sha": "40c86c7c7a7ef97fe8b5a0e4e79b89184769fda6",
+  "prompts": {},
+  "sessions": {
+    "s_d92a162c4798dd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "360deef7-8c42-43b7-bd32-1c055da8344d",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
