@@ -45,10 +45,12 @@ export class ImageAnalysisService {
         const latencyMs = Date.now() - startTime;
 
         const matches = this._transformVisionResults(visionResult);
-        const labels: Label[] = (visionResult.labels || []).map((l) => ({
-          description: l.description,
-          score: l.score,
-        }));
+        const labels: Label[] = (visionResult.labels || [])
+          .filter((l) => typeof l?.description === 'string')
+          .map((l) => ({
+            description: l.description,
+            score: typeof l.score === 'number' ? l.score : 0,
+          }));
 
         return {
           matches,

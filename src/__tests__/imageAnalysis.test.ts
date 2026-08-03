@@ -134,6 +134,7 @@ describe('ImageAnalysisService', () => {
 
     expect(result.metadata.visionApiUsed).toBe(false);
     expect(result.matches.length).toBeGreaterThan(0);
+    expect(result.labels).toEqual([]);
   });
 
   it('should validate imageBuffer type in request', async () => {
@@ -184,7 +185,7 @@ describe('ImageAnalysisService', () => {
   it('returns transformed Vision matches and caches the provider', async () => {
     const visionService = new ImageAnalysisService({ visionApiKey: 'test-key' });
     const analyzeImage = jest.fn().mockResolvedValue({
-      labels: [],
+      labels: [{ description: 'Boat', score: 0.9 }],
       web: {
         fullMatchingImages: [
           { url: 'https://example.com/full.jpg', score: 0.876 },
@@ -205,6 +206,7 @@ describe('ImageAnalysisService', () => {
       { url: 'https://example.com/full.jpg', similarity: 88, source: 'google_vision' },
       { url: 'https://example.com/no-score.jpg', similarity: 0, source: 'google_vision' },
     ]);
+    expect(first.labels).toEqual([{ description: 'Boat', score: 0.9 }]);
     expect(second.metadata.visionApiUsed).toBe(true);
     expect(analyzeImage).toHaveBeenCalledTimes(2);
     expect(getProvider).toHaveBeenCalledTimes(2);
@@ -218,6 +220,7 @@ describe('ImageAnalysisService', () => {
     });
     const mockResults = {
       matches: [{ url: 'mock', similarity: 1, source: 'mock' }],
+      labels: [],
       metadata: {
         format: 'jpeg', size: 3, processedAt: 'now', visionApiUsed: false,
         latencyMs: 1, apiProvider: 'mock',
@@ -231,6 +234,7 @@ describe('ImageAnalysisService', () => {
     });
 
     expect(result).toBe(mockResults);
+    expect(result.labels).toEqual([]);
     expect(mock).toHaveBeenCalledWith(expect.any(Buffer), 'jpeg');
     expect(log).toHaveBeenCalledWith(expect.stringContaining('Vision API failed: Vision unavailable'));
     log.mockRestore();

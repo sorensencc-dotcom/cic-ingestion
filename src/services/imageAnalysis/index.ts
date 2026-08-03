@@ -5,6 +5,7 @@ export type {
   AnalyzeImageRequest,
   AnalyzeImageResponse,
   ImageMatch,
+  Label,
   AnalysisMetadata,
   ImageAnalysisConfig,
   OcrRequest,
@@ -12,4 +13,4 @@ export type {
   OcrMetadata,
 } from './types';
 export { GoogleVisionProvider } from './providers/GoogleVisionProvider';
-export type { VisionResult, Label, WebDetection } from './providers/GoogleVisionProvider';
+export type { VisionResult, Label as VisionProviderLabel, WebDetection } from './providers/GoogleVisionProvider';
