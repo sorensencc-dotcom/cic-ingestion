@@ -1,4 +1,4 @@
-import { AnalyzeImageRequest, AnalyzeImageResponse, ImageMatch, ImageAnalysisConfig, OcrRequest, OcrResponse } from './types';
+import { AnalyzeImageRequest, AnalyzeImageResponse, ImageMatch, ImageAnalysisConfig, OcrRequest, OcrResponse, Label } from './types';
 import { GoogleVisionProvider, VisionResult } from './providers/GoogleVisionProvider';
 
 export class ImageAnalysisService {
@@ -45,9 +45,14 @@ export class ImageAnalysisService {
         const latencyMs = Date.now() - startTime;
 
         const matches = this._transformVisionResults(visionResult);
+        const labels: Label[] = (visionResult.labels || []).map((l) => ({
+          description: l.description,
+          score: l.score,
+        }));
 
         return {
           matches,
+          labels,
           metadata: {
             format,
             size: imageBuffer.length,
@@ -198,6 +203,7 @@ export class ImageAnalysisService {
 
     return {
       matches: mockMatches,
+      labels: [],
       metadata: {
         format,
         size: imageBuffer.length,
