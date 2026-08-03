@@ -11,11 +11,6 @@ export interface ImageMatch {
   source: string; // e.g., 'google_vision'
 }
 
-export interface Label {
-  description: string;
-  score: number; // 0-1
-}
-
 export interface AnalysisMetadata {
   format: string;
   size: number; // bytes of decoded image
@@ -27,7 +22,6 @@ export interface AnalysisMetadata {
 
 export interface AnalyzeImageResponse {
   matches: ImageMatch[];
-  labels: Label[];
   metadata: AnalysisMetadata;
 }
 
