@@ -1,0 +1,5 @@
+#!/bin/sh
+set -eu
+ROOT="$(git rev-parse --show-toplevel)"
+pwsh -NoProfile -ExecutionPolicy Bypass -File "$ROOT/scripts/agent-worktree.ps1" -Mode CommitGuard
+exec pwsh -NoProfile -ExecutionPolicy Bypass -File "$ROOT/.githooks/pre-commit.ps1"

@@ -22,7 +22,10 @@ foreach ($file in $stagedFiles) {
 $allowedPatterns = @(
   "^cic-os/src/core/(ledger|maal)/",
   "^cic-ingestion/src/orchestrator/",
-  "^postgres/ledgers/"
+  "^postgres/ledgers/",
+  "^\.githooks/pre-commit(\.ps1)?$",
+  "^scripts/agent-worktree\.ps1$",
+  "^scripts/test-agent-worktree\.ps1$"
 )
 
 foreach ($file in $stagedFiles) {
