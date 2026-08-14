@@ -1,0 +1,19 @@
+src/routes/execute.ts
+  s_97e9c28b8bd31b::t_372344bbf43f1c 7-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.22",
+  "base_commit_sha": "6bb6e8e85c8e8918cd7dbde460763026ce7e14fa",
+  "prompts": {},
+  "sessions": {
+    "s_97e9c28b8bd31b": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "25ce2d99-e802-4543-93f0-7807ba509cf3",
+        "model": "claude-sonnet-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
