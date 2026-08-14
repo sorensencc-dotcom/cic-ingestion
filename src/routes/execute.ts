@@ -4,6 +4,33 @@ import { AdapterIntegrationService } from "../services/AdapterIntegrationService
 export function createExecuteRouter(service: AdapterIntegrationService): Router {
   const router = Router();
 
+  router.post("/telemetry/report", async (req: Request, res: Response) => {
+    try {
+      const { source, errorCode, latencyMs, traceId, details } = req.body;
+      if (!source || typeof errorCode === "undefined") {
+        return res.status(400).json({
+          success: false,
+          error: "Missing required fields: source, errorCode",
+        });
+      }
+
+      res.status(200).json({
+        status: "acknowledged",
+        source,
+        errorCode,
+        latencyMs: typeof latencyMs === "number" ? latencyMs : 0,
+        traceId: traceId || null,
+        details: details || {},
+        timestamp: new Date().toISOString(),
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  });
+
   router.post("/:adapterName", async (req: Request, res: Response) => {
     try {
       const { adapterName } = req.params;
