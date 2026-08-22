@@ -711,8 +711,12 @@ def test_http_worker_adapter_real_local_http_socket_integration():
                             {
                                 "type": "observation",
                                 "source_id": "src-doc-1",
-                                "source_revision": "rev-1",
-                                "source_span": {"uri": "file:///doc.txt", "start_char": 0, "end_char": 50},
+                                "source_revision": "sha256:e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+                                "source_span": {
+                                    "start": 0,
+                                    "end": 24,
+                                    "span_hash": "sha256:2898fe78df49cf7a4a9058fa1a8ca4b0ecda51bc6e3bbadba622a59a724dbcf7",
+                                },
                                 "confidence": 0.95,
                                 "rationale": "Direct evidence verified",
                             }
