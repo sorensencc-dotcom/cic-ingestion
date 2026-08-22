@@ -672,4 +672,109 @@ def test_configure_research_provider_from_env(monkeypatch):
     provider_env = torque_module.configure_research_provider_from_env()
     assert isinstance(provider_env, torque_module.HttpResearchWorkerAdapter)
     assert provider_env.worker_url == "http://worker.internal:8080/tasks"
-    torque_module.reset_research_provider()
+    torque_module.reset_research_provider()
+
+
+def test_http_worker_adapter_real_local_http_socket_integration():
+    """
+    Real HTTP integration test using an active local socket server fixture
+    (no mocking or monkeypatching of urllib).
+    """
+    import threading
+    from http.server import HTTPServer, BaseHTTPRequestHandler
+    import json
+
+    received_requests = []
+
+    class MockWorkerHandler(BaseHTTPRequestHandler):
+        def do_POST(self):
+            content_len = int(self.headers.get("Content-Length", 0))
+            body = self.rfile.read(content_len)
+            task_payload = json.loads(body.decode("utf-8"))
+            received_requests.append(task_payload)
+
+            if self.path == "/tasks":
+                response_data = {
+                    "schema": "research.result.v1",
+                    "task_id": task_payload["task_id"],
+                    "run_id": task_payload["run_id"],
+                    "status": "completed",
+                    "producer": {
+                        "engine": "torquequery",
+                        "provider": "live-local-fixture-worker",
+                        "model": "fixture-model",
+                        "prompt_version": "v1",
+                    },
+                    "payload": {
+                        "target_claim_ids": ["claim-live-1"],
+                        "findings": [
+                            {
+                                "type": "observation",
+                                "source_id": "src-doc-1",
+                                "source_revision": "rev-1",
+                                "source_span": {"uri": "file:///doc.txt", "start_char": 0, "end_char": 50},
+                                "confidence": 0.95,
+                                "rationale": "Direct evidence verified",
+                            }
+                        ],
+                    },
+                    "requires_approval": task_payload.get("approval_required", True),
+                }
+                self.send_response(200)
+                self.send_header("Content-Type", "application/json")
+                self.end_headers()
+                self.wfile.write(json.dumps(response_data).encode("utf-8"))
+            elif self.path == "/error-500":
+                self.send_response(500)
+                self.end_headers()
+                self.wfile.write(b"Internal Error")
+            else:
+                self.send_response(404)
+                self.end_headers()
+
+        def log_message(self, format, *args):
+            pass
+
+    server = HTTPServer(("127.0.0.1", 0), MockWorkerHandler)
+    host, port = server.server_address
+    server_thread = threading.Thread(target=server.serve_forever, daemon=True)
+    server_thread.start()
+
+    try:
+        worker_url = f"http://{host}:{port}/tasks"
+        adapter = torque_module.HttpResearchWorkerAdapter(worker_url=worker_url, timeout=5.0)
+        torque_module.set_research_provider(adapter)
+
+        task = {
+            "schema": "research.task.v1",
+            "task_id": "TASK-SOCKET-1",
+            "run_id": "RUN-SOCKET-1",
+            "kind": "research.synthesize",
+            "inputs": {"source_ids": ["src-doc-1"]},
+            "output_contract": "research.result.v1",
+            "approval_required": True,
+            "instruction": "Synthesize findings",
+        }
+
+        response = client.post("/tasks", json=task)
+        assert response.status_code == 200
+        data = response.json()
+        assert data["schema"] == "research.result.v1"
+        assert data["task_id"] == "TASK-SOCKET-1"
+        assert data["run_id"] == "RUN-SOCKET-1"
+        assert data["producer"]["provider"] == "live-local-fixture-worker"
+        assert len(data["payload"]["findings"]) == 1
+        assert len(received_requests) == 1
+        assert received_requests[0]["task_id"] == "TASK-SOCKET-1"
+
+        # Test 500 error mapping to PROVIDER_UNAVAILABLE over socket
+        adapter_err = torque_module.HttpResearchWorkerAdapter(worker_url=f"http://{host}:{port}/error-500", timeout=5.0)
+        torque_module.set_research_provider(adapter_err)
+        err_resp = client.post("/tasks", json=task)
+        assert err_resp.status_code == 502
+        assert err_resp.json()["detail"]["code"] == "PROVIDER_UNAVAILABLE"
+    finally:
+        server.shutdown()
+        server.server_close()
+        torque_module.reset_research_provider()
+
