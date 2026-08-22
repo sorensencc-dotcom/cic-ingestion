@@ -1,3 +1,4 @@
+import TorqueQueryV2Server as torque_module
 """
 Tests for TorqueQueryV2Server.py — the memory/drift semantic search service
 (CIC + MAAL). Per Tier 1 decision 2026-07-17 (Option i, split and rename),
@@ -276,3 +277,54 @@ def test_batch_search_swallows_individual_errors_without_surfacing_failure_count
     resp = client.post("/batch-search", json=[good, good]).json()
     assert resp["count"] == 2
     assert len(resp["results"]) == 2
+
+
+# ---------------------------------------------------------------------------
+# TRM worker contract
+# ---------------------------------------------------------------------------
+
+def test_task_worker_returns_research_result_for_injected_provider(monkeypatch):
+    task = {
+        "schema": "research.task.v1",
+        "task_id": "TASK-1",
+        "run_id": "RUN-1",
+        "instruction": "Compare sources.",
+        "success_criteria": ["Return cited findings."],
+        "idempotency_key": "idem-1",
+        "approval_required": True,
+    }
+
+    def provider(received):
+        assert received["task_id"] == "TASK-1"
+        return {
+            "schema": "research.result.v1",
+            "task_id": "TASK-1",
+            "run_id": "RUN-1",
+            "status": "completed",
+            "producer": {"engine": "torquequery", "provider": "test", "model": "fixture", "prompt_version": "v1"},
+            "payload": {"target_claim_ids": [], "findings": []},
+            "requires_approval": True,
+        }
+
+    monkeypatch.setattr(torque_module, "TASK_PROVIDER", provider)
+    response = client.post("/tasks", json=task)
+    assert response.status_code == 200
+    assert response.json()["schema"] == "research.result.v1"
+    assert response.json()["task_id"] == "TASK-1"
+
+
+def test_task_worker_rejects_malformed_task():
+    response = client.post("/tasks", json={"task_id": "TASK-1"})
+    assert response.status_code == 422
+
+
+def test_task_worker_returns_failed_result_when_provider_fails(monkeypatch):
+    task = {
+        "schema": "research.task.v1", "task_id": "TASK-2", "run_id": "RUN-2",
+        "instruction": "Compare sources.", "success_criteria": ["Return cited findings."],
+        "idempotency_key": "idem-2", "approval_required": False,
+    }
+    monkeypatch.setattr(torque_module, "TASK_PROVIDER", lambda _task: (_ for _ in ()).throw(RuntimeError("provider offline")))
+    response = client.post("/tasks", json=task)
+    assert response.status_code == 502
+    assert response.json()["detail"]["code"] == "PROVIDER_UNAVAILABLE"

@@ -216,6 +216,44 @@ def health():
         },
     }
 
+
+class ResearchTaskRequest(BaseModel):
+    schema: str
+    task_id: str
+    run_id: str
+    instruction: str
+    success_criteria: List[str]
+    idempotency_key: str
+    approval_required: bool
+
+class ResearchResult(BaseModel):
+    schema: str
+    task_id: str
+    run_id: str
+    status: str
+    producer: dict
+    payload: dict
+    requires_approval: bool
+
+
+def _unavailable_task_provider(_task: dict) -> dict:
+    raise RuntimeError("no TorqueQuery research provider configured")
+
+
+TASK_PROVIDER = _unavailable_task_provider
+
+
+@app.post("/tasks", response_model=ResearchResult)
+def execute_task(task: ResearchTaskRequest):
+    if task.schema != "research.task.v1":
+        raise HTTPException(status_code=422, detail="schema must be research.task.v1")
+    try:
+        result = TASK_PROVIDER(task.model_dump())
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail={"code": "PROVIDER_UNAVAILABLE", "message": str(exc)}) from exc
+    if result.get("schema") != "research.result.v1" or result.get("task_id") != task.task_id or result.get("run_id") != task.run_id:
+        raise HTTPException(status_code=502, detail={"code": "INVALID_PROVIDER_RESULT", "message": "provider returned mismatched research result"})
+    return ResearchResult.model_validate(result)
 @app.post("/search", response_model=SearchResponse)
 def search(req: SearchRequest):
     """
