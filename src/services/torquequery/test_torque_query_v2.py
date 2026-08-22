@@ -519,3 +519,157 @@ def test_task_worker_accepts_canonical_research_task_shape(monkeypatch):
     assert received_task["requested_by"] == "agent-cic"
     assert received_task["subject"] == {"topic": "memory drift"}
     assert received_task["constraints"] == {"max_citations": 5}
+
+
+# ---------------------------------------------------------------------------
+# HTTP Research Worker Adapter & Env Discovery Tests
+# ---------------------------------------------------------------------------
+
+def test_http_worker_adapter_missing_url_fails_closed():
+    adapter = torque_module.HttpResearchWorkerAdapter(worker_url=None)
+    torque_module.set_research_provider(adapter)
+    task = {
+        "schema": "research.task.v1",
+        "task_id": "TASK-HTTP-NOURL",
+        "run_id": "RUN-HTTP-NOURL",
+        "kind": "research.compare",
+        "inputs": {},
+        "output_contract": "research.result.v1",
+        "approval_required": True,
+    }
+    response = client.post("/tasks", json=task)
+    assert response.status_code == 502
+    assert response.json()["detail"]["code"] == "PROVIDER_UNAVAILABLE"
+    torque_module.reset_research_provider()
+
+
+def test_http_worker_adapter_unreachable_endpoint_returns_provider_unavailable():
+    adapter = torque_module.HttpResearchWorkerAdapter(worker_url="http://127.0.0.1:59999/tasks", timeout=0.5)
+    torque_module.set_research_provider(adapter)
+    task = {
+        "schema": "research.task.v1",
+        "task_id": "TASK-HTTP-UNREACHABLE",
+        "run_id": "RUN-HTTP-UNREACHABLE",
+        "kind": "research.compare",
+        "inputs": {},
+        "output_contract": "research.result.v1",
+        "approval_required": True,
+    }
+    response = client.post("/tasks", json=task)
+    assert response.status_code == 502
+    assert response.json()["detail"]["code"] == "PROVIDER_UNAVAILABLE"
+    torque_module.reset_research_provider()
+
+
+def test_http_worker_adapter_successful_delegation(monkeypatch):
+    import io
+
+    class MockHTTPResponse:
+        def __init__(self, data: dict, status: int = 200):
+            self.data = data
+            self.status = status
+
+        def read(self):
+            import json
+            return json.dumps(self.data).encode("utf-8")
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+    expected_result = {
+        "schema": "research.result.v1",
+        "task_id": "TASK-HTTP-OK",
+        "run_id": "RUN-HTTP-OK",
+        "status": "completed",
+        "producer": {"engine": "torquequery", "provider": "external-http-worker", "model": "remote-v1", "prompt_version": "v1"},
+        "payload": {"target_claim_ids": ["c1"], "findings": []},
+        "requires_approval": True,
+    }
+
+    def mock_urlopen(req, timeout=30.0):
+        assert req.full_url == "http://mock-research-worker.local/tasks"
+        return MockHTTPResponse(expected_result)
+
+    monkeypatch.setattr(torque_module.urllib.request, "urlopen", mock_urlopen)
+
+    adapter = torque_module.HttpResearchWorkerAdapter(worker_url="http://mock-research-worker.local/tasks")
+    torque_module.set_research_provider(adapter)
+
+    task = {
+        "schema": "research.task.v1",
+        "task_id": "TASK-HTTP-OK",
+        "run_id": "RUN-HTTP-OK",
+        "kind": "research.compare",
+        "inputs": {},
+        "output_contract": "research.result.v1",
+        "approval_required": True,
+    }
+    response = client.post("/tasks", json=task)
+    assert response.status_code == 200
+    res = response.json()
+    assert res["schema"] == "research.result.v1"
+    assert res["producer"]["provider"] == "external-http-worker"
+    assert res["payload"]["target_claim_ids"] == ["c1"]
+    torque_module.reset_research_provider()
+
+
+def test_http_worker_adapter_malformed_worker_response(monkeypatch):
+    class MockHTTPResponse:
+        def __init__(self, data: dict, status: int = 200):
+            self.data = data
+            self.status = status
+
+        def read(self):
+            import json
+            return json.dumps(self.data).encode("utf-8")
+
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            pass
+
+    # Malformed: schema mismatch
+    bad_result = {
+        "schema": "invalid.schema.v99",
+        "task_id": "TASK-HTTP-BAD",
+        "run_id": "RUN-HTTP-BAD",
+        "status": "completed",
+        "producer": {},
+        "payload": {},
+        "requires_approval": False,
+    }
+
+    monkeypatch.setattr(torque_module.urllib.request, "urlopen", lambda req, timeout=30.0: MockHTTPResponse(bad_result))
+
+    adapter = torque_module.HttpResearchWorkerAdapter(worker_url="http://mock-research-worker.local/tasks")
+    torque_module.set_research_provider(adapter)
+
+    task = {
+        "schema": "research.task.v1",
+        "task_id": "TASK-HTTP-BAD",
+        "run_id": "RUN-HTTP-BAD",
+        "kind": "research.compare",
+        "inputs": {},
+        "output_contract": "research.result.v1",
+        "approval_required": False,
+    }
+    response = client.post("/tasks", json=task)
+    assert response.status_code == 502
+    assert response.json()["detail"]["code"] == "INVALID_PROVIDER_RESULT"
+    torque_module.reset_research_provider()
+
+
+def test_configure_research_provider_from_env(monkeypatch):
+    monkeypatch.delenv("RESEARCH_WORKER_URL", raising=False)
+    provider_default = torque_module.configure_research_provider_from_env()
+    assert isinstance(provider_default, torque_module.DefaultFailingProviderAdapter)
+
+    monkeypatch.setenv("RESEARCH_WORKER_URL", "http://worker.internal:8080/tasks")
+    provider_env = torque_module.configure_research_provider_from_env()
+    assert isinstance(provider_env, torque_module.HttpResearchWorkerAdapter)
+    assert provider_env.worker_url == "http://worker.internal:8080/tasks"
+    torque_module.reset_research_provider()

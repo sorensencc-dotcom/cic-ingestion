@@ -44,6 +44,8 @@ import json
 import logging
 import os
 import hashlib
+import urllib.request
+import urllib.error
 
 # ========== Logging ==========
 
@@ -284,6 +286,49 @@ class DefaultFailingProviderAdapter:
         raise ProviderUnavailableError("no TorqueQuery research provider configured")
 
 
+class HttpResearchWorkerAdapter:
+    """
+    Concrete adapter delegating research tasks to an external worker/service
+    (e.g., dedicated TRM research worker or local/remote LLM agent runner) over HTTP.
+    External dependency: requires a live HTTP worker endpoint listening at RESEARCH_WORKER_URL
+    implementing the research.task.v1 -> research.result.v1 protocol contract.
+    """
+    def __init__(self, worker_url: Optional[str] = None, timeout: float = 30.0):
+        self.worker_url = worker_url or os.environ.get("RESEARCH_WORKER_URL")
+        self.timeout = timeout
+
+    def execute_task(self, task: ResearchTaskRequest) -> Dict[str, Any]:
+        if not self.worker_url:
+            raise ProviderUnavailableError("RESEARCH_WORKER_URL is not configured for HttpResearchWorkerAdapter")
+
+        payload = task.model_dump()
+        data_bytes = json.dumps(payload).encode("utf-8")
+        req = urllib.request.Request(
+            self.worker_url,
+            data=data_bytes,
+            headers={"Content-Type": "application/json", "Accept": "application/json"},
+            method="POST",
+        )
+        try:
+            with urllib.request.urlopen(req, timeout=self.timeout) as resp:
+                if resp.status != 200:
+                    raise ProviderUnavailableError(f"Worker HTTP error: status {resp.status}")
+                body = resp.read().decode("utf-8")
+                return json.loads(body)
+        except urllib.error.HTTPError as err:
+            if err.code in (400, 422):
+                try:
+                    err_body = json.loads(err.read().decode("utf-8"))
+                except Exception:
+                    err_body = str(err)
+                raise MalformedResultError(f"Worker rejected task: {err_body}")
+            raise ProviderUnavailableError(f"Worker HTTP failure: {err}") from err
+        except (urllib.error.URLError, TimeoutError, OSError) as err:
+            raise ProviderUnavailableError(f"Worker connection failure: {err}") from err
+        except json.JSONDecodeError as err:
+            raise MalformedResultError(f"Worker returned non-JSON response: {err}") from err
+
+
 class _CallableAdapter:
     def __init__(self, fn: Callable):
         self._fn = fn
@@ -295,7 +340,19 @@ class _CallableAdapter:
             return self._fn(task.model_dump())
 
 
-_CURRENT_PROVIDER: ResearchProviderAdapter = DefaultFailingProviderAdapter()
+def configure_research_provider_from_env() -> ResearchProviderAdapter:
+    """
+    Discover and configure research provider from environment variables.
+    If RESEARCH_WORKER_URL is set, returns an HttpResearchWorkerAdapter.
+    Otherwise, returns DefaultFailingProviderAdapter (failing closed).
+    """
+    worker_url = os.environ.get("RESEARCH_WORKER_URL")
+    if worker_url:
+        return HttpResearchWorkerAdapter(worker_url=worker_url)
+    return DefaultFailingProviderAdapter()
+
+
+_CURRENT_PROVIDER: ResearchProviderAdapter = configure_research_provider_from_env()
 
 
 def set_research_provider(
@@ -317,9 +374,9 @@ def get_research_provider() -> ResearchProviderAdapter:
 
 
 def reset_research_provider() -> None:
-    """Reset provider to default fail-closed state."""
+    """Reset provider to default fail-closed state (or environment configured provider)."""
     global _CURRENT_PROVIDER
-    _CURRENT_PROVIDER = DefaultFailingProviderAdapter()
+    _CURRENT_PROVIDER = configure_research_provider_from_env()
 
 
 def _unavailable_task_provider(_task: dict) -> dict:
