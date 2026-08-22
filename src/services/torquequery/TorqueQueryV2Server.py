@@ -221,10 +221,13 @@ class ResearchTaskRequest(BaseModel):
     schema: str
     task_id: str
     run_id: str
-    instruction: str
-    success_criteria: List[str]
-    idempotency_key: str
-    approval_required: bool
+    kind: str
+    inputs: dict = {}
+    output_contract: str = "research.result.v1"
+    idempotency_key: Optional[str] = None
+    approval_required: bool = True
+    instruction: Optional[str] = None
+    success_criteria: Optional[List[str]] = None
 
 class ResearchResult(BaseModel):
     schema: str

@@ -288,6 +288,9 @@ def test_task_worker_returns_research_result_for_injected_provider(monkeypatch):
         "schema": "research.task.v1",
         "task_id": "TASK-1",
         "run_id": "RUN-1",
+        "kind": "research.compare",
+        "inputs": {"source_ids": []},
+        "output_contract": "research.result.v1",
         "instruction": "Compare sources.",
         "success_criteria": ["Return cited findings."],
         "idempotency_key": "idem-1",
@@ -300,6 +303,9 @@ def test_task_worker_returns_research_result_for_injected_provider(monkeypatch):
             "schema": "research.result.v1",
             "task_id": "TASK-1",
             "run_id": "RUN-1",
+        "kind": "research.compare",
+        "inputs": {"source_ids": []},
+        "output_contract": "research.result.v1",
             "status": "completed",
             "producer": {"engine": "torquequery", "provider": "test", "model": "fixture", "prompt_version": "v1"},
             "payload": {"target_claim_ids": [], "findings": []},
@@ -320,7 +326,7 @@ def test_task_worker_rejects_malformed_task():
 
 def test_task_worker_returns_failed_result_when_provider_fails(monkeypatch):
     task = {
-        "schema": "research.task.v1", "task_id": "TASK-2", "run_id": "RUN-2",
+        "schema": "research.task.v1", "task_id": "TASK-2", "run_id": "RUN-2", "kind": "research.compare", "inputs": {}, "output_contract": "research.result.v1",
         "instruction": "Compare sources.", "success_criteria": ["Return cited findings."],
         "idempotency_key": "idem-2", "approval_required": False,
     }
@@ -328,3 +334,17 @@ def test_task_worker_returns_failed_result_when_provider_fails(monkeypatch):
     response = client.post("/tasks", json=task)
     assert response.status_code == 502
     assert response.json()["detail"]["code"] == "PROVIDER_UNAVAILABLE"
+
+def test_task_worker_accepts_canonical_research_task_shape(monkeypatch):
+    task = {
+        "schema": "research.task.v1", "task_id": "TASK-CANONICAL", "run_id": "RUN-CANONICAL",
+        "kind": "research.compare", "inputs": {"source_ids": []},
+        "output_contract": "research.result.v1", "approval_required": True,
+    }
+    monkeypatch.setattr(torque_module, "TASK_PROVIDER", lambda received: {
+        "schema": "research.result.v1", "task_id": received["task_id"], "run_id": received["run_id"],
+        "status": "completed", "producer": {"engine": "torquequery", "provider": "fixture", "model": "fixture", "prompt_version": "v1"},
+        "payload": {"target_claim_ids": [], "findings": []}, "requires_approval": True,
+    })
+    response = client.post("/tasks", json=task)
+    assert response.status_code == 200
