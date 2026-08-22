@@ -37,8 +37,8 @@ Semver: 2.0.0
 """
 
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel
-from typing import List, Optional
+from pydantic import BaseModel, ConfigDict
+from typing import List, Optional, Union, Dict, Any, Callable, Protocol, runtime_checkable
 import numpy as np
 import json
 import logging
@@ -217,26 +217,109 @@ def health():
     }
 
 
+# ========== Research Protocol Schemas & Provider Boundary ==========
+
 class ResearchTaskRequest(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
     schema: str
     task_id: str
     run_id: str
     kind: str
     inputs: dict = {}
+    subject: Optional[dict] = None
+    constraints: Optional[dict] = None
     output_contract: str = "research.result.v1"
     idempotency_key: Optional[str] = None
+    requested_by: Optional[str] = None
     approval_required: bool = True
     instruction: Optional[str] = None
     success_criteria: Optional[List[str]] = None
 
+
 class ResearchResult(BaseModel):
+    model_config = ConfigDict(protected_namespaces=())
+
     schema: str
     task_id: str
     run_id: str
+    attempt_id: Optional[str] = None
     status: str
     producer: dict
     payload: dict
     requires_approval: bool
+
+
+class ProviderError(Exception):
+    def __init__(self, message: str, code: str = "PROVIDER_ERROR"):
+        super().__init__(message)
+        self.code = code
+        self.message = message
+
+
+class ProviderUnavailableError(ProviderError):
+    def __init__(self, message: str = "no TorqueQuery research provider configured"):
+        super().__init__(message, code="PROVIDER_UNAVAILABLE")
+
+
+class MalformedResultError(ProviderError):
+    def __init__(self, message: str = "provider returned invalid research result"):
+        super().__init__(message, code="INVALID_PROVIDER_RESULT")
+
+
+@runtime_checkable
+class ResearchProviderAdapter(Protocol):
+    """
+    Typed provider interface for research task execution.
+    Implementations must accept a ResearchTaskRequest and return either a
+    ResearchResult model instance or a dictionary conforming to research.result.v1.
+    """
+    def execute_task(self, task: ResearchTaskRequest) -> Union[ResearchResult, Dict[str, Any]]:
+        ...
+
+
+class DefaultFailingProviderAdapter:
+    """Default fail-closed provider adapter when no live research engine is injected."""
+    def execute_task(self, task: ResearchTaskRequest) -> ResearchResult:
+        raise ProviderUnavailableError("no TorqueQuery research provider configured")
+
+
+class _CallableAdapter:
+    def __init__(self, fn: Callable):
+        self._fn = fn
+
+    def execute_task(self, task: ResearchTaskRequest) -> Union[ResearchResult, Dict[str, Any]]:
+        try:
+            return self._fn(task)
+        except TypeError:
+            return self._fn(task.model_dump())
+
+
+_CURRENT_PROVIDER: ResearchProviderAdapter = DefaultFailingProviderAdapter()
+
+
+def set_research_provider(
+    provider: Union[ResearchProviderAdapter, Callable[[dict], dict], Callable[[ResearchTaskRequest], Union[ResearchResult, dict]]]
+) -> None:
+    """Explicitly inject a research task provider."""
+    global _CURRENT_PROVIDER
+    if isinstance(provider, ResearchProviderAdapter) or hasattr(provider, "execute_task"):
+        _CURRENT_PROVIDER = provider
+    elif callable(provider):
+        _CURRENT_PROVIDER = _CallableAdapter(provider)
+    else:
+        raise ValueError("Provider must implement ResearchProviderAdapter or be callable")
+
+
+def get_research_provider() -> ResearchProviderAdapter:
+    """Retrieve the currently active research provider."""
+    return _CURRENT_PROVIDER
+
+
+def reset_research_provider() -> None:
+    """Reset provider to default fail-closed state."""
+    global _CURRENT_PROVIDER
+    _CURRENT_PROVIDER = DefaultFailingProviderAdapter()
 
 
 def _unavailable_task_provider(_task: dict) -> dict:
@@ -250,13 +333,71 @@ TASK_PROVIDER = _unavailable_task_provider
 def execute_task(task: ResearchTaskRequest):
     if task.schema != "research.task.v1":
         raise HTTPException(status_code=422, detail="schema must be research.task.v1")
+
+    provider = get_research_provider()
+    # Support legacy monkeypatching of TASK_PROVIDER when default adapter is active
+    if isinstance(provider, DefaultFailingProviderAdapter) and TASK_PROVIDER is not _unavailable_task_provider:
+        provider = _CallableAdapter(TASK_PROVIDER)
+
     try:
-        result = TASK_PROVIDER(task.model_dump())
+        if hasattr(provider, "execute_task"):
+            raw_result = provider.execute_task(task)
+        elif callable(provider):
+            try:
+                raw_result = provider(task)
+            except TypeError:
+                raw_result = provider(task.model_dump())
+        else:
+            raise ProviderUnavailableError("Invalid provider configured")
+    except (ProviderUnavailableError, HTTPException) as exc:
+        if isinstance(exc, HTTPException):
+            raise exc
+        raise HTTPException(status_code=502, detail={"code": exc.code, "message": exc.message}) from exc
+    except MalformedResultError as exc:
+        raise HTTPException(status_code=502, detail={"code": exc.code, "message": exc.message}) from exc
     except Exception as exc:
         raise HTTPException(status_code=502, detail={"code": "PROVIDER_UNAVAILABLE", "message": str(exc)}) from exc
-    if result.get("schema") != "research.result.v1" or result.get("task_id") != task.task_id or result.get("run_id") != task.run_id:
-        raise HTTPException(status_code=502, detail={"code": "INVALID_PROVIDER_RESULT", "message": "provider returned mismatched research result"})
-    return ResearchResult.model_validate(result)
+
+    if isinstance(raw_result, ResearchResult):
+        result_dict = raw_result.model_dump()
+    elif isinstance(raw_result, dict):
+        result_dict = raw_result
+    else:
+        raise HTTPException(
+            status_code=502,
+            detail={"code": "INVALID_PROVIDER_RESULT", "message": "provider returned non-dictionary result"}
+        )
+
+    if result_dict.get("schema") != "research.result.v1":
+        raise HTTPException(
+            status_code=502,
+            detail={"code": "INVALID_PROVIDER_RESULT", "message": "provider returned mismatched research result schema"}
+        )
+    if result_dict.get("task_id") != task.task_id or result_dict.get("run_id") != task.run_id:
+        raise HTTPException(
+            status_code=502,
+            detail={"code": "INVALID_PROVIDER_RESULT", "message": "provider returned mismatched research result"}
+        )
+    if "requires_approval" not in result_dict:
+        raise HTTPException(
+            status_code=502,
+            detail={"code": "INVALID_PROVIDER_RESULT", "message": "provider result missing requires_approval"}
+        )
+    if "status" not in result_dict or "producer" not in result_dict or "payload" not in result_dict:
+        raise HTTPException(
+            status_code=502,
+            detail={"code": "INVALID_PROVIDER_RESULT", "message": "provider result missing required fields"}
+        )
+
+    try:
+        return ResearchResult.model_validate(result_dict)
+    except Exception as exc:
+        raise HTTPException(
+            status_code=502,
+            detail={"code": "INVALID_PROVIDER_RESULT", "message": f"malformed result validation: {exc}"}
+        ) from exc
+
+
 @app.post("/search", response_model=SearchResponse)
 def search(req: SearchRequest):
     """

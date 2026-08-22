@@ -303,9 +303,9 @@ def test_task_worker_returns_research_result_for_injected_provider(monkeypatch):
             "schema": "research.result.v1",
             "task_id": "TASK-1",
             "run_id": "RUN-1",
-        "kind": "research.compare",
-        "inputs": {"source_ids": []},
-        "output_contract": "research.result.v1",
+            "kind": "research.compare",
+            "inputs": {"source_ids": []},
+            "output_contract": "research.result.v1",
             "status": "completed",
             "producer": {"engine": "torquequery", "provider": "test", "model": "fixture", "prompt_version": "v1"},
             "payload": {"target_claim_ids": [], "findings": []},
@@ -319,6 +319,138 @@ def test_task_worker_returns_research_result_for_injected_provider(monkeypatch):
     assert response.json()["task_id"] == "TASK-1"
 
 
+def test_task_worker_default_fails_closed_provider_unavailable():
+    torque_module.reset_research_provider()
+    task = {
+        "schema": "research.task.v1",
+        "task_id": "TASK-DEFAULT-FAIL",
+        "run_id": "RUN-DEFAULT-FAIL",
+        "kind": "research.compare",
+        "inputs": {"source_ids": []},
+        "output_contract": "research.result.v1",
+        "approval_required": True,
+    }
+    response = client.post("/tasks", json=task)
+    assert response.status_code == 502
+    data = response.json()
+    assert data["detail"]["code"] == "PROVIDER_UNAVAILABLE"
+
+
+def test_task_worker_successful_typed_adapter_injection():
+    class InjectedMockProvider:
+        def execute_task(self, req: torque_module.ResearchTaskRequest) -> torque_module.ResearchResult:
+            return torque_module.ResearchResult(
+                schema="research.result.v1",
+                task_id=req.task_id,
+                run_id=req.run_id,
+                status="completed",
+                producer={"engine": "torquequery", "provider": "injected-mock", "model": "test-v1", "prompt_version": "v1"},
+                payload={"target_claim_ids": ["claim-1"], "findings": []},
+                requires_approval=req.approval_required,
+            )
+
+    torque_module.set_research_provider(InjectedMockProvider())
+    task = {
+        "schema": "research.task.v1",
+        "task_id": "TASK-TYPED-1",
+        "run_id": "RUN-TYPED-1",
+        "kind": "research.compare",
+        "inputs": {"source_ids": ["src-1"]},
+        "output_contract": "research.result.v1",
+        "approval_required": False,
+    }
+    response = client.post("/tasks", json=task)
+    assert response.status_code == 200
+    res = response.json()
+    assert res["schema"] == "research.result.v1"
+    assert res["task_id"] == "TASK-TYPED-1"
+    assert res["run_id"] == "RUN-TYPED-1"
+    assert res["status"] == "completed"
+    assert res["requires_approval"] is False
+    assert res["producer"]["provider"] == "injected-mock"
+    assert res["payload"]["target_claim_ids"] == ["claim-1"]
+    torque_module.reset_research_provider()
+
+
+def test_task_worker_provider_unavailable_exception():
+    class OfflineProvider:
+        def execute_task(self, req: torque_module.ResearchTaskRequest):
+            raise torque_module.ProviderUnavailableError("upstream provider unreachable")
+
+    torque_module.set_research_provider(OfflineProvider())
+    task = {
+        "schema": "research.task.v1",
+        "task_id": "TASK-UNAVAIL-1",
+        "run_id": "RUN-UNAVAIL-1",
+        "kind": "research.compare",
+        "inputs": {},
+        "output_contract": "research.result.v1",
+        "approval_required": True,
+    }
+    response = client.post("/tasks", json=task)
+    assert response.status_code == 502
+    assert response.json()["detail"]["code"] == "PROVIDER_UNAVAILABLE"
+    assert "upstream provider unreachable" in response.json()["detail"]["message"]
+    torque_module.reset_research_provider()
+
+
+def test_task_worker_malformed_provider_result():
+    class MalformedResultProvider:
+        def execute_task(self, req: torque_module.ResearchTaskRequest):
+            # Missing required 'producer' and 'payload'
+            return {
+                "schema": "research.result.v1",
+                "task_id": req.task_id,
+                "run_id": req.run_id,
+                "status": "completed",
+                "requires_approval": True,
+            }
+
+    torque_module.set_research_provider(MalformedResultProvider())
+    task = {
+        "schema": "research.task.v1",
+        "task_id": "TASK-MALFORMED",
+        "run_id": "RUN-MALFORMED",
+        "kind": "research.compare",
+        "inputs": {},
+        "output_contract": "research.result.v1",
+        "approval_required": True,
+    }
+    response = client.post("/tasks", json=task)
+    assert response.status_code == 502
+    assert response.json()["detail"]["code"] == "INVALID_PROVIDER_RESULT"
+    torque_module.reset_research_provider()
+
+
+def test_task_worker_task_run_id_mismatch():
+    class MismatchedIdProvider:
+        def execute_task(self, req: torque_module.ResearchTaskRequest):
+            return {
+                "schema": "research.result.v1",
+                "task_id": "WRONG_TASK_ID",
+                "run_id": req.run_id,
+                "status": "completed",
+                "producer": {"engine": "torquequery", "provider": "mock", "model": "v1", "prompt_version": "v1"},
+                "payload": {"target_claim_ids": [], "findings": []},
+                "requires_approval": True,
+            }
+
+    torque_module.set_research_provider(MismatchedIdProvider())
+    task = {
+        "schema": "research.task.v1",
+        "task_id": "TASK-MISMATCH",
+        "run_id": "RUN-MISMATCH",
+        "kind": "research.compare",
+        "inputs": {},
+        "output_contract": "research.result.v1",
+        "approval_required": True,
+    }
+    response = client.post("/tasks", json=task)
+    assert response.status_code == 502
+    assert response.json()["detail"]["code"] == "INVALID_PROVIDER_RESULT"
+    torque_module.reset_research_provider()
+
+
 def test_task_worker_rejects_malformed_task():
     response = client.post("/tasks", json={"task_id": "TASK-1"})
     assert response.status_code == 422
@@ -326,25 +458,64 @@ def test_task_worker_rejects_malformed_task():
 
 def test_task_worker_returns_failed_result_when_provider_fails(monkeypatch):
     task = {
-        "schema": "research.task.v1", "task_id": "TASK-2", "run_id": "RUN-2", "kind": "research.compare", "inputs": {}, "output_contract": "research.result.v1",
-        "instruction": "Compare sources.", "success_criteria": ["Return cited findings."],
-        "idempotency_key": "idem-2", "approval_required": False,
+        "schema": "research.task.v1",
+        "task_id": "TASK-2",
+        "run_id": "RUN-2",
+        "kind": "research.compare",
+        "inputs": {},
+        "output_contract": "research.result.v1",
+        "instruction": "Compare sources.",
+        "success_criteria": ["Return cited findings."],
+        "idempotency_key": "idem-2",
+        "approval_required": False,
     }
     monkeypatch.setattr(torque_module, "TASK_PROVIDER", lambda _task: (_ for _ in ()).throw(RuntimeError("provider offline")))
     response = client.post("/tasks", json=task)
     assert response.status_code == 502
     assert response.json()["detail"]["code"] == "PROVIDER_UNAVAILABLE"
 
+
 def test_task_worker_accepts_canonical_research_task_shape(monkeypatch):
     task = {
-        "schema": "research.task.v1", "task_id": "TASK-CANONICAL", "run_id": "RUN-CANONICAL",
-        "kind": "research.compare", "inputs": {"source_ids": []},
-        "output_contract": "research.result.v1", "approval_required": True,
+        "schema": "research.task.v1",
+        "task_id": "TASK-CANONICAL",
+        "run_id": "RUN-CANONICAL",
+        "kind": "research.synthesize",
+        "inputs": {"source_ids": ["doc-1", "doc-2"]},
+        "subject": {"topic": "memory drift"},
+        "constraints": {"max_citations": 5},
+        "idempotency_key": "idem-canonical-99",
+        "requested_by": "agent-cic",
+        "output_contract": "research.result.v1",
+        "approval_required": True,
+        "instruction": "Synthesize drift evidence.",
+        "success_criteria": ["Confidence >= 0.8"],
     }
-    monkeypatch.setattr(torque_module, "TASK_PROVIDER", lambda received: {
-        "schema": "research.result.v1", "task_id": received["task_id"], "run_id": received["run_id"],
-        "status": "completed", "producer": {"engine": "torquequery", "provider": "fixture", "model": "fixture", "prompt_version": "v1"},
-        "payload": {"target_claim_ids": [], "findings": []}, "requires_approval": True,
-    })
+
+    received_task = {}
+
+    def provider(received):
+        nonlocal received_task
+        received_task = received
+        return {
+            "schema": "research.result.v1",
+            "task_id": received["task_id"],
+            "run_id": received["run_id"],
+            "status": "completed",
+            "producer": {"engine": "torquequery", "provider": "fixture", "model": "fixture", "prompt_version": "v1"},
+            "payload": {"target_claim_ids": ["claim-a"], "findings": []},
+            "requires_approval": received["approval_required"],
+        }
+
+    monkeypatch.setattr(torque_module, "TASK_PROVIDER", provider)
     response = client.post("/tasks", json=task)
     assert response.status_code == 200
+    res = response.json()
+    assert res["schema"] == "research.result.v1"
+    assert res["task_id"] == "TASK-CANONICAL"
+    assert res["run_id"] == "RUN-CANONICAL"
+    assert res["requires_approval"] is True
+    assert received_task["idempotency_key"] == "idem-canonical-99"
+    assert received_task["requested_by"] == "agent-cic"
+    assert received_task["subject"] == {"topic": "memory drift"}
+    assert received_task["constraints"] == {"max_citations": 5}
