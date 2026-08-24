@@ -16,6 +16,8 @@
  */
 
 
+import { FallbackChain } from '../resilience/fallbackChain';
+
 export interface TorqueQueryV2SearchRequest {
   query: string;
   normalized_embedding?: number[];
@@ -129,3 +131,102 @@ export async function torqueQueryV2BatchSearch(
     throw new Error(`TorqueQuery v2 batch search error: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
+
+export interface ScoredSearchResult extends TorqueQueryV2SearchResult {
+  relevanceScore?: number;
+  relevanceReasoning?: string;
+}
+
+export interface PostSearchEvaluationInput {
+  query: string;
+  results: TorqueQueryV2SearchResult[];
+  evaluationPrompt?: string;
+}
+
+export interface PostSearchEvaluationOutput {
+  query: string;
+  summary: string;
+  scoredResults: ScoredSearchResult[];
+  rawResponse?: string;
+}
+
+export interface EvaluateAndSummarizeOptions {
+  chain?: FallbackChain<PostSearchEvaluationInput, PostSearchEvaluationOutput>;
+  evaluationPrompt?: string;
+  topNToScore?: number;
+}
+
+let defaultEvaluationChain: FallbackChain<PostSearchEvaluationInput, PostSearchEvaluationOutput> | null = null;
+
+export function buildEvaluationPrompt(query: string, results: TorqueQueryV2SearchResult[]): string {
+  const hitsDescription = results
+    .map((r, i) => `[${i + 1}] ID: ${r.id} (Score: ${r.score.toFixed(4)})\nMetadata: ${JSON.stringify(r.metadata)}`)
+    .join('\n\n');
+
+  return `You are evaluating search results for query: "${query}"
+
+Search hits:
+${hitsDescription}
+
+Please evaluate the relevance of each hit to the query (score 0.0 - 1.0) and produce a concise summary of the findings.`;
+}
+
+export function getDefaultEvaluationChain(): FallbackChain<PostSearchEvaluationInput, PostSearchEvaluationOutput> {
+  if (!defaultEvaluationChain) {
+    defaultEvaluationChain = new FallbackChain<PostSearchEvaluationInput, PostSearchEvaluationOutput>({
+      name: 'TorqueQueryPostSearchEvaluation',
+      providerFailureThreshold: 3,
+      providerResetTimeoutMs: 30000,
+    });
+
+    defaultEvaluationChain.addProvider({
+      name: 'heuristic-scoring-summary',
+      priority: 100,
+      execute: async (input: PostSearchEvaluationInput): Promise<PostSearchEvaluationOutput> => {
+        const scoredResults: ScoredSearchResult[] = input.results.map((item) => {
+          const score = typeof item.score === 'number' ? Math.min(Math.max(item.score, 0), 1) : 0.5;
+          return {
+            ...item,
+            relevanceScore: score,
+            relevanceReasoning: `Ranked with score ${score.toFixed(4)}`,
+          };
+        });
+
+        const summary = scoredResults.length > 0
+          ? `Found ${scoredResults.length} relevant hit(s) for "${input.query}". Top result: ${scoredResults[0].id}.`
+          : `No results found for "${input.query}".`;
+
+        return {
+          query: input.query,
+          summary,
+          scoredResults,
+        };
+      },
+    });
+  }
+  return defaultEvaluationChain;
+}
+
+export function resetDefaultEvaluationChain(): void {
+  defaultEvaluationChain = null;
+}
+
+/**
+ * Score relevance and synthesize summary for search results via FallbackChain.
+ */
+export async function evaluateAndSummarizeResults(
+  searchResponse: TorqueQueryV2SearchResponse,
+  options?: EvaluateAndSummarizeOptions
+): Promise<PostSearchEvaluationOutput> {
+  const chain = options?.chain ?? getDefaultEvaluationChain();
+  const input: PostSearchEvaluationInput = {
+    query: searchResponse.query,
+    results: options?.topNToScore
+      ? searchResponse.results.slice(0, options.topNToScore)
+      : searchResponse.results,
+    evaluationPrompt: options?.evaluationPrompt,
+  };
+
+  return await chain.execute(input);
+}
+

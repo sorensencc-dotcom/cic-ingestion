@@ -16,6 +16,20 @@ export interface CloudModelSpec {
 
 export const CLOUD_MODEL_SPECS: Record<string, CloudModelSpec> = {
   // OpenRouter models
+  "openrouter:ox-alpha": {
+    id: "openrouter:ox-alpha",
+    type: "cloud-openai-compatible",
+    provider: "openrouter",
+    supported: true,
+    auth: { envVar: "OPENROUTER_API_KEY", required: true },
+  },
+  "openrouter:gemini-2.0-flash-exp:free": {
+    id: "openrouter:gemini-2.0-flash-exp:free",
+    type: "cloud-openai-compatible",
+    provider: "openrouter",
+    supported: true,
+    auth: { envVar: "OPENROUTER_API_KEY", required: true },
+  },
   "openrouter:llama3-8b": {
     id: "openrouter:llama3-8b",
     type: "cloud-openai-compatible",

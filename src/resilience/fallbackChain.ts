@@ -1,6 +1,6 @@
-export interface FallbackProvider {
+export interface FallbackProvider<TInput = any, TOutput = any> {
   name: string;
-  execute: <T>() => Promise<T>;
+  execute: (input: TInput) => Promise<TOutput>;
   priority: number;
 }
 
@@ -37,8 +37,8 @@ interface InternalProviderState {
  * Default: Grok → OpenRouter → Ollama
  * Falls through to next on failure.
  */
-export class FallbackChain {
-  private providers: FallbackProvider[] = [];
+export class FallbackChain<TInput = any, TOutput = any> {
+  private providers: FallbackProvider<TInput, TOutput>[] = [];
   private readonly name: string;
   private readonly breakOnSuccess: boolean;
   private readonly providerFailureThreshold: number;
@@ -58,7 +58,7 @@ export class FallbackChain {
     this.providerResetTimeoutMs = config?.providerResetTimeoutMs ?? 30000;
   }
 
-  addProvider(provider: FallbackProvider): void {
+  addProvider(provider: FallbackProvider<TInput, TOutput>): void {
     this.providers.push(provider);
     this.providers.sort((a, b) => a.priority - b.priority);
 
@@ -75,7 +75,7 @@ export class FallbackChain {
     });
   }
 
-  async execute<T>(): Promise<T> {
+  async execute<R = TOutput>(input?: TInput): Promise<R> {
     if (this.providers.length === 0) {
       throw new Error(`${this.name} has no providers configured`);
     }
@@ -97,7 +97,7 @@ export class FallbackChain {
       this.attempts[provider.name]++;
 
       try {
-        const result = await provider.execute<T>();
+        const result = (await provider.execute(input as TInput)) as unknown as R;
 
         // Success: reset state and counter
         providerState.state = "CLOSED";
@@ -132,6 +132,9 @@ export class FallbackChain {
             providerState.state = "HALF_OPEN";
             providerState.resetTimer = null;
           }, this.providerResetTimeoutMs);
+          if (typeof providerState.resetTimer?.unref === 'function') {
+            providerState.resetTimer.unref();
+          }
         } else if (providerState.state === "HALF_OPEN") {
           // Failure in HALF_OPEN: back to OPEN, restart cooldown
           providerState.state = "OPEN";
@@ -142,6 +145,9 @@ export class FallbackChain {
             providerState.state = "HALF_OPEN";
             providerState.resetTimer = null;
           }, this.providerResetTimeoutMs);
+          if (typeof providerState.resetTimer?.unref === 'function') {
+            providerState.resetTimer.unref();
+          }
         }
       }
     }
@@ -200,17 +206,20 @@ export class FallbackChain {
  * Registry of fallback chains per endpoint.
  */
 export class FallbackChainRegistry {
-  private chains: Map<string, FallbackChain> = new Map();
+  private chains: Map<string, FallbackChain<any, any>> = new Map();
 
-  getOrCreate(name: string, config?: FallbackChainConfig): FallbackChain {
+  getOrCreate<TInput = any, TOutput = any>(
+    name: string,
+    config?: FallbackChainConfig
+  ): FallbackChain<TInput, TOutput> {
     if (!this.chains.has(name)) {
-      this.chains.set(name, new FallbackChain({ ...config, name }));
+      this.chains.set(name, new FallbackChain<TInput, TOutput>({ ...config, name }));
     }
-    return this.chains.get(name)!;
+    return this.chains.get(name)! as FallbackChain<TInput, TOutput>;
   }
 
-  get(name: string): FallbackChain | undefined {
-    return this.chains.get(name);
+  get<TInput = any, TOutput = any>(name: string): FallbackChain<TInput, TOutput> | undefined {
+    return this.chains.get(name) as FallbackChain<TInput, TOutput> | undefined;
   }
 
   getMetrics(name: string): FallbackChainMetrics | undefined {
@@ -235,3 +244,4 @@ export class FallbackChainRegistry {
     }
   }
 }
+
