@@ -25,6 +25,10 @@ coverage/
 *.log
 .env
 .env.local
+.env.*.local
+*.pem
+*.key
+secrets/
 __pycache__/
 .pytest_cache/
 *.pyc

@@ -1,0 +1,11 @@
+title = "cic-ingestion gitleaks config"
+
+[extend]
+useDefault = true
+
+[allowlist]
+regexes = [
+  # devops/automation/terraform/main.tf: self-flagged Terraform placeholder,
+  # literally named CHANGE_ME_SECURELY — not a real credential.
+  '''CHANGE_ME_SECURELY''',
+]

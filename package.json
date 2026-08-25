@@ -5,6 +5,8 @@
   "type": "module",
   "main": "src/index.js",
   "scripts": {
+    "prepare": "node scripts/install-git-hooks.mjs",
+    "secret-scan": "node scripts/secret-scan.mjs",
     "build": "tsc --project tsconfig.json",
     "test": "npx jest",
     "pre-flight": "npm test",
