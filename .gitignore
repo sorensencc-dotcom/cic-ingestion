@@ -35,3 +35,6 @@ __pycache__/
 .performance-report.json
 .validation-report.json
 .worktrees/
+
+# graft's local graph cache — regenerable, not committed (run `graft build`).
+graft/

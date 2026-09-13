@@ -329,7 +329,12 @@ export class AutonomyAPIServer {
           resolve();
         }
       });
-      this.server.closeAllConnections();
+      if (typeof this.server.closeAllConnections === 'function') {
+        this.server.closeAllConnections();
+      }
+      if (typeof this.server.unref === 'function') {
+        this.server.unref();
+      }
     });
   }
 
