@@ -51,7 +51,7 @@ export class AdapterIntegrationService {
     adapterName: string,
     payload: any
   ): Promise<ExecutionResult> {
-    const startTime = Date.now();
+    const startTime = performance.now();
     const driftSignals: any[] = [];
     const hydrationFailures: any[] = [];
 
@@ -85,7 +85,7 @@ export class AdapterIntegrationService {
 
       const validated = adapter.validate(result);
 
-      const executionTime = Date.now() - startTime;
+      const executionTime = performance.now() - startTime;
       const poolStats = this.warmPool.getStats();
 
       return {
@@ -101,7 +101,7 @@ export class AdapterIntegrationService {
         },
       };
     } catch (error) {
-      const executionTime = Date.now() - startTime;
+      const executionTime = performance.now() - startTime;
       const poolStats = this.warmPool.getStats();
 
       return {
