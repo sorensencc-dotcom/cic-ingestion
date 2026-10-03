@@ -262,6 +262,8 @@ export class WarmPoolManager {
 
       this.stats.evictions += evicted;
     }, 60000); // cleanup every minute
+    // A background sweep must not keep the process (or Jest) alive.
+    this.cleanupInterval.unref();
   }
 
   destroy(): void {
