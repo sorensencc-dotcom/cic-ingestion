@@ -31,14 +31,44 @@ export function createExecuteRouter(service: AdapterIntegrationService): Router 
     }
   });
 
+  router.post("/invalidate", (req: Request, res: Response) => {
+    try {
+      const { key } = req.body;
+
+      const count = service.invalidateWarmPool(key);
+
+      res.json({
+        success: true,
+        invalidated: count,
+        timestamp: Date.now(),
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  });
+
   router.post("/:adapterName", async (req: Request, res: Response) => {
     try {
       const { adapterName } = req.params;
       const payload = req.body;
 
+      if (!service.getRegisteredAdapters()[adapterName]) {
+        return res.status(404).json({
+          success: false,
+          error: `Adapter not found: ${adapterName}`,
+          driftSignals: [],
+          hydrationFailures: [],
+          stats: { hitRate: 0 },
+        });
+      }
+
       const result = await service.execute(adapterName, payload);
 
-      res.status(result.success ? 200 : 400).json({
+      const status = result.success ? 200 : result.errorKind === "upstream" ? 502 : 400;
+      res.status(status).json({
         success: result.success,
         data: result.data,
         error: result.error,
@@ -86,25 +116,6 @@ export function createExecuteRouter(service: AdapterIntegrationService): Router 
       warmPool: poolStats,
       timestamp: Date.now(),
     });
-  });
-
-  router.post("/invalidate", (req: Request, res: Response) => {
-    try {
-      const { key } = req.body;
-
-      const count = service.invalidateWarmPool(key);
-
-      res.json({
-        success: true,
-        invalidated: count,
-        timestamp: Date.now(),
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
   });
 
   return router;

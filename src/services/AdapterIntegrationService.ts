@@ -1,5 +1,6 @@
 import { AdapterRegistry } from "../adapters/AdapterRegistry";
 import { BaseAdapter, AdapterInput, AdapterOutput } from "../adapters/BaseAdapter";
+import { UpstreamError } from "../adapters/UpstreamError";
 import { WarmPoolManager } from "./WarmPoolManager";
 import { SpaHydrationDetector } from "../detectors/SpaHydrationDetector";
 import { VerticalDriftDetector } from "../detectors/VerticalDriftDetector";
@@ -9,6 +10,7 @@ export interface ExecutionResult {
   success: boolean;
   data?: any;
   error?: string;
+  errorKind?: "upstream";
   driftSignals: any[];
   hydrationFailures: any[];
   stats: {
@@ -107,6 +109,7 @@ export class AdapterIntegrationService {
       return {
         success: false,
         error: error instanceof Error ? error.message : String(error),
+        errorKind: error instanceof UpstreamError ? "upstream" : undefined,
         driftSignals,
         hydrationFailures,
         stats: {

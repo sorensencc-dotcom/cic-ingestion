@@ -1,0 +1,22 @@
+{
+  "results": 3,
+  "index": 1,
+  "entries": [
+    {
+      "id": "AAAA-111",
+      "score": 0.42,
+      "content": { "gedcomx": { "persons": [
+        { "id": "AAAA-111", "names": [{ "nameForms": [{ "fullText": "John Smyth" }] }], "display": { "name": "John Smyth", "birthDate": "1852" } }
+      ] } }
+    },
+    {
+      "id": "BBBB-222",
+      "score": 0.95,
+      "content": { "gedcomx": { "persons": [
+        { "id": "FATHER-1", "names": [{ "nameForms": [{ "fullText": "Thomas Smith" }] }] },
+        { "id": "BBBB-222", "names": [{ "nameForms": [{ "fullText": "John Smith" }] }],
+          "facts": [{ "type": "http://gedcomx.org/Birth", "date": { "original": "3 May 1850" }, "place": { "original": "Leeds" } }] }
+      ] } }
+    }
+  ]
+}
