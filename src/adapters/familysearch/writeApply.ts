@@ -1,13 +1,15 @@
 import { FAMILYSEARCH_HOSTS, FamilySearchEnv, parseFamilySearchEnv } from "./environments";
 import { WriteResponse } from "./FamilySearchAdapter";
-import { GedcomxDocument } from "./schema";
 import {
-  DedupeKey,
   PersonReader,
+  PlanOptions,
   PlannedOperation,
+  ProposedFinding,
   WritePlan,
+  buildPlan,
   descriptionIdOf,
-  findDescription,
+  fingerprint,
+  loadPerson,
 } from "./writePlan";
 
 export interface PersonWriter extends PersonReader {
@@ -17,6 +19,9 @@ export interface PersonWriter extends PersonReader {
 
 export interface ApplyOptions {
   confirm: boolean;
+  /** The findings the reviewed plan was built from; apply re-plans from them. */
+  findings: ProposedFinding[];
+  planOptions?: PlanOptions;
   env: NodeJS.ProcessEnv;
   writer: PersonWriter;
   confirmOperation: (op: PlannedOperation) => Promise<boolean>;
@@ -82,25 +87,31 @@ export async function applyPlan(
   const now = options.now ?? Date.now;
   const minInterval = options.minIntervalMs ?? 1500;
   const host = FAMILYSEARCH_HOSTS[options.writer.env].api;
-  const doc = await options.writer.readPerson(plan.pid);
+  // Every safety rule (living, conflicts, confidence, already-present) runs
+  // again against the person as it is now. Only operations the human
+  // reviewed AND the fresh plan still produces are executed.
+  const doc = await loadPerson(options.writer, plan.pid);
+  const fresh = buildPlan(plan.pid, options.findings, doc, options.planOptions);
+  const reviewed = new Set(plan.operations.map(fingerprint));
+  const freshPrints = new Set(fresh.operations.map(fingerprint));
   const createdIds = new Map<string, string>();
   const results: OperationResult[] = [];
   let lastPost = 0;
   let halted = false;
 
-  for (const op of plan.operations) {
+  for (const stale of plan.operations) {
+    if (!freshPrints.has(fingerprint(stale))) {
+      results.push({
+        opId: stale.id,
+        status: "already_present",
+        error: "no longer needed or no longer allowed at write time",
+      });
+    }
+  }
+
+  for (const op of fresh.operations.filter((o) => reviewed.has(fingerprint(o)))) {
     if (halted) {
       results.push({ opId: op.id, status: "not_run" });
-      continue;
-    }
-    if (isPresent(op.dedupe, doc, plan.pid)) {
-      if (op.dedupe.kind === "source") {
-        const existing = findDescription(doc, op.dedupe.about, op.dedupe.marker);
-        if (existing?.id) {
-          createdIds.set(op.id, `${host}/platform/sources/descriptions/${existing.id}`);
-        }
-      }
-      results.push({ opId: op.id, status: "already_present" });
       continue;
     }
     if (op.dependsOn && !createdIds.has(op.dependsOn)) {
@@ -112,7 +123,19 @@ export async function applyPlan(
       });
       continue;
     }
-    if (!(await options.confirmOperation(op))) {
+    let approved: boolean;
+    try {
+      approved = await options.confirmOperation(op);
+    } catch (error) {
+      halted = true;
+      results.push({
+        opId: op.id,
+        status: "failed",
+        error: `confirmation failed: ${error instanceof Error ? error.message : String(error)}`,
+      });
+      continue;
+    }
+    if (!approved) {
       results.push({ opId: op.id, status: "declined" });
       continue;
     }
@@ -164,35 +187,4 @@ function resolveRefs(
     }
     return v;
   });
-}
-
-export function isPresent(key: DedupeKey, doc: GedcomxDocument, pid: string): boolean {
-  const person = doc.persons?.find((p) => p.id === pid);
-  if (!person) return false;
-  switch (key.kind) {
-    case "note":
-      return (person.notes ?? []).some((n) => n.text?.includes(key.marker));
-    case "source":
-      return !!findDescription(doc, key.about, key.marker);
-    case "attachment": {
-      const sd = findDescription(doc, key.about, key.marker);
-      if (!sd?.id) return false;
-      return (person.sources ?? []).some(
-        (s) => descriptionIdOf(s.description ?? s.descriptionId) === sd.id
-      );
-    }
-    case "fact":
-      return (person.facts ?? []).some(
-        (f) =>
-          f.type === key.factType &&
-          (!key.year || (f.date?.formal ?? f.date?.original ?? "").includes(key.year)) &&
-          (!key.place || (f.place?.original ?? "").toLowerCase().includes(key.place.toLowerCase()))
-      );
-    case "name":
-      return (person.names ?? []).some((n) =>
-        (n.nameForms ?? []).some(
-          (form) => form.fullText?.toLowerCase() === key.fullText.toLowerCase()
-        )
-      );
-  }
 }

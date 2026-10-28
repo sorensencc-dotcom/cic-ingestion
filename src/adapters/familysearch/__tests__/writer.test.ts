@@ -49,6 +49,14 @@ function makeAdapter() {
   });
 }
 
+function mockRead(d: object = personFixture) {
+  nock(API).get(`/platform/tree/persons/${PID}`).query(true).reply(200, d);
+  const notes = (d as GedcomxDocument).persons?.find((p) => p.id === PID)?.notes;
+  nock(API)
+    .get(`/platform/tree/persons/${PID}/notes`)
+    .reply(200, { persons: [{ id: PID, notes: notes ?? [] }] });
+}
+
 beforeEach(() => nock.disableNetConnect());
 afterEach(() => {
   expect(nock.pendingMocks()).toEqual([]);
@@ -196,7 +204,7 @@ describe("buildPlan", () => {
 
 describe("planWrite", () => {
   it("reads the person through the adapter and performs no write", async () => {
-    nock(API).get(`/platform/tree/persons/${PID}`).query(true).reply(200, personFixture);
+    mockRead(personFixture);
     const plan = await planWrite(PID, [finding()], makeAdapter());
     expect(plan.operations).toHaveLength(3);
   });
@@ -207,6 +215,7 @@ describe("applyPlan", () => {
   const planFor = (findings = [finding()], d = doc()): WritePlan => buildPlan(PID, findings, d);
   const base = (over: Record<string, unknown> = {}) => ({
     confirm: true as const,
+    findings: [finding()],
     env: { FAMILYSEARCH_ENV: "beta" } as NodeJS.ProcessEnv,
     writer: makeAdapter(),
     confirmOperation: confirmAll,
@@ -234,7 +243,7 @@ describe("applyPlan", () => {
   });
 
   it("posts source, attachment, and note in order, wiring the new source id", async () => {
-    nock(API).get(`/platform/tree/persons/${PID}`).query(true).reply(200, personFixture);
+    mockRead(personFixture);
     let sdBody: any;
     let attachBody: any;
     let noteBody: any;
@@ -265,7 +274,7 @@ describe("applyPlan", () => {
     d.sourceDescriptions!.push({ id: "SD-N", about: SOURCE_URL });
     d.persons![0].sources = [{ description: `${API}/platform/sources/descriptions/SD-N` }];
     d.persons![0].notes = [{ text: "[TRM:S-42/F-1]" }];
-    nock(API).get(`/platform/tree/persons/${PID}`).query(true).reply(200, d);
+    mockRead(d);
     const results = await applyPlan(plan, base());
     expect(results.map((r) => r.status)).toEqual(["already_present", "already_present", "already_present"]);
   });
@@ -273,7 +282,7 @@ describe("applyPlan", () => {
   it("reuses an existing source description found at apply time for the attachment", async () => {
     const d = doc();
     d.sourceDescriptions!.push({ id: "SD-N", about: SOURCE_URL });
-    nock(API).get(`/platform/tree/persons/${PID}`).query(true).reply(200, d);
+    mockRead(d);
     let attachBody: any;
     nock(API).post(`/platform/tree/persons/${PID}`, (b) => ((attachBody = b), true)).reply(201);
     nock(API).post(`/platform/tree/persons/${PID}/notes`).reply(201);
@@ -283,7 +292,7 @@ describe("applyPlan", () => {
   });
 
   it("skips declined operations and their dependents", async () => {
-    nock(API).get(`/platform/tree/persons/${PID}`).query(true).reply(200, personFixture);
+    mockRead(personFixture);
     nock(API).post(`/platform/tree/persons/${PID}/notes`).reply(201);
     const results = await applyPlan(
       planFor(),
@@ -293,7 +302,7 @@ describe("applyPlan", () => {
   });
 
   it("stops after a failed post and never retries it", async () => {
-    nock(API).get(`/platform/tree/persons/${PID}`).query(true).reply(200, personFixture);
+    mockRead(personFixture);
     nock(API).post("/platform/sources/descriptions").reply(500);
     const results = await applyPlan(planFor(), base());
     expect(results.map((r) => r.status)).toEqual(["failed", "not_run", "not_run"]);
@@ -301,7 +310,7 @@ describe("applyPlan", () => {
   });
 
   it("honors Retry-After on 429 and rate limits between posts", async () => {
-    nock(API).get(`/platform/tree/persons/${PID}`).query(true).reply(200, personFixture);
+    mockRead(personFixture);
     nock(API).post("/platform/sources/descriptions").reply(429, "", { "Retry-After": "1" });
     nock(API).post("/platform/sources/descriptions").reply(201, "", { "X-Entity-Id": "QDS-2" });
     nock(API).post(`/platform/tree/persons/${PID}`).reply(201);
@@ -315,5 +324,117 @@ describe("applyPlan", () => {
     expect(results.map((r) => r.status)).toEqual(["posted", "posted", "posted"]);
     const waits = sleep.mock.calls.map((c) => c[0]);
     expect(waits.filter((ms) => ms >= 1000).length).toBeGreaterThanOrEqual(2);
+  });
+});
+
+describe("fail-closed findings", () => {
+  it.each([
+    ["undefined", undefined],
+    ["NaN", Number.NaN],
+    ["string", "high"],
+    ["above 1", 7],
+  ])("drops a finding whose confidence is %s", (_label, confidence) => {
+    const plan = buildPlan(
+      PID,
+      [finding({ confidence: confidence as unknown as number })],
+      doc()
+    );
+    expect(plan.operations).toEqual([]);
+    expect(plan.dropped[0].reason).toMatch(/confidence/);
+  });
+
+  it("drops non-string ids and unknown kinds instead of throwing", () => {
+    const plan = buildPlan(
+      PID,
+      [
+        finding({ trmSourceId: 42 as unknown as string }),
+        finding({ kind: "bogus" as never, trmFactId: "F-5" }),
+      ],
+      doc()
+    );
+    expect(plan.operations).toEqual([]);
+    expect(plan.dropped).toHaveLength(2);
+  });
+
+  it("drops a duplicate finding id within one batch", () => {
+    const plan = buildPlan(PID, [finding(), finding()], doc());
+    expect(plan.operations.filter((o) => o.type === "add_note")).toHaveLength(1);
+    expect(plan.dropped[0].reason).toMatch(/duplicate/);
+  });
+});
+
+describe("write-time safety", () => {
+  const opts = (over: Record<string, unknown> = {}) => ({
+    confirm: true as const,
+    findings: [finding()],
+    env: { FAMILYSEARCH_ENV: "beta" } as NodeJS.ProcessEnv,
+    writer: makeAdapter(),
+    confirmOperation: async () => true,
+    sleep: async () => {},
+    ...over,
+  });
+
+  it("posts nothing when the person became living after the plan was reviewed", async () => {
+    const reviewed = buildPlan(PID, [finding()], doc());
+    const living = doc();
+    living.persons![0].living = true;
+    mockRead(living);
+    const results = await applyPlan(reviewed, opts());
+    expect(results.every((r) => r.status === "already_present")).toBe(true);
+  });
+
+  it("does not execute an operation that is absent from the reviewed plan", async () => {
+    const reviewed = buildPlan(PID, [finding()], doc());
+    reviewed.operations = reviewed.operations.filter((o) => o.type !== "add_note");
+    mockRead(personFixture);
+    nock(API).post("/platform/sources/descriptions").reply(201, "", { "X-Entity-Id": "Q1" });
+    nock(API).post(`/platform/tree/persons/${PID}`).reply(201);
+    const results = await applyPlan(reviewed, opts());
+    expect(results.map((r) => r.status)).toEqual(["posted", "posted"]);
+  });
+
+  it("records a failed confirmation callback and stops", async () => {
+    const reviewed = buildPlan(PID, [finding()], doc());
+    mockRead(personFixture);
+    const results = await applyPlan(
+      reviewed,
+      opts({ confirmOperation: async () => { throw new Error("stdin closed"); } })
+    );
+    expect(results[0]).toMatchObject({ status: "failed" });
+    expect(results.slice(1).every((r) => r.status === "not_run")).toBe(true);
+  });
+});
+
+describe("redirects and merged persons", () => {
+  it("throws PersonMergedError on 301 instead of following it", async () => {
+    nock(API)
+      .get(`/platform/tree/persons/${PID}`)
+      .query(true)
+      .reply(301, "", { Location: `${API}/platform/tree/persons/KWCH-999` });
+    await expect(makeAdapter().readPerson(PID)).rejects.toMatchObject({
+      name: "PersonMergedError",
+      survivorPid: "KWCH-999",
+    });
+  });
+
+  it("does not record a write as posted when a redirect is returned", async () => {
+    nock(API)
+      .post(`/platform/tree/persons/${PID}/notes`)
+      .reply(301, "", { Location: `${API}/platform/tree/persons/KWCH-999/notes` });
+    await expect(
+      makeAdapter().postGedcomx(`/platform/tree/persons/${PID}/notes`, {})
+    ).rejects.toMatchObject({ name: "PersonMergedError" });
+  });
+
+  it("rejects a write answered with a bare 200", async () => {
+    nock(API).post("/platform/sources/descriptions").reply(200);
+    await expect(
+      makeAdapter().postGedcomx("/platform/sources/descriptions", {})
+    ).rejects.toThrow(/HTTP 200/);
+  });
+
+  it("rejects a read whose payload lacks the requested person", async () => {
+    nock(API).get(`/platform/tree/persons/OTHER-1`).query(true).reply(200, personFixture);
+    await expect(makeAdapter().readPerson("OTHER-1")).rejects.toThrow(/does not contain/);
   });
 });

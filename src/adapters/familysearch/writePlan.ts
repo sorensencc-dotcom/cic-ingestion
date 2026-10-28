@@ -77,7 +77,26 @@ export interface PlanOptions {
 
 export interface PersonReader {
   readPerson(pid: string): Promise<GedcomxDocument>;
+  /** Read Person does not reliably inline notes; fetch them explicitly. */
+  readNotes?(pid: string): Promise<Array<{ text?: string }>>;
 }
+
+export async function loadPerson(
+  reader: PersonReader,
+  pid: string
+): Promise<GedcomxDocument> {
+  const doc = await reader.readPerson(pid);
+  if (!reader.readNotes) return doc;
+  const person = doc.persons?.find((p) => p.id === pid);
+  if (person) {
+    person.notes = [...(person.notes ?? []), ...(await reader.readNotes(pid))];
+  }
+  return doc;
+}
+
+/** Stable identity of an operation across two plans built at different times. */
+export const fingerprint = (op: PlannedOperation) =>
+  `${op.type}|${[...op.findingIds].sort().join(",")}`;
 
 const GX = "http://gedcomx.org/";
 const FACT_TYPES: Partial<Record<FindingKind, string>> = {
@@ -100,13 +119,72 @@ const yearOf = (text?: string) => text?.match(/\d{4}/)?.[0];
 const norm = (text?: string) =>
   (text ?? "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 
+const FINDING_KINDS: ReadonlySet<string> = new Set<FindingKind>([
+  "name_variant",
+  "birth",
+  "death",
+  "marriage",
+  "residence",
+  "relationship",
+]);
+
+const nonEmpty = (v: unknown): v is string =>
+  typeof v === "string" && v.trim().length > 0;
+const optionalString = (v: unknown) => v === undefined || typeof v === "string";
+
+/**
+ * Findings arrive as parsed JSON, not checked TypeScript values, so this
+ * fails closed: anything not provably valid is dropped with a reason.
+ * Returns undefined when the finding is acceptable.
+ */
+export function findingProblem(
+  f: unknown,
+  minConfidence: number
+): string | undefined {
+  if (!f || typeof f !== "object") return "finding is not an object";
+  const r = f as Record<string, unknown>;
+  if (!nonEmpty(r.trmSourceId) || !nonEmpty(r.trmFactId)) {
+    return "missing TRM source id or fact id";
+  }
+  if (!nonEmpty(r.sourceTitle) || !nonEmpty(r.value) || !nonEmpty(r.note)) {
+    return "missing source title, value, or note";
+  }
+  if (typeof r.kind !== "string" || !FINDING_KINDS.has(r.kind)) {
+    return `unknown finding kind ${String(r.kind)}`;
+  }
+  if (
+    !optionalString(r.date) ||
+    !optionalString(r.place) ||
+    !optionalString(r.sourceUrl)
+  ) {
+    return "date, place, and sourceUrl must be strings";
+  }
+  if (
+    typeof r.confidence !== "number" ||
+    !Number.isFinite(r.confidence) ||
+    r.confidence < 0 ||
+    r.confidence > 1
+  ) {
+    return `confidence must be a number in [0, 1], got ${String(r.confidence)}`;
+  }
+  if (r.confidence < minConfidence) {
+    return `confidence ${r.confidence} below ${minConfidence}`;
+  }
+  return undefined;
+}
+
+function safeFindingId(f: unknown): string {
+  const r = (f && typeof f === "object" ? f : {}) as Record<string, unknown>;
+  return `${String(r.trmSourceId ?? "?")}/${String(r.trmFactId ?? "?")}`;
+}
+
 export async function planWrite(
   pid: string,
   findings: ProposedFinding[],
   reader: PersonReader,
   options: PlanOptions = {}
 ): Promise<WritePlan> {
-  return buildPlan(pid, findings, await reader.readPerson(pid), options);
+  return buildPlan(pid, findings, await loadPerson(reader, pid), options);
 }
 
 export function isPossiblyLiving(person: GxPerson, now: Date): boolean {
@@ -135,7 +213,7 @@ export function buildPlan(
   if (isPossiblyLiving(person, now)) {
     for (const f of findings) {
       plan.dropped.push({
-        findingId: findingId(f),
+        findingId: safeFindingId(f),
         reason: "person is living or possibly living",
       });
     }
@@ -144,19 +222,16 @@ export function buildPlan(
 
   const minConfidence = options.minConfidence ?? 0.6;
   const accepted: ProposedFinding[] = [];
-  for (const f of findings) {
-    const id = findingId(f);
-    if (!f.trmSourceId?.trim() || !f.trmFactId?.trim()) {
-      plan.dropped.push({ findingId: id, reason: "missing TRM source id or fact id" });
-    } else if (!f.sourceTitle?.trim() || !f.value?.trim()) {
-      plan.dropped.push({ findingId: id, reason: "missing source title or value" });
-    } else if (f.confidence < minConfidence) {
-      plan.dropped.push({
-        findingId: id,
-        reason: `confidence ${f.confidence} below ${minConfidence}`,
-      });
+  const seenIds = new Set<string>();
+  for (const raw of findings) {
+    const problem =
+      findingProblem(raw, minConfidence) ??
+      (seenIds.has(safeFindingId(raw)) ? "duplicate finding id in batch" : undefined);
+    seenIds.add(safeFindingId(raw));
+    if (problem) {
+      plan.dropped.push({ findingId: safeFindingId(raw), reason: problem });
     } else {
-      accepted.push(f);
+      accepted.push(raw);
     }
   }
 
@@ -183,7 +258,12 @@ export function buildPlan(
     const about = first.sourceUrl;
     const ids = group.map(findingId);
     const existingId = findDescription(doc, about, sourceMarker(first))?.id;
+    // Tag only conclusion types the source actually supports on the tree.
     const tags = group
+      .filter((f) => {
+        const s = factStatus(person, f);
+        return s === "present" || (s === "absent" && !!options.allowConclusions);
+      })
       .map((f) => FACT_TYPES[f.kind])
       .filter((t): t is string => !!t);
     const message = `TRM ${first.trmSourceId}: ${first.sourceTitle}`.slice(0, 400);
@@ -261,6 +341,7 @@ export function buildPlan(
     }
   }
 
+  const seenConclusions = new Set<string>();
   for (const f of accepted) {
     const id = findingId(f);
     const status = factStatus(person, f);
@@ -306,6 +387,16 @@ export function buildPlan(
       });
       continue;
     }
+    const conclusionKey = `${f.kind}|${norm(f.value)}|${yearOf(f.date) ?? ""}|${norm(f.place)}`;
+    if (seenConclusions.has(conclusionKey)) {
+      plan.skipped.push({
+        findingId: id,
+        operation: f.kind === "name_variant" ? "add_name" : "add_fact",
+        reason: "identical conclusion already planned in this batch",
+      });
+      continue;
+    }
+    seenConclusions.add(conclusionKey);
     const op = conclusionOp(pid, f, nextId());
     if (op) factOps.push(op);
   }
