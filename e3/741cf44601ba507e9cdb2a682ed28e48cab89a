@@ -1,0 +1,35 @@
+PHASE_27.env.example
+  s_16f96a7a9e008e::t_da21535a026302 7-16
+src/adapters/familysearch/environments.ts
+  s_16f96a7a9e008e::t_2a5ac727fc2782 1-28
+src/adapters/familysearch/schema.ts
+  s_16f96a7a9e008e::t_8ff0eac8a92ea0 1-81,86-87,96-102,108-149,152-167
+src/adapters/familysearch/tokenProvider.ts
+  s_16f96a7a9e008e::t_da98eceb3b39eb 1-244
+src/adapters/familysearch/mapper.ts
+  s_16f96a7a9e008e::t_7e401a4df7ce0a 1-157
+src/adapters/familysearch/FamilySearchAdapter.ts
+  s_16f96a7a9e008e::t_4db1db61f9e4c4 1,8-23,26-40,43-45,47-52,54,56-60,62,64-76,85,94-97,99-100,106-107,119-150,173-174,184,187-190,192-198,200-207,209-225,227-257
+src/adapters/familysearch/__tests__/familysearch.test.ts
+  s_16f96a7a9e008e::t_ccbeb93a224ba3 1-245
+src/adapters/familysearch/__tests__/fixtures/person.json
+  s_16f96a7a9e008e::t_f1cb8d093730be 1-39
+src/adapters/familysearch/__tests__/fixtures/search.json
+  s_16f96a7a9e008e::t_7d188b379fb176 1-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "e3741cf44601ba507e9cdb2a682ed28e48cab89a",
+  "prompts": {},
+  "sessions": {
+    "s_16f96a7a9e008e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b4f56393-426f-4bd3-815f-f445b5b39c67",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
