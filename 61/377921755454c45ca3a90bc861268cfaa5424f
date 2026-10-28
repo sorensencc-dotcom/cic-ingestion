@@ -1,0 +1,29 @@
+src/adapters/familysearch/__tests__/writer.test.ts
+  s_16f96a7a9e008e::t_93af36891d46cf 1-319
+src/adapters/familysearch/writeApply.ts
+  s_16f96a7a9e008e::t_7094e504c0f605 1-196
+  s_16f96a7a9e008e::t_c5d139e5d2147e 197-198
+src/adapters/familysearch/writePlan.ts
+  s_16f96a7a9e008e::t_71766c57fcfa60 1-454,460
+  s_16f96a7a9e008e::t_2459901f8d6927 455-459,461-466
+src/adapters/familysearch/FamilySearchAdapter.ts
+  s_16f96a7a9e008e::t_c5022e2a999b55 18,44-54,131-157,242-243,253-258,260-264,287
+src/adapters/familysearch/schema.ts
+  s_16f96a7a9e008e::t_f91f2d7f26e095 31-32,57-67,72
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "61377921755454c45ca3a90bc861268cfaa5424f",
+  "prompts": {},
+  "sessions": {
+    "s_16f96a7a9e008e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b4f56393-426f-4bd3-815f-f445b5b39c67",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
