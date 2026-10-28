@@ -19,6 +19,7 @@ import { GrokMcpClient } from "../adapters/grok/grok-mcp-client.ts";
 import { GrokModelClient } from "../adapters/grok/grok-model-client.ts";
 import { ConsoleMetricsAdapter } from "../adapters/metrics/ConsoleMetricsAdapter.ts";
 import { createExecuteRouter } from "../routes/execute.ts";
+import { registerFamilySearchFromEnv } from "../config/familySearchRegistration.ts";
 import { createImageAnalysisRouter, loadConfig as loadImageAnalysisConfig } from "../services/imageAnalysis/index.ts";
 import { UsageLedger } from "../lib/usage/UsageLedger.ts";
 import { generateCicCostComputeReport } from "../lib/report/CicCostComputeReport.ts";
@@ -201,6 +202,7 @@ export class AutonomyAPIServer {
       torqueQuery: torqueQueryClient,
     });
     adapterRegistry.register("console-metrics", consoleMetricsAdapter);
+    registerFamilySearchFromEnv(adapterRegistry);
 
     // Mount console router
     const consoleAdapterService = new AdapterIntegrationService(adapterRegistry);
@@ -217,6 +219,7 @@ export class AutonomyAPIServer {
     this.adapterServices.push(adapterService);
     const executeRouter = createExecuteRouter(adapterService);
     this.app.use("/", executeRouter);
+    this.app.use("/execute", executeRouter);
 
     // 404 handler
     this.app.use((req: Request, res: Response) => {

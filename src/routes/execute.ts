@@ -36,9 +36,20 @@ export function createExecuteRouter(service: AdapterIntegrationService): Router 
       const { adapterName } = req.params;
       const payload = req.body;
 
+      if (!service.getRegisteredAdapters()[adapterName]) {
+        return res.status(404).json({
+          success: false,
+          error: `Adapter not found: ${adapterName}`,
+          driftSignals: [],
+          hydrationFailures: [],
+          stats: { hitRate: 0 },
+        });
+      }
+
       const result = await service.execute(adapterName, payload);
 
-      res.status(result.success ? 200 : 400).json({
+      const status = result.success ? 200 : result.errorKind === "upstream" ? 502 : 400;
+      res.status(status).json({
         success: result.success,
         data: result.data,
         error: result.error,
