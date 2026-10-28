@@ -1,0 +1,39 @@
+src/adapters/familysearch/cli/login.ts
+  s_16f96a7a9e008e::t_17e9a546f17fdc 1-71
+src/adapters/familysearch/__tests__/cli.test.ts
+  s_16f96a7a9e008e::t_5063050ba41def 1-137
+scripts/familysearch-read-person.ts
+  s_16f96a7a9e008e::t_46ac3faaddd58a 1-24
+src/adapters/familysearch/cli/personSummary.ts
+  s_16f96a7a9e008e::t_264e09e210ad84 1-70
+docs/familysearch-beta-setup.md
+  s_16f96a7a9e008e::t_3bd5dd0ad24864 1-57
+src/adapters/familysearch/cli/envFile.ts
+  s_16f96a7a9e008e::t_676b964f52d01f 1-47
+scripts/familysearch-login.ts
+  s_16f96a7a9e008e::t_a555896b94cdc8 1-72
+.env.example
+  s_16f96a7a9e008e::t_c4bbff7a5902e0 16-27
+.gitignore
+  s_16f96a7a9e008e::t_6f8d6eb3f4c73f 41-43
+PHASE_27.env.example
+  s_16f96a7a9e008e::t_583b73a45635ef 12-13,19
+package.json
+  s_16f96a7a9e008e::t_2bad3f3e1f1675 17-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d0100ae7746e368dfd47841f9b83cacb7206d63f",
+  "prompts": {},
+  "sessions": {
+    "s_16f96a7a9e008e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b4f56393-426f-4bd3-815f-f445b5b39c67",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
