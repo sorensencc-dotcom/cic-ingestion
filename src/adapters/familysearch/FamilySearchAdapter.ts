@@ -15,6 +15,7 @@ import {
   FamilySearchResponse,
   GEDCOMX_ATOM_JSON,
   GEDCOMX_JSON,
+  GedcomxDocument,
   SearchParams,
   SearchResult,
   validateAtomFeed,
@@ -38,6 +39,17 @@ export class FamilySearchApiError extends Error {
     super(message);
     this.name = "FamilySearchApiError";
   }
+}
+
+export interface WriteResponse {
+  status: number;
+  location?: string;
+  entityId?: string;
+}
+
+interface WriteOptions {
+  method: "post";
+  data: unknown;
 }
 
 const DEFAULT_RETRY_AFTER_MS = 5000;
@@ -114,6 +126,33 @@ export class FamilySearchAdapter extends BaseAdapter {
         timestamp: Date.now(),
       };
     }
+  }
+
+  async readPerson(pid: string): Promise<GedcomxDocument> {
+    const response = await this.request(
+      `/platform/tree/persons/${encodeURIComponent(pid)}`,
+      { relatives: true, sourceDescriptions: true },
+      GEDCOMX_JSON
+    );
+    return validateGedcomxPersonDocument(response.data);
+  }
+
+  async postGedcomx(path: string, body: unknown): Promise<WriteResponse> {
+    const response = await this.request(
+      path,
+      {},
+      GEDCOMX_JSON,
+      { method: "post", data: body }
+    );
+    const header = (name: string): string | undefined => {
+      const value = response.headers?.[name];
+      return typeof value === "string" ? value : undefined;
+    };
+    return {
+      status: response.status,
+      location: header("location"),
+      entityId: header("x-entity-id"),
+    };
   }
 
   async search(params: SearchParams): Promise<SearchResult> {
@@ -200,7 +239,8 @@ export class FamilySearchAdapter extends BaseAdapter {
   private async request(
     path: string,
     params: Record<string, string | number | boolean>,
-    accept: string
+    accept: string,
+    write?: WriteOptions
   ): Promise<AxiosResponse> {
     let authRetried = false;
     let rateLimited = 0;
@@ -210,11 +250,18 @@ export class FamilySearchAdapter extends BaseAdapter {
       const token = await this.tokens.getToken();
       let response: AxiosResponse;
       try {
-        response = await this.client.get(path, {
-          params,
-          headers: { Accept: accept, Authorization: `Bearer ${token}` },
-        });
+        const headers = { Accept: accept, Authorization: `Bearer ${token}` };
+        response = write
+          ? await this.client.post(path, write.data, {
+              headers: { ...headers, "Content-Type": GEDCOMX_JSON },
+            })
+          : await this.client.get(path, { params, headers });
       } catch (error) {
+        if (write) {
+          throw new FamilySearchApiError(
+            `FamilySearch write failed without a response; not retried to avoid duplicates: ${error instanceof Error ? error.message : "network error"}`
+          );
+        }
         if (++transient >= this.config.retries) {
           throw new FamilySearchApiError(
             `FamilySearch request failed: ${error instanceof Error ? error.message : "network error"}`
@@ -237,7 +284,7 @@ export class FamilySearchAdapter extends BaseAdapter {
         await this.sleep(this.retryAfterMs(response));
         continue;
       }
-      if (status >= 500 && ++transient < this.config.retries) {
+      if (!write && status >= 500 && ++transient < this.config.retries) {
         await this.sleep(Math.pow(2, transient) * 100);
         continue;
       }

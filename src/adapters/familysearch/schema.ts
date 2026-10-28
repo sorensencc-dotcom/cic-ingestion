@@ -28,6 +28,8 @@ export interface GxPerson {
   names?: GxName[];
   facts?: GxFact[];
   living?: boolean;
+  sources?: GxSourceReference[];
+  notes?: GxNote[];
   display?: {
     name?: string;
     gender?: string;
@@ -52,10 +54,22 @@ export interface GxRelationship {
   facts?: GxFact[];
 }
 
+export interface GxSourceReference {
+  description?: string;
+  descriptionId?: string;
+}
+
+export interface GxNote {
+  id?: string;
+  subject?: string;
+  text?: string;
+}
+
 export interface GxSourceDescription {
   id?: string;
   about?: string;
   titles?: Array<{ value?: string }>;
+  notes?: Array<{ text?: string }>;
 }
 
 export interface GedcomxDocument {
