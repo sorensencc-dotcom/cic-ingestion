@@ -7,19 +7,9 @@ import {
 
 export const FAMILYSEARCH_ADAPTER_NAME = "familysearch";
 
-export type FamilySearchSourceFactory = (cfg: {
-  apiUrl: string;
-  apiKey: string;
-  timeout: number;
-  retries: number;
-}) => FamilySearchSource;
+export type FamilySearchSourceFactory = (env: NodeJS.ProcessEnv) => FamilySearchSource;
 
-const defaultFactory: FamilySearchSourceFactory = (cfg) =>
-  new FamilySearchAdapter({
-    name: FAMILYSEARCH_ADAPTER_NAME,
-    version: "1.0.0",
-    ...cfg,
-  }) as unknown as FamilySearchSource;
+const defaultFactory: FamilySearchSourceFactory = (env) => FamilySearchAdapter.fromEnv(env);
 
 export function registerFamilySearchFromEnv(
   registry: AdapterRegistry,
@@ -27,20 +17,26 @@ export function registerFamilySearchFromEnv(
   log: Pick<Console, "info" | "warn"> = console,
   factory: FamilySearchSourceFactory = defaultFactory
 ): boolean {
-  const apiKey = env.FAMILYSEARCH_API_KEY?.trim();
-  if (!apiKey) {
+  const appKey = env.FAMILYSEARCH_APP_KEY?.trim();
+  const hasToken =
+    Boolean(env.FAMILYSEARCH_ACCESS_TOKEN?.trim()) ||
+    Boolean(env.FAMILYSEARCH_REFRESH_TOKEN?.trim());
+  if (!appKey || !hasToken) {
     log.warn(
-      "[familysearch] FAMILYSEARCH_API_KEY not set; adapter not registered, /execute/familysearch will return 404"
+      "[familysearch] FAMILYSEARCH_APP_KEY and FAMILYSEARCH_ACCESS_TOKEN (or FAMILYSEARCH_REFRESH_TOKEN) not set; adapter not registered, /execute/familysearch will return 404"
     );
     return false;
   }
 
-  const source = factory({
-    apiUrl: env.FAMILYSEARCH_API_URL?.trim() || "https://api.familysearch.org",
-    apiKey,
-    timeout: Number(env.FAMILYSEARCH_TIMEOUT_MS) || 10000,
-    retries: Number(env.FAMILYSEARCH_RETRIES) || 2,
-  });
+  let source: FamilySearchSource;
+  try {
+    source = factory(env);
+  } catch (error) {
+    log.warn(
+      `[familysearch] adapter not registered: ${error instanceof Error ? error.message : String(error)}`
+    );
+    return false;
+  }
 
   registry.register(
     FAMILYSEARCH_ADAPTER_NAME,

@@ -5,8 +5,11 @@ import { AdapterRegistry } from "../../adapters/AdapterRegistry";
 import { AdapterIntegrationService } from "../../services/AdapterIntegrationService";
 import { createExecuteRouter } from "../execute";
 import { AdapterInput, AdapterOutput } from "../../adapters/BaseAdapter";
+import { SearchResult } from "../../adapters/familysearch/schema";
 import { FamilySearchSource } from "../../adapters/FamilySearchRouteAdapter";
 import { registerFamilySearchFromEnv } from "../../config/familySearchRegistration";
+
+const CREDS = { FAMILYSEARCH_APP_KEY: "app", FAMILYSEARCH_ACCESS_TOKEN: "tok" };
 
 const ok = (data: unknown): AdapterOutput => ({ success: true, data, score: 0.9, timestamp: 1 });
 
@@ -14,7 +17,7 @@ function makeSource(overrides: Partial<FamilySearchSource> = {}) {
   const source = {
     run: jest.fn(async (input: AdapterInput) => ok({ persons: [{ pid: input.key, name: "A" }], relationships: [] })),
     validate: jest.fn((o: AdapterOutput) => o),
-    search: jest.fn(async (p: Record<string, unknown>) => ok({ results: [p] })),
+    search: jest.fn(async (): Promise<SearchResult> => ({ total: 1, offset: 0, hits: [], raw: {} } as unknown as SearchResult)),
     ...overrides,
   };
   return source;
@@ -51,7 +54,7 @@ describe("POST /execute/:adapter (familysearch)", () => {
   });
 
   it("person mode returns the chat-agent response shape", async () => {
-    await start({ FAMILYSEARCH_API_KEY: "k" });
+    await start(CREDS);
     const res = await post("/execute/familysearch", { key: "KW7S-ZZZ", payload: { mode: "person" } });
     const body = await res.json();
     expect(res.status).toBe(200);
@@ -64,34 +67,34 @@ describe("POST /execute/:adapter (familysearch)", () => {
   });
 
   it("defaults to person mode when payload is empty", async () => {
-    await start({ FAMILYSEARCH_API_KEY: "k" });
+    await start(CREDS);
     const res = await post("/execute/familysearch", { key: "PID-1", payload: {} });
     expect(res.status).toBe(200);
     expect(source.run).toHaveBeenCalledTimes(1);
   });
 
   it("search mode passes payload (minus mode) as search params", async () => {
-    await start({ FAMILYSEARCH_API_KEY: "k" });
+    await start(CREDS);
     const res = await post("/execute/familysearch", {
       key: "ignored",
-      payload: { mode: "search", surname: "Sorensen", birthYear: 1900 },
+      payload: { mode: "search", surname: "Sorensen", birthLikeDate: "1900", junk: 1 },
     });
     const body = await res.json();
     expect(res.status).toBe(200);
-    expect(source.search).toHaveBeenCalledWith({ surname: "Sorensen", birthYear: 1900 });
+    expect(source.search).toHaveBeenCalledWith({ surname: "Sorensen", birthLikeDate: "1900" });
     expect(source.run).not.toHaveBeenCalled();
-    expect(body.data.results).toEqual([{ surname: "Sorensen", birthYear: 1900 }]);
+    expect(body.data.total).toBe(1);
   });
 
   it("does not serve a cached search result for different params", async () => {
-    await start({ FAMILYSEARCH_API_KEY: "k" });
+    await start(CREDS);
     await post("/execute/familysearch", { key: "x", payload: { mode: "search", surname: "A" } });
     await post("/execute/familysearch", { key: "x", payload: { mode: "search", surname: "B" } });
     expect(source.search).toHaveBeenCalledTimes(2);
   });
 
   it("returns 404 for an unknown adapter", async () => {
-    await start({ FAMILYSEARCH_API_KEY: "k" });
+    await start(CREDS);
     const res = await post("/execute/nope", { key: "a", payload: {} });
     const body = await res.json();
     expect(res.status).toBe(404);
@@ -109,12 +112,12 @@ describe("POST /execute/:adapter (familysearch)", () => {
     const log = { info: jest.fn(), warn: jest.fn() };
     expect(registerFamilySearchFromEnv(registry, {}, log)).toBe(false);
     expect(registry.has("familysearch")).toBe(false);
-    expect(log.warn).toHaveBeenCalledWith(expect.stringContaining("FAMILYSEARCH_API_KEY"));
+    expect(log.warn).toHaveBeenCalledWith(expect.stringContaining("FAMILYSEARCH_APP_KEY"));
   });
 
   it("returns 502 when the upstream call fails", async () => {
     await start(
-      { FAMILYSEARCH_API_KEY: "k" },
+      CREDS,
       makeSource({ run: jest.fn(async () => ({ success: false, error: "HTTP 503", timestamp: 1 })) })
     );
     const res = await post("/execute/familysearch", { key: "PID", payload: {} });
@@ -126,16 +129,49 @@ describe("POST /execute/:adapter (familysearch)", () => {
 
   it("returns 502 when search upstream fails", async () => {
     await start(
-      { FAMILYSEARCH_API_KEY: "k" },
-      makeSource({ search: jest.fn(async () => ({ success: false, error: "timeout", timestamp: 1 })) })
+      CREDS,
+      makeSource({ search: jest.fn(async () => { throw new Error("FamilySearch API error: HTTP 503"); }) })
     );
     const res = await post("/execute/familysearch", { key: "k", payload: { mode: "search", surname: "x" } });
     expect(res.status).toBe(502);
   });
 
   it("returns 400 when person mode has no key", async () => {
-    await start({ FAMILYSEARCH_API_KEY: "k" });
+    await start(CREDS);
     const res = await post("/execute/familysearch", { payload: {} });
     expect(res.status).toBe(400);
+  });
+
+  it("returns 400 when search mode has no query term", async () => {
+    await start(CREDS);
+    const res = await post("/execute/familysearch", { payload: { mode: "search", count: 5 } });
+    expect(res.status).toBe(400);
+    expect(source.search).not.toHaveBeenCalled();
+  });
+
+  it("skips registration when only the app key is set", () => {
+    const registry = new AdapterRegistry();
+    const log = { info: jest.fn(), warn: jest.fn() };
+    expect(registerFamilySearchFromEnv(registry, { FAMILYSEARCH_APP_KEY: "app" }, log)).toBe(false);
+    expect(registry.has("familysearch")).toBe(false);
+  });
+
+  it("skips registration with a warning when the factory throws", () => {
+    const registry = new AdapterRegistry();
+    const log = { info: jest.fn(), warn: jest.fn() };
+    const factory = () => {
+      throw new Error("bad env");
+    };
+    expect(registerFamilySearchFromEnv(registry, CREDS, log, factory)).toBe(false);
+    expect(log.warn).toHaveBeenCalledWith(expect.stringContaining("bad env"));
+  });
+
+  it("POST /execute/invalidate is not shadowed by /:adapterName", async () => {
+    await start(CREDS);
+    const res = await post("/execute/invalidate", { key: "PID-1" });
+    const body = await res.json();
+    expect(res.status).toBe(200);
+    expect(typeof body.invalidated).toBe("number");
+    expect(source.run).not.toHaveBeenCalled();
   });
 });

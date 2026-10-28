@@ -1,12 +1,34 @@
 import { BaseAdapter, AdapterConfig, AdapterInput, AdapterOutput } from "./BaseAdapter";
 import { UpstreamError } from "./UpstreamError";
+import { SearchParams, SearchResult } from "./familysearch/schema";
 
 export type FamilySearchMode = "person" | "search";
 
 export interface FamilySearchSource {
   run(input: AdapterInput): Promise<AdapterOutput>;
   validate(output: AdapterOutput): AdapterOutput;
-  search(params: Record<string, unknown>): Promise<AdapterOutput>;
+  search(params: SearchParams): Promise<SearchResult>;
+}
+
+const SEARCH_TERM_KEYS = [
+  "givenName",
+  "surname",
+  "sex",
+  "birthLikeDate",
+  "birthLikePlace",
+  "deathLikeDate",
+  "deathLikePlace",
+] as const;
+const SEARCH_PAGING_KEYS = ["offset", "count"] as const;
+
+const SEARCH_SCORE = 0.8;
+
+function pickSearchParams(raw: Record<string, unknown>): SearchParams {
+  const params: Record<string, unknown> = {};
+  for (const key of [...SEARCH_TERM_KEYS, ...SEARCH_PAGING_KEYS]) {
+    if (raw[key] !== undefined && raw[key] !== "") params[key] = raw[key];
+  }
+  return params as SearchParams;
 }
 
 function stableStringify(value: unknown): string {
@@ -34,7 +56,12 @@ export class FamilySearchRouteAdapter extends BaseAdapter {
     const mode: FamilySearchMode = payload.mode === "search" ? "search" : "person";
 
     if (mode === "search") {
-      const { mode: _mode, ...params } = payload;
+      const params = pickSearchParams(payload);
+      if (!SEARCH_TERM_KEYS.some((k) => k in params)) {
+        throw new Error(
+          `FamilySearch search requires at least one of: ${SEARCH_TERM_KEYS.join(", ")}`
+        );
+      }
       return {
         key: `search:${stableStringify(params)}`,
         payload: { mode, params },
@@ -48,15 +75,31 @@ export class FamilySearchRouteAdapter extends BaseAdapter {
   }
 
   async run(input: AdapterInput): Promise<AdapterOutput> {
-    const output =
-      input.payload.mode === "search"
-        ? await this.source.search(input.payload.params ?? {})
-        : this.source.validate(await this.source.run(input));
-
+    if (input.payload.mode === "search") {
+      return this.runSearch(input.payload.params);
+    }
+    const output = this.source.validate(await this.source.run(input));
     if (!output.success) {
       throw new UpstreamError(output.error ?? "FamilySearch request failed");
     }
     return output;
+  }
+
+  private async runSearch(params: SearchParams): Promise<AdapterOutput> {
+    let result: SearchResult;
+    try {
+      result = await this.source.search(params);
+    } catch (error) {
+      throw new UpstreamError(error instanceof Error ? error.message : String(error));
+    }
+    const timestamp = Date.now();
+    return {
+      success: true,
+      data: result,
+      hydration: { cached: false, timestamp },
+      score: SEARCH_SCORE,
+      timestamp,
+    };
   }
 
   validate(output: AdapterOutput): AdapterOutput {

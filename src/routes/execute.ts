@@ -31,6 +31,25 @@ export function createExecuteRouter(service: AdapterIntegrationService): Router 
     }
   });
 
+  router.post("/invalidate", (req: Request, res: Response) => {
+    try {
+      const { key } = req.body;
+
+      const count = service.invalidateWarmPool(key);
+
+      res.json({
+        success: true,
+        invalidated: count,
+        timestamp: Date.now(),
+      });
+    } catch (error) {
+      res.status(500).json({
+        success: false,
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  });
+
   router.post("/:adapterName", async (req: Request, res: Response) => {
     try {
       const { adapterName } = req.params;
@@ -97,25 +116,6 @@ export function createExecuteRouter(service: AdapterIntegrationService): Router 
       warmPool: poolStats,
       timestamp: Date.now(),
     });
-  });
-
-  router.post("/invalidate", (req: Request, res: Response) => {
-    try {
-      const { key } = req.body;
-
-      const count = service.invalidateWarmPool(key);
-
-      res.json({
-        success: true,
-        invalidated: count,
-        timestamp: Date.now(),
-      });
-    } catch (error) {
-      res.status(500).json({
-        success: false,
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
   });
 
   return router;
