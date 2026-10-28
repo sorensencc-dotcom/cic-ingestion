@@ -1,0 +1,39 @@
+{
+  "persons": [
+    {
+      "id": "KWCH-1AB",
+      "gender": { "type": "http://gedcomx.org/Male" },
+      "names": [{ "preferred": true, "nameForms": [{ "fullText": "John Smith" }] }],
+      "facts": [
+        { "type": "http://gedcomx.org/Birth", "date": { "original": "3 May 1850" }, "place": { "original": "Leeds, Yorkshire, England" } },
+        { "type": "http://gedcomx.org/Death", "date": { "original": "1 Jan 1920" }, "place": { "original": "Provo, Utah, United States" } }
+      ],
+      "display": { "name": "John Smith", "birthDate": "3 May 1850", "deathDate": "1 Jan 1920" }
+    },
+    {
+      "id": "KWCH-2CD",
+      "gender": { "type": "http://gedcomx.org/Female" },
+      "names": [{ "nameForms": [{ "fullText": "Mary Jones" }] }],
+      "display": { "name": "Mary Jones", "birthDate": "1855", "birthPlace": "Bath, Somerset, England" }
+    },
+    {
+      "id": "KWCH-3EF",
+      "gender": { "type": "http://gedcomx.org/Male" },
+      "display": { "name": "William Smith", "birthDate": "1880" }
+    }
+  ],
+  "relationships": [
+    {
+      "id": "R-COUPLE",
+      "type": "http://gedcomx.org/Couple",
+      "person1": { "resourceId": "KWCH-2CD" },
+      "person2": { "resourceId": "KWCH-1AB" },
+      "facts": [{ "type": "http://gedcomx.org/Marriage", "date": { "original": "1875" }, "place": { "original": "Leeds" } }]
+    },
+    { "type": "http://gedcomx.org/ParentChild", "person1": { "resourceId": "KWCH-1AB" }, "person2": { "resourceId": "KWCH-3EF" } },
+    { "type": "http://gedcomx.org/ParentChild", "person1": { "resourceId": "KWCH-2CD" }, "person2": { "resourceId": "KWCH-3EF" } }
+  ],
+  "sourceDescriptions": [
+    { "id": "SD-1", "about": "https://www.familysearch.org/ark:/61903/1:1:XXXX", "titles": [{ "value": "England Census, 1851" }] }
+  ]
+}
