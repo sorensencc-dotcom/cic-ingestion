@@ -1,0 +1,31 @@
+src/adapters/FamilySearchRouteAdapter.ts
+  s_16f96a7a9e008e::t_e63c78b3bcdb84 1-65
+src/adapters/UpstreamError.ts
+  s_16f96a7a9e008e::t_c1556692795aa6 1-6
+src/autonomy/AutonomyAPIServer.ts
+  s_16f96a7a9e008e::t_d936390218677d 22,205,222
+src/config/familySearchRegistration.ts
+  s_16f96a7a9e008e::t_ce4a7e371c8bcd 1-54
+src/routes/__tests__/execute.familysearch.test.ts
+  s_16f96a7a9e008e::t_99a87cb671dc12 1-141
+src/routes/execute.ts
+  s_16f96a7a9e008e::t_b14835b9007f0a 39-48,51-52
+src/services/AdapterIntegrationService.ts
+  s_16f96a7a9e008e::t_8f9b1a75e884c0 3,13,112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "c9c3557ed483cf1986db5687289794e6acf15f8e",
+  "prompts": {},
+  "sessions": {
+    "s_16f96a7a9e008e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b4f56393-426f-4bd3-815f-f445b5b39c67",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
