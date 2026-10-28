@@ -55,3 +55,7 @@ Read one person from the FamilySearch beta environment. These steps make no writ
 `FAMILYSEARCH_API_KEY` and `FAMILYSEARCH_API_URL` were removed. Nothing reads them.
 
 Variables already set in your shell take precedence over values in the env file.
+
+## Route protection
+
+Set `CIC_CREDENTIALED_ROUTE_KEY` (16+ characters) before starting the server. `/execute/familysearch` returns 401 without a matching `x-cic-route-key` header, and the adapter is not registered when the variable is unset. Responses omit the raw GEDCOM X document unless the payload sets `includeRaw: true`. Callers such as the toolforge chat-agent must send the header.

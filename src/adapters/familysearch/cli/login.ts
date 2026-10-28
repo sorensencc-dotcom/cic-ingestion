@@ -1,4 +1,4 @@
-import { randomBytes, timingSafeEqual } from "node:crypto";
+import { createHash, randomBytes, timingSafeEqual } from "node:crypto";
 import { FamilySearchEnv, parseFamilySearchEnv } from "../environments";
 
 export const DEFAULT_REDIRECT_URI = "http://localhost:3000/callback";
@@ -14,6 +14,12 @@ export interface LoginConfig {
 
 export function generateState(): string {
   return randomBytes(24).toString("base64url");
+}
+
+export function generatePkce(): { verifier: string; challenge: string } {
+  const verifier = randomBytes(48).toString("base64url");
+  const challenge = createHash("sha256").update(verifier).digest("base64url");
+  return { verifier, challenge };
 }
 
 export function statesMatch(expected: string, actual: string | null): boolean {
@@ -68,4 +74,8 @@ export function evaluateCallback(
 
 export function powershellTokenLine(token: string): string {
   return `$env:FAMILYSEARCH_ACCESS_TOKEN = '${token.replace(/'/g, "''")}'`;
+}
+
+export function powershellRefreshLine(token: string): string {
+  return `$env:FAMILYSEARCH_REFRESH_TOKEN = '${token.replace(/'/g, "''")}'`;
 }

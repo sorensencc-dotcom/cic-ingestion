@@ -175,6 +175,8 @@ export function buildAuthorizationUrl(params: {
   clientId: string;
   redirectUri: string;
   state: string;
+  /** S256 PKCE challenge; FamilySearch requires PKCE for native apps. */
+  codeChallenge?: string;
 }): string {
   const query = new URLSearchParams({
     client_id: params.clientId,
@@ -182,6 +184,10 @@ export function buildAuthorizationUrl(params: {
     response_type: "code",
     state: params.state,
   });
+  if (params.codeChallenge) {
+    query.set("code_challenge", params.codeChallenge);
+    query.set("code_challenge_method", "S256");
+  }
   return `${FAMILYSEARCH_HOSTS[params.env].ident}${AUTHORIZATION_PATH}?${query.toString()}`;
 }
 
@@ -196,16 +202,19 @@ export async function exchangeAuthorizationCode(params: {
   clientId: string;
   redirectUri: string;
   code: string;
+  codeVerifier?: string;
   timeoutMs?: number;
 }): Promise<ExchangedTokens> {
+  const form = new URLSearchParams({
+    grant_type: "authorization_code",
+    client_id: params.clientId,
+    redirect_uri: params.redirectUri,
+    code: params.code,
+  });
+  if (params.codeVerifier) form.set("code_verifier", params.codeVerifier);
   const parsed = await postTokenForm(
     params.env,
-    new URLSearchParams({
-      grant_type: "authorization_code",
-      client_id: params.clientId,
-      redirect_uri: params.redirectUri,
-      code: params.code,
-    }),
+    form,
     params.timeoutMs
   );
   return {

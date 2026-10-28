@@ -5,6 +5,8 @@ import {
   FamilySearchSource,
 } from "../adapters/FamilySearchRouteAdapter";
 
+import { MIN_ROUTE_KEY_LENGTH, ROUTE_KEY_ENV } from "../routes/execute";
+
 export const FAMILYSEARCH_ADAPTER_NAME = "familysearch";
 
 export type FamilySearchSourceFactory = (env: NodeJS.ProcessEnv) => FamilySearchSource;
@@ -24,6 +26,13 @@ export function registerFamilySearchFromEnv(
   if (!appKey || !hasToken) {
     log.warn(
       "[familysearch] FAMILYSEARCH_APP_KEY and FAMILYSEARCH_ACCESS_TOKEN (or FAMILYSEARCH_REFRESH_TOKEN) not set; adapter not registered, /execute/familysearch will return 404"
+    );
+    return false;
+  }
+
+  if ((env[ROUTE_KEY_ENV]?.trim().length ?? 0) < MIN_ROUTE_KEY_LENGTH) {
+    log.warn(
+      `[familysearch] ${ROUTE_KEY_ENV} (at least ${MIN_ROUTE_KEY_LENGTH} characters) not set; the route is unauthenticated, so the adapter is not registered`
     );
     return false;
   }

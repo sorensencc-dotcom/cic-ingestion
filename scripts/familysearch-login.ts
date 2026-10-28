@@ -7,7 +7,9 @@ import { extractEnvFileArg, loadVars } from "../src/adapters/familysearch/cli/en
 import {
   LOGIN_TIMEOUT_MS,
   evaluateCallback,
+  generatePkce,
   generateState,
+  powershellRefreshLine,
   powershellTokenLine,
   resolveLoginConfig,
 } from "../src/adapters/familysearch/cli/login";
@@ -16,6 +18,7 @@ async function main(): Promise<void> {
   const { envFile, rest } = extractEnvFileArg(process.argv.slice(2));
   const cfg = resolveLoginConfig(loadVars(envFile), rest.includes("--allow-production"));
   const state = generateState();
+  const pkce = generatePkce();
 
   const code = await new Promise<string>((resolve, reject) => {
     const timer = setTimeout(() => {
@@ -49,6 +52,7 @@ async function main(): Promise<void> {
           clientId: cfg.appKey,
           redirectUri: cfg.redirectUri,
           state,
+          codeChallenge: pkce.challenge,
         })
       );
       console.log("\nWaiting for callback (5 minute limit)...");
@@ -60,9 +64,14 @@ async function main(): Promise<void> {
     clientId: cfg.appKey,
     redirectUri: cfg.redirectUri,
     code,
+    codeVerifier: pkce.verifier,
   });
   console.log("\nPaste this into PowerShell (token is shown only here):\n");
   console.log(powershellTokenLine(tokens.accessToken));
+  if (tokens.refreshToken) {
+    console.log("\nRefresh token issued (treat it like a password):\n");
+    console.log(powershellRefreshLine(tokens.refreshToken));
+  }
   console.log(`\nToken lifetime about ${Math.round(tokens.expiresInMs / 3600000)}h.`);
 }
 
