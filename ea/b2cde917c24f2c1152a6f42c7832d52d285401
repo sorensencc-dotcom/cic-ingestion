@@ -1,0 +1,40 @@
+src/adapters/familysearch/FamilySearchAdapter.ts
+  s_16f96a7a9e008e::t_d744fd626a15b8 105-107
+  s_16f96a7a9e008e::t_fed863e739ad0c 44-71,175
+  s_16f96a7a9e008e::t_4f88a301e2784c 168-174
+  s_16f96a7a9e008e::t_68b6e33ace28e8 323-334
+  s_16f96a7a9e008e::t_96139b09e6a867 177-185
+  s_16f96a7a9e008e::t_87a961beb6f46f 176
+src/adapters/familysearch/writePlan.ts
+  s_16f96a7a9e008e::t_16c57c34ae8ee3 226,231-232,234
+  s_16f96a7a9e008e::t_e559e7b29e412c 80-81,84-99
+  s_16f96a7a9e008e::t_b52c43560098de 122-180
+  s_16f96a7a9e008e::t_5a6d5710d047c2 216
+  s_16f96a7a9e008e::t_dff72bec128d7b 261,263-266
+  s_16f96a7a9e008e::t_8b3efdb8ca82f3 187
+  s_16f96a7a9e008e::t_8bc2a8452d4a9b 344
+  s_16f96a7a9e008e::t_e4a882a6585064 390-399
+  s_16f96a7a9e008e::t_2206fe73fe97c1 225,227-230
+  s_16f96a7a9e008e::t_e25feabaad8bce 100
+src/adapters/familysearch/__tests__/writer.test.ts
+  s_16f96a7a9e008e::t_b9e7596426b4c8 52
+  s_16f96a7a9e008e::t_f4340082294ba0 53-59,207,218,246,277,285,295,305,313,329-440
+src/adapters/familysearch/writeApply.ts
+  s_16f96a7a9e008e::t_75ed14797a4ad0 5,7,9,11-12,22-24,90-96,102-112,126-138
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "eab2cde917c24f2c1152a6f42c7832d52d285401",
+  "prompts": {},
+  "sessions": {
+    "s_16f96a7a9e008e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b4f56393-426f-4bd3-815f-f445b5b39c67",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
