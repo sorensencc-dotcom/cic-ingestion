@@ -114,6 +114,32 @@ describe("buildPlan", () => {
     );
   });
 
+  it("treats a same-year death with a different day as a conflict, not as present", () => {
+    const plan = buildPlan(
+      PID,
+      [finding({ kind: "death", date: "13 August 1920", place: "Provo", trmFactId: "F-4" })],
+      doc(),
+      { allowConclusions: true }
+    );
+    expect(plan.operations.some((o) => o.type === "add_fact")).toBe(false);
+    const notes = plan.operations.filter((o) => o.type === "add_note");
+    expect(notes).toHaveLength(1);
+    expect(notes[0].rationale).toMatch(/differs/);
+  });
+
+  it("still treats a year-only or same-day death as present", () => {
+    const plan = buildPlan(
+      PID,
+      [
+        finding({ kind: "death", date: "1920", place: "Provo", trmFactId: "F-5" }),
+        finding({ kind: "death", date: "1 January 1920", place: "Provo", trmFactId: "F-6" }),
+      ],
+      doc()
+    );
+    expect(plan.operations.some((o) => o.type === "add_note")).toBe(false);
+    expect(plan.skipped.filter((s) => s.reason === "already present as a conclusion")).toHaveLength(2);
+  });
+
   it("reuses an existing source description and skips an existing attachment", () => {
     const d = doc();
     d.sourceDescriptions!.push({ id: "SD-9", about: SOURCE_URL, titles: [{ value: "x" }] });

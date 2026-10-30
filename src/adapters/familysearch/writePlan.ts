@@ -116,6 +116,21 @@ export const marker = (f: ProposedFinding) => `[TRM:${findingId(f)}]`;
 const sourceMarker = (f: ProposedFinding) => `[TRM-SOURCE:${f.trmSourceId}]`;
 
 const yearOf = (text?: string) => text?.match(/\d{4}/)?.[0];
+const MONTHS = [
+  "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec",
+];
+const pad = (n: number | string) => String(n).padStart(2, "0");
+// Returns YYYY-MM-DD only when the text carries a full day; undefined for year-only or month-only dates.
+function dayOf(text?: string): string | undefined {
+  if (!text) return undefined;
+  const iso = text.match(/^\+?(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
+  const dmy = text.match(/\b(\d{1,2})\s+([A-Za-z]{3})[A-Za-z]*\.?,?\s+(\d{4})\b/);
+  const mdy = text.match(/\b([A-Za-z]{3})[A-Za-z]*\.?\s+(\d{1,2}),?\s+(\d{4})\b/);
+  const [d, m, y] = dmy ? [dmy[1], dmy[2], dmy[3]] : mdy ? [mdy[2], mdy[1], mdy[3]] : [];
+  const month = m ? MONTHS.indexOf(m.toLowerCase()) : -1;
+  return month >= 0 && d && y ? `${y}-${pad(month + 1)}-${pad(d)}` : undefined;
+}
 const norm = (text?: string) =>
   (text ?? "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 
@@ -428,7 +443,10 @@ function factStatus(person: GxPerson, f: ProposedFinding): FactStatus {
 function factMatches(existing: GxFact, f: ProposedFinding): boolean {
   const existingYear = yearOf(existing.date?.formal ?? existing.date?.original);
   const wantedYear = yearOf(f.date);
-  const dateOk = !wantedYear || existingYear === wantedYear;
+  const existingDay = dayOf(existing.date?.formal) ?? dayOf(existing.date?.original);
+  const wantedDay = dayOf(f.date);
+  const dayClash = !!existingDay && !!wantedDay && existingDay !== wantedDay;
+  const dateOk = (!wantedYear || existingYear === wantedYear) && !dayClash;
   const placeOk =
     !f.place || norm(existing.place?.original).includes(norm(f.place).split(" ")[0]);
   return dateOk && placeOk;
