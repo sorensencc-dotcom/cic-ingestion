@@ -73,7 +73,16 @@ export interface PlanOptions {
   allowConclusions?: boolean;
   minConfidence?: number;
   now?: () => Date;
+  /**
+   * TRM source id -> id of a source description that already exists but the
+   * person does not reference yet, so the person document cannot reveal it.
+   * The planner then attaches it instead of creating a duplicate. The caller
+   * must have confirmed the description exists and belongs to that source.
+   */
+  existingSources?: Readonly<Record<string, string>>;
 }
+
+const SOURCE_DESCRIPTION_ID = /^[A-Za-z0-9][A-Za-z0-9-]{2,30}$/;
 
 export interface PersonReader {
   readPerson(pid: string): Promise<GedcomxDocument>;
@@ -284,7 +293,12 @@ export function buildPlan(
     const first = group[0];
     const about = first.sourceUrl;
     const ids = group.map(findingId);
-    const existingId = findDescription(doc, about, sourceMarker(first))?.id;
+    const declaredId = options.existingSources?.[first.trmSourceId];
+    if (declaredId !== undefined && !SOURCE_DESCRIPTION_ID.test(declaredId)) {
+      throw new Error(`invalid existing source description id "${declaredId}" for ${first.trmSourceId}`);
+    }
+    const existingId =
+      declaredId ?? findDescription(doc, about, sourceMarker(first))?.id;
     // Tag only conclusion types the source actually supports on the tree.
     const tags = group
       .filter((f) => {

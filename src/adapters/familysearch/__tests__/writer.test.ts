@@ -349,6 +349,47 @@ describe("applyPlan", () => {
     expect(attachBody.persons[0].sources[0].description).toBe(`${API}/platform/sources/descriptions/SD-N`);
   });
 
+  it("attaches a declared existing source description instead of creating one", async () => {
+    const existingSources = { "S-42": "71FD-WWJ" };
+    const plan = buildPlan(PID, [finding()], doc(), { existingSources });
+    expect(plan.operations.map((o) => o.type)).toEqual(["attach_source", "add_note"]);
+    expect(plan.operations[0].dependsOn).toBeUndefined();
+    expect(plan.skipped.map((s) => s.operation)).toContain("create_source_description");
+
+    mockRead(personFixture);
+    let attachBody: any;
+    nock(API).post(`/platform/tree/persons/${PID}`, (b) => ((attachBody = b), true)).reply(201);
+    const results = await applyPlan(
+      plan,
+      base({
+        planOptions: { existingSources },
+        confirmOperation: async (op: { type: string }) => op.type === "attach_source",
+      })
+    );
+    expect(results.map((r) => r.status)).toEqual(["posted", "declined"]);
+    expect(attachBody.persons[0].sources[0].description).toBe(
+      `${API}/platform/sources/descriptions/71FD-WWJ`
+    );
+  });
+
+  it("skips the attachment when the declared source description is already attached", () => {
+    const d = doc();
+    d.persons![0].sources = [{ description: `${API}/platform/sources/descriptions/71FD-WWJ` }];
+    const plan = buildPlan(PID, [finding()], d, { existingSources: { "S-42": "71FD-WWJ" } });
+    expect(plan.operations.map((o) => o.type)).toEqual(["add_note"]);
+    expect(plan.skipped.map((s) => s.operation)).toEqual(
+      expect.arrayContaining(["create_source_description", "attach_source"])
+    );
+  });
+
+  it("rejects a malformed declared source description id", () => {
+    for (const id of ["", "x", "../../persons", "AB CD", "71FD-WWJ?x=1"]) {
+      expect(() => buildPlan(PID, [finding()], doc(), { existingSources: { "S-42": id } })).toThrow(
+        /invalid existing source description id/
+      );
+    }
+  });
+
   it("skips declined operations and their dependents", async () => {
     mockRead(personFixture);
     nock(API).post(`/platform/tree/persons/${PID}/notes`).reply(201);
