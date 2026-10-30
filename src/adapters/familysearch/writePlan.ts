@@ -120,9 +120,12 @@ const MONTHS = [
   "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec",
 ];
 const pad = (n: number | string) => String(n).padStart(2, "0");
-// Returns YYYY-MM-DD only when the text carries a full day; undefined for year-only or month-only dates.
+const QUALIFIED_DATE =
+  /\b(?:abt|about|approx\w*|circa|ca|est\w*|before|bef|after|aft|between|bet|from|calc\w*)\b|\bc\.|[~\/?]|^\s*[ABab]\+/;
+// Returns YYYY-MM-DD only when the text carries an exact full day; undefined for year-only,
+// month-only, or qualified dates (about, before, ranges), which are not compared by day.
 function dayOf(text?: string): string | undefined {
-  if (!text) return undefined;
+  if (!text || QUALIFIED_DATE.test(text)) return undefined;
   const iso = text.match(/^\+?(\d{4})-(\d{2})-(\d{2})/);
   if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
   const dmy = text.match(/\b(\d{1,2})\s+([A-Za-z]{3})[A-Za-z]*\.?,?\s+(\d{4})\b/);

@@ -140,6 +140,23 @@ describe("buildPlan", () => {
     expect(plan.skipped.filter((s) => s.reason === "already present as a conclusion")).toHaveLength(2);
   });
 
+  it("compares month-first and ISO dates by day too", () => {
+    const run = (date: string, id: string) =>
+      buildPlan(PID, [finding({ kind: "death", date, place: "Provo", trmFactId: id })], doc());
+    expect(run("Jan 1, 1920", "F-7").operations.some((o) => o.type === "add_note")).toBe(false);
+    expect(run("January 2, 1920", "F-8").operations.some((o) => o.type === "add_note")).toBe(true);
+    expect(run("1920-01-02", "F-9").operations.some((o) => o.type === "add_note")).toBe(true);
+  });
+
+  it("does not treat a qualified date as an exact day", () => {
+    const plan = buildPlan(
+      PID,
+      [finding({ kind: "death", date: "about 5 March 1920", place: "Provo", trmFactId: "F-10" })],
+      doc()
+    );
+    expect(plan.operations.some((o) => o.type === "add_note")).toBe(false);
+  });
+
   it("reuses an existing source description and skips an existing attachment", () => {
     const d = doc();
     d.sourceDescriptions!.push({ id: "SD-9", about: SOURCE_URL, titles: [{ value: "x" }] });
