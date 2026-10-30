@@ -122,17 +122,26 @@ const MONTHS = [
 const pad = (n: number | string) => String(n).padStart(2, "0");
 const QUALIFIED_DATE =
   /\b(?:abt|about|approx\w*|circa|ca|est\w*|before|bef|after|aft|between|bet|from|calc\w*)\b|\bc\.|[~\/?]|^\s*[ABab]\+/;
+// A real calendar day, so "31 February 1920" never becomes a day to compare.
+function exactDay(y: string, m: number, d: string): string | undefined {
+  const date = new Date(Date.UTC(Number(y), m - 1, Number(d)));
+  const real =
+    date.getUTCFullYear() === Number(y) &&
+    date.getUTCMonth() === m - 1 &&
+    date.getUTCDate() === Number(d);
+  return real ? `${y}-${pad(m)}-${pad(d)}` : undefined;
+}
 // Returns YYYY-MM-DD only when the text carries an exact full day; undefined for year-only,
-// month-only, or qualified dates (about, before, ranges), which are not compared by day.
+// month-only, qualified (about, before, ranges) or impossible dates, which are not compared by day.
 function dayOf(text?: string): string | undefined {
   if (!text || QUALIFIED_DATE.test(text)) return undefined;
   const iso = text.match(/^\+?(\d{4})-(\d{2})-(\d{2})/);
-  if (iso) return `${iso[1]}-${iso[2]}-${iso[3]}`;
+  if (iso) return exactDay(iso[1], Number(iso[2]), iso[3]);
   const dmy = text.match(/\b(\d{1,2})\s+([A-Za-z]{3})[A-Za-z]*\.?,?\s+(\d{4})\b/);
   const mdy = text.match(/\b([A-Za-z]{3})[A-Za-z]*\.?\s+(\d{1,2}),?\s+(\d{4})\b/);
   const [d, m, y] = dmy ? [dmy[1], dmy[2], dmy[3]] : mdy ? [mdy[2], mdy[1], mdy[3]] : [];
   const month = m ? MONTHS.indexOf(m.toLowerCase()) : -1;
-  return month >= 0 && d && y ? `${y}-${pad(month + 1)}-${pad(d)}` : undefined;
+  return month >= 0 && d && y ? exactDay(y, month + 1, d) : undefined;
 }
 const norm = (text?: string) =>
   (text ?? "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();

@@ -157,6 +157,21 @@ describe("buildPlan", () => {
     expect(plan.operations.some((o) => o.type === "add_note")).toBe(false);
   });
 
+  it("does not compare an impossible calendar day", () => {
+    const run = (date: string, id: string) =>
+      buildPlan(PID, [finding({ kind: "death", date, place: "Provo", trmFactId: id })], doc());
+    for (const [date, id] of [
+      ["31 February 1920", "F-11"],
+      ["Feb 30, 1920", "F-12"],
+      ["1920-02-31", "F-13"],
+      ["1920-13-01", "F-14"],
+      ["0 January 1920", "F-15"],
+    ]) {
+      expect(run(date, id).operations.some((o) => o.type === "add_note")).toBe(false);
+    }
+    expect(run("29 February 1920", "F-16").operations.some((o) => o.type === "add_note")).toBe(true);
+  });
+
   it("reuses an existing source description and skips an existing attachment", () => {
     const d = doc();
     d.sourceDescriptions!.push({ id: "SD-9", about: SOURCE_URL, titles: [{ value: "x" }] });
