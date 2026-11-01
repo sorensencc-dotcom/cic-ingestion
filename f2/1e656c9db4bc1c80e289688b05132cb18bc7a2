@@ -1,0 +1,25 @@
+src/adapters/familysearch/__tests__/writer.test.ts
+  s_c18290ef58a40c::t_91be13f4c8f3f9 199-206,216-233
+  s_c18290ef58a40c::t_c60288d6ef9738 207-215
+src/adapters/familysearch/writePlan.ts
+  s_c18290ef58a40c::t_f62a3d0bd605bb 497-508
+  s_c18290ef58a40c::t_c880d5968706e2 386
+  s_c18290ef58a40c::t_2f1919bd1e03e5 432,441-449,451
+  s_c18290ef58a40c::t_e0d326edd8241e 518
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "f21e656c9db4bc1c80e289688b05132cb18bc7a2",
+  "prompts": {},
+  "sessions": {
+    "s_c18290ef58a40c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ce39e3dd-db5c-44d9-bd2f-236703b13d05",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
