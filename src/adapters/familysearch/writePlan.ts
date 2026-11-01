@@ -143,7 +143,7 @@ function exactDay(y: string, m: number, d: string): string | undefined {
 }
 // Returns YYYY-MM-DD only when the text carries an exact full day; undefined for year-only,
 // month-only, qualified (about, before, ranges) or impossible dates, which are not compared by day.
-function dayOf(text?: string): string | undefined {
+export function dayOf(text?: string): string | undefined {
   if (!text || QUALIFIED_DATE.test(text)) return undefined;
   const iso = text.match(/^\+?(\d{4})-(\d{2})-(\d{2})/);
   if (iso) return exactDay(iso[1], Number(iso[2]), iso[3]);
@@ -153,7 +153,7 @@ function dayOf(text?: string): string | undefined {
   const month = m ? MONTHS.indexOf(m.toLowerCase()) : -1;
   return month >= 0 && d && y ? exactDay(y, month + 1, d) : undefined;
 }
-const norm = (text?: string) =>
+export const norm = (text?: string) =>
   (text ?? "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
 
 const FINDING_KINDS: ReadonlySet<string> = new Set<FindingKind>([
