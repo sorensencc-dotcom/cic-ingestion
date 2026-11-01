@@ -1,0 +1,19 @@
+.trail/learnings/2026-11-01-fs-apply-ledger-and-plan-hash-soren.md
+  s_8d757b145ec218::t_0a9eda333db74f 1-13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "ce991c945db20fe521262bc2e83ff941bdd474fd",
+  "prompts": {},
+  "sessions": {
+    "s_8d757b145ec218": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "75548f70-11f7-48aa-917a-1db9219a4bcb",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
