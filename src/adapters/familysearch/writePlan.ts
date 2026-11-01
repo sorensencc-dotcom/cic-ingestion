@@ -383,6 +383,7 @@ export function buildPlan(
   }
 
   const seenConclusions = new Set<string>();
+  const plannedUnique = new Set<FindingKind>();
   for (const f of accepted) {
     const id = findingId(f);
     const status = factStatus(person, f);
@@ -428,7 +429,7 @@ export function buildPlan(
       });
       continue;
     }
-    const conclusionKey = `${f.kind}|${norm(f.value)}|${yearOf(f.date) ?? ""}|${norm(f.place)}`;
+    const conclusionKey = `${f.kind}|${norm(f.value)}|${dayOf(f.date) ?? norm(f.date)}|${norm(f.place)}`;
     if (seenConclusions.has(conclusionKey)) {
       plan.skipped.push({
         findingId: id,
@@ -437,7 +438,17 @@ export function buildPlan(
       });
       continue;
     }
+    // A person has one birth and one death: a second, different one stays a note.
+    if (UNIQUE_FACTS.has(f.kind) && plannedUnique.has(f.kind)) {
+      plan.skipped.push({
+        findingId: id,
+        operation: "add_fact",
+        reason: `another ${f.kind} conclusion is already planned in this batch; recorded as note only`,
+      });
+      continue;
+    }
     seenConclusions.add(conclusionKey);
+    if (UNIQUE_FACTS.has(f.kind)) plannedUnique.add(f.kind);
     const op = conclusionOp(pid, f, nextId());
     if (op) factOps.push(op);
   }
@@ -483,6 +494,18 @@ function uniqueDateAgrees(existing: GxFact, wanted?: string): boolean {
   return texts.some((t) => norm(t) === norm(wanted));
 }
 
+// Whole comma-separated parts must match, so "San Diego" never matches "San Francisco" and
+// "Springfield, Illinois" never matches "Springfield, Missouri". One side may be less
+// specific than the other ("Provo" vs "Provo, Utah, United States").
+function placeAgrees(existing?: string, wanted?: string): boolean {
+  if (!wanted?.trim()) return true;
+  const parts = (t?: string) => (t ?? "").split(",").map(norm).filter(Boolean);
+  const e = parts(existing);
+  const w = parts(wanted);
+  if (e.length === 0 || w.length === 0) return false;
+  return w.every((p) => e.includes(p)) || e.every((p) => w.includes(p));
+}
+
 function factMatches(existing: GxFact, f: ProposedFinding, unique = false): boolean {
   const existingYear = yearOf(existing.date?.formal ?? existing.date?.original);
   const wantedYear = yearOf(f.date);
@@ -492,9 +515,7 @@ function factMatches(existing: GxFact, f: ProposedFinding, unique = false): bool
   const dateOk = unique
     ? uniqueDateAgrees(existing, f.date)
     : (!wantedYear || existingYear === wantedYear) && !dayClash;
-  const placeOk =
-    !f.place || norm(existing.place?.original).includes(norm(f.place).split(" ")[0]);
-  return dateOk && placeOk;
+  return dateOk && placeAgrees(existing.place?.original, f.place);
 }
 
 function conclusionOp(

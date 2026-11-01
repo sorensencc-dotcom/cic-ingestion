@@ -196,6 +196,41 @@ describe("buildPlan", () => {
     }
   });
 
+  it("plans only one death per batch and leaves a second, different one as a note", () => {
+    const base = { kind: "death" as const, place: "Reno, Nevada" };
+    const plan = buildPlan(
+      PID,
+      [
+        finding({ ...base, date: "13 August 1968", trmFactId: "F-30" }),
+        finding({ ...base, date: "11 August 1968", trmFactId: "F-31" }),
+      ],
+      {
+        ...doc(),
+        persons: [
+          {
+            ...doc().persons![0],
+            facts: doc().persons![0].facts!.filter((x) => x.type?.endsWith("Birth")),
+          },
+        ],
+      } as GedcomxDocument,
+      { allowConclusions: true }
+    );
+    expect(plan.operations.filter((o) => o.type === "add_fact")).toHaveLength(1);
+    expect(plan.operations.filter((o) => o.type === "add_note")).toHaveLength(2);
+    expect(plan.skipped).toContainEqual(
+      expect.objectContaining({ findingId: "S-42/F-31", operation: "add_fact" })
+    );
+  });
+
+  it("does not match places that only share a first word", () => {
+    const run = (place: string, id: string) =>
+      buildPlan(PID, [finding({ kind: "death", date: "1920", place, trmFactId: id })], doc());
+    expect(run("Provo", "F-32").operations.some((o) => o.type === "add_note")).toBe(false);
+    expect(run("Provo, Utah", "F-33").operations.some((o) => o.type === "add_note")).toBe(false);
+    expect(run("Provo, Ohio", "F-34").operations.some((o) => o.type === "add_note")).toBe(true);
+    expect(run("Pro", "F-35").operations.some((o) => o.type === "add_note")).toBe(true);
+  });
+
   it("still treats identical text or an equal exact day as present for a unique fact", () => {
     const run = (date: string, id: string) =>
       buildPlan(PID, [finding({ kind: "death", date, place: "Provo", trmFactId: id })], doc());
