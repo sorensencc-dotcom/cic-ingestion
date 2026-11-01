@@ -223,6 +223,16 @@ describe("buildPlan", () => {
     );
   });
 
+  it("finds an inlined source description by title when it has no marker note", () => {
+    const d = doc();
+    d.sourceDescriptions = [{ id: "ABCD-123", titles: [{ value: "1910 Census Extract" }] }];
+    const plan = buildPlan(PID, [finding({ sourceUrl: undefined })], d);
+    expect(plan.operations.some((o) => o.type === "create_source_description")).toBe(false);
+    expect(plan.operations.find((o) => o.type === "attach_source")?.existingDescriptionId).toBe(
+      "ABCD-123"
+    );
+  });
+
   it("uses the fingerprint as the op id, stable when the plan is rebuilt", () => {
     const a = finding({ kind: "residence", trmFactId: "F-40" });
     const b = finding({ kind: "residence", trmFactId: "F-41", place: "Ogden, Utah" });
@@ -362,11 +372,15 @@ describe("applyPlan", () => {
     env: { FAMILYSEARCH_ENV: "beta" } as NodeJS.ProcessEnv,
     writer: makeAdapter(),
     confirmOperation: confirmAll,
+    sourceDescriptionsVerified: true,
     sleep: async () => {},
     ...over,
   });
 
   it("refuses without confirm, without a callback, and outside beta", async () => {
+    await expect(
+      applyPlan(planFor(), base({ sourceDescriptionsVerified: undefined }))
+    ).rejects.toThrow(/source description.*unverified/);
     await expect(applyPlan(planFor(), base({ confirm: false }))).rejects.toThrow(WriteRefusedError);
     await expect(applyPlan(planFor(), base({ confirmOperation: undefined }))).rejects.toThrow(/confirmOperation/);
     await expect(applyPlan(planFor(), base({ env: {} }))).rejects.toThrow(/FAMILYSEARCH_ENV=beta/);
@@ -554,6 +568,7 @@ describe("write-time safety", () => {
     env: { FAMILYSEARCH_ENV: "beta" } as NodeJS.ProcessEnv,
     writer: makeAdapter(),
     confirmOperation: async () => true,
+    sourceDescriptionsVerified: true,
     sleep: async () => {},
     ...over,
   });

@@ -297,7 +297,7 @@ export function buildPlan(
       throw new Error(`invalid existing source description id "${declaredId}" for ${first.trmSourceId}`);
     }
     const existingId =
-      declaredId ?? findDescription(doc, about, sourceMarker(first))?.id;
+      declaredId ?? findDescription(doc, about, sourceMarker(first), first.sourceTitle)?.id;
     // Tag only conclusion types the source actually supports on the tree.
     const tags = group
       .filter((f) => {
@@ -634,11 +634,14 @@ export function descriptionIdOf(ref?: string): string {
 export function findDescription(
   doc: GedcomxDocument,
   about: string | undefined,
-  sourceMarker: string
+  sourceMarker: string,
+  title?: string
 ): GxSourceDescription | undefined {
+  const wantedTitle = norm(title);
   return (doc.sourceDescriptions ?? []).find(
     (sd) =>
       (about !== undefined && sd.about === about) ||
-      (sd.notes ?? []).some((n) => n.text?.includes(sourceMarker))
+      (sd.notes ?? []).some((n) => n.text?.includes(sourceMarker)) ||
+      (!!wantedTitle && (sd.titles ?? []).some((t) => norm(t.value) === wantedTitle))
   );
 }

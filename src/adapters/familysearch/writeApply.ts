@@ -22,6 +22,13 @@ export interface ApplyOptions {
   /** The findings the reviewed plan was built from; apply re-plans from them. */
   findings: ProposedFinding[];
   planOptions?: PlanOptions;
+  /**
+   * Creating a source description cannot be undone and cannot be detected later:
+   * the person document never lists a description the person does not reference,
+   * and descriptions carry no note to match on. Set this only after the caller
+   * confirmed none exists for the source (otherwise pass planOptions.existingSources).
+   */
+  sourceDescriptionsVerified?: boolean;
   env: NodeJS.ProcessEnv;
   writer: PersonWriter;
   confirmOperation: (op: PlannedOperation) => Promise<boolean>;
@@ -82,6 +89,15 @@ export async function applyPlan(
     throw new WriteRefusedError("Refusing write: confirmOperation callback is required");
   }
   assertWritesAllowed(options.env, options.writer.env);
+  if (
+    plan.operations.some((o) => o.type === "create_source_description") &&
+    options.sourceDescriptionsVerified !== true
+  ) {
+    throw new WriteRefusedError(
+      "Refusing write: the plan creates a source description and its absence is unverified; " +
+        "declare it in planOptions.existingSources or set sourceDescriptionsVerified: true"
+    );
+  }
 
   const sleep = options.sleep ?? ((ms) => new Promise<void>((r) => setTimeout(r, ms)));
   const now = options.now ?? Date.now;
