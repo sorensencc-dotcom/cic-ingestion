@@ -1,0 +1,24 @@
+src/adapters/familysearch/__tests__/writer.test.ts
+  s_c18290ef58a40c::t_1b7aa490acef0a 226-237
+  s_c18290ef58a40c::t_984914cb8791a4 14
+src/adapters/familysearch/writePlan.ts
+  s_c18290ef58a40c::t_93b012b1095ff5 107-109,320,353,400,451-455
+.trail/learnings/2026-11-01-write-plans-keep-one-birth-or-soren.md
+  s_c18290ef58a40c::t_910be720d0e0fc 1-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "d7a93ed910f8046b51157c073478c35b7f260a22",
+  "prompts": {},
+  "sessions": {
+    "s_c18290ef58a40c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ce39e3dd-db5c-44d9-bd2f-236703b13d05",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
