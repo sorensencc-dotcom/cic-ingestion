@@ -1,0 +1,27 @@
+src/adapters/familysearch/writeApply.ts
+  s_c18290ef58a40c::t_8c899734409051 25-31,92-100
+src/adapters/familysearch/writePlan.ts
+  s_c18290ef58a40c::t_8c899734409051 300,637-638,640,644-645
+src/adapters/familysearch/__tests__/writer.test.ts
+  s_c18290ef58a40c::t_7df8af8227d1ef 375,571
+  s_c18290ef58a40c::t_73ba945809f477 381-383
+  s_c18290ef58a40c::t_c8ee25dcba35c8 226-235
+.trail/learnings/2026-11-01-applying-a-plan-that-creates-a-soren.md
+  s_c18290ef58a40c::t_79811c16183500 1-24
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "add9401474aee08754f47a9fd31547b465096e74",
+  "prompts": {},
+  "sessions": {
+    "s_c18290ef58a40c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ce39e3dd-db5c-44d9-bd2f-236703b13d05",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
