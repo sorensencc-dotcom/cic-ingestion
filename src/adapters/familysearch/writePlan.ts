@@ -460,19 +460,38 @@ function factStatus(person: GxPerson, f: ProposedFinding): FactStatus {
   if (!factType) return "note_only";
   if (!f.date && !f.place) return "note_only";
   const same = (person.facts ?? []).filter((x) => x.type === factType);
-  const matches = same.some((x) => factMatches(x, f));
+  const matches = same.some((x) => factMatches(x, f, UNIQUE_FACTS.has(f.kind)));
   if (matches) return "present";
   if (same.length > 0 && UNIQUE_FACTS.has(f.kind)) return "conflict";
   return "absent";
 }
 
-function factMatches(existing: GxFact, f: ProposedFinding): boolean {
+// A unique fact (birth, death) counts as already present only when the dates are provably
+// the same: equal exact days, a bare year matching the existing year, or identical text.
+// Anything else (13-Aug-1968, 8/13/1968, month-only, "about", non-English months) is not
+// proven equal, so it is a conflict and gets recorded as a note instead of being skipped.
+function uniqueDateAgrees(existing: GxFact, wanted?: string): boolean {
+  if (!wanted?.trim()) return true;
+  const texts = [existing.date?.formal, existing.date?.original].filter(
+    (t): t is string => !!t
+  );
+  if (/^\s*\d{4}\s*$/.test(wanted)) {
+    return texts.some((t) => yearOf(t) === yearOf(wanted));
+  }
+  const wantedDay = dayOf(wanted);
+  if (wantedDay) return texts.some((t) => dayOf(t) === wantedDay);
+  return texts.some((t) => norm(t) === norm(wanted));
+}
+
+function factMatches(existing: GxFact, f: ProposedFinding, unique = false): boolean {
   const existingYear = yearOf(existing.date?.formal ?? existing.date?.original);
   const wantedYear = yearOf(f.date);
   const existingDay = dayOf(existing.date?.formal) ?? dayOf(existing.date?.original);
   const wantedDay = dayOf(f.date);
   const dayClash = !!existingDay && !!wantedDay && existingDay !== wantedDay;
-  const dateOk = (!wantedYear || existingYear === wantedYear) && !dayClash;
+  const dateOk = unique
+    ? uniqueDateAgrees(existing, f.date)
+    : (!wantedYear || existingYear === wantedYear) && !dayClash;
   const placeOk =
     !f.place || norm(existing.place?.original).includes(norm(f.place).split(" ")[0]);
   return dateOk && placeOk;

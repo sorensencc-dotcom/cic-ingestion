@@ -148,16 +148,18 @@ describe("buildPlan", () => {
     expect(run("1920-01-02", "F-9").operations.some((o) => o.type === "add_note")).toBe(true);
   });
 
-  it("does not treat a qualified date as an exact day", () => {
+  it("does not treat a qualified date as proof the death is already present", () => {
     const plan = buildPlan(
       PID,
       [finding({ kind: "death", date: "about 5 March 1920", place: "Provo", trmFactId: "F-10" })],
-      doc()
+      doc(),
+      { allowConclusions: true }
     );
-    expect(plan.operations.some((o) => o.type === "add_note")).toBe(false);
+    expect(plan.operations.some((o) => o.type === "add_fact")).toBe(false);
+    expect(plan.operations.some((o) => o.type === "add_note")).toBe(true);
   });
 
-  it("does not compare an impossible calendar day", () => {
+  it("does not treat an impossible calendar day as present", () => {
     const run = (date: string, id: string) =>
       buildPlan(PID, [finding({ kind: "death", date, place: "Provo", trmFactId: id })], doc());
     for (const [date, id] of [
@@ -166,10 +168,45 @@ describe("buildPlan", () => {
       ["1920-02-31", "F-13"],
       ["1920-13-01", "F-14"],
       ["0 January 1920", "F-15"],
+      ["29 February 1920", "F-16"],
+    ]) {
+      expect(run(date, id).operations.some((o) => o.type === "add_note")).toBe(true);
+    }
+  });
+
+  it("treats a unique fact with an unparsed date format as a conflict, never as present", () => {
+    const run = (date: string, id: string, extra: Partial<ProposedFinding> = {}) =>
+      buildPlan(
+        PID,
+        [finding({ kind: "death", date, place: "Provo", trmFactId: id, ...extra })],
+        doc(),
+        { allowConclusions: true }
+      );
+    for (const [date, id] of [
+      ["2-Jan-1920", "F-17"],
+      ["1/1/1920", "F-18"],
+      ["1 Jan", "F-19"],
+      ["January 1920", "F-20"],
+      ["1. Januar 1920", "F-21"],
+      ["1 maj 1920", "F-22"],
+    ]) {
+      const plan = run(date, id);
+      expect(plan.operations.some((o) => o.type === "add_fact")).toBe(false);
+      expect(plan.operations.some((o) => o.type === "add_note")).toBe(true);
+    }
+  });
+
+  it("still treats identical text or an equal exact day as present for a unique fact", () => {
+    const run = (date: string, id: string) =>
+      buildPlan(PID, [finding({ kind: "death", date, place: "Provo", trmFactId: id })], doc());
+    for (const [date, id] of [
+      ["1 January 1920", "F-23"],
+      ["Jan 1, 1920", "F-24"],
+      ["1920-01-01", "F-25"],
+      ["1920", "F-26"],
     ]) {
       expect(run(date, id).operations.some((o) => o.type === "add_note")).toBe(false);
     }
-    expect(run("29 February 1920", "F-16").operations.some((o) => o.type === "add_note")).toBe(true);
   });
 
   it("reuses an existing source description and skips an existing attachment", () => {
