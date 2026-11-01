@@ -104,8 +104,9 @@ export async function loadPerson(
 }
 
 /** Stable identity of an operation across two plans built at different times. */
-export const fingerprint = (op: PlannedOperation) =>
-  `${op.type}|${[...op.findingIds].sort().join(",")}`;
+const opKey = (type: OperationType, findingIds: string[]) =>
+  `${type}|${[...findingIds].sort().join(",")}`;
+export const fingerprint = (op: PlannedOperation) => opKey(op.type, op.findingIds);
 
 const GX = "http://gedcomx.org/";
 const FACT_TYPES: Partial<Record<FindingKind, string>> = {
@@ -280,8 +281,6 @@ export function buildPlan(
   const attachOps: PlannedOperation[] = [];
   const noteOps: PlannedOperation[] = [];
   const factOps: PlannedOperation[] = [];
-  const seq = { n: 0 };
-  const nextId = () => `op-${++seq.n}`;
 
   const bySource = new Map<string, ProposedFinding[]>();
   for (const f of accepted) {
@@ -318,7 +317,7 @@ export function buildPlan(
         reason: `source description ${existingId} already present`,
       });
     } else {
-      sdOpId = nextId();
+      sdOpId = opKey("create_source_description", ids);
       sdOps.push({
         id: sdOpId,
         type: "create_source_description",
@@ -351,7 +350,7 @@ export function buildPlan(
       });
     } else {
       attachOps.push({
-        id: nextId(),
+        id: opKey("attach_source", ids),
         type: "attach_source",
         rationale: `Attach TRM source ${first.trmSourceId} to ${pid}`,
         evidenceUrl: about,
@@ -398,7 +397,7 @@ export function buildPlan(
     } else {
       const message = changeMessage(f, status);
       noteOps.push({
-        id: nextId(),
+        id: opKey("add_note", [id]),
         type: "add_note",
         rationale: noteRationale(f, status),
         evidenceUrl: f.sourceUrl,
@@ -449,7 +448,11 @@ export function buildPlan(
     }
     seenConclusions.add(conclusionKey);
     if (UNIQUE_FACTS.has(f.kind)) plannedUnique.add(f.kind);
-    const op = conclusionOp(pid, f, nextId());
+    const op = conclusionOp(
+      pid,
+      f,
+      opKey(f.kind === "name_variant" ? "add_name" : "add_fact", [id])
+    );
     if (op) factOps.push(op);
   }
 

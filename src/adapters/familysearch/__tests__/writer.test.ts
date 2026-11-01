@@ -11,6 +11,7 @@ import {
   ProposedFinding,
   WritePlan,
   buildPlan,
+  fingerprint,
   planWrite,
 } from "../writePlan";
 import personFixture from "./fixtures/person.json";
@@ -220,6 +221,18 @@ describe("buildPlan", () => {
     expect(plan.skipped).toContainEqual(
       expect.objectContaining({ findingId: "S-42/F-31", operation: "add_fact" })
     );
+  });
+
+  it("uses the fingerprint as the op id, stable when the plan is rebuilt", () => {
+    const a = finding({ kind: "residence", trmFactId: "F-40" });
+    const b = finding({ kind: "residence", trmFactId: "F-41", place: "Ogden, Utah" });
+    const first = buildPlan(PID, [a, b], doc(), { allowConclusions: true });
+    const second = buildPlan(PID, [b], doc(), { allowConclusions: true });
+    for (const op of first.operations) expect(op.id).toBe(fingerprint(op));
+    expect(new Set(first.operations.map((o) => o.id)).size).toBe(first.operations.length);
+    const noteOf = (p: WritePlan, id: string) =>
+      p.operations.find((o) => o.type === "add_note" && o.findingIds[0] === id)?.id;
+    expect(noteOf(second, "S-42/F-41")).toBe(noteOf(first, "S-42/F-41"));
   });
 
   it("does not match places that only share a first word", () => {
