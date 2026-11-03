@@ -1,5 +1,35 @@
-import { Router, Request, Response } from "express";
+import { timingSafeEqual } from "crypto";
+import { NextFunction, Router, Request, Response } from "express";
 import { AdapterIntegrationService } from "../services/AdapterIntegrationService";
+
+// Adapters that act with a personal third-party credential. The listener has
+// no authentication of its own, so these require a shared secret header.
+export const CREDENTIALED_ADAPTERS: ReadonlySet<string> = new Set(["familysearch"]);
+export const ROUTE_KEY_ENV = "CIC_CREDENTIALED_ROUTE_KEY";
+export const ROUTE_KEY_HEADER = "x-cic-route-key";
+export const MIN_ROUTE_KEY_LENGTH = 16;
+
+function routeKeyMatches(provided: unknown): boolean {
+  const expected = process.env[ROUTE_KEY_ENV] ?? "";
+  if (expected.length < MIN_ROUTE_KEY_LENGTH || typeof provided !== "string") {
+    return false;
+  }
+  const a = Buffer.from(provided);
+  const b = Buffer.from(expected);
+  return a.length === b.length && timingSafeEqual(a, b);
+}
+
+function requireRouteKey(req: Request, res: Response, next: NextFunction) {
+  if (!CREDENTIALED_ADAPTERS.has(req.params.adapterName)) return next();
+  if (routeKeyMatches(req.header(ROUTE_KEY_HEADER))) return next();
+  return res.status(401).json({
+    success: false,
+    error: `Adapter ${req.params.adapterName} requires a valid ${ROUTE_KEY_HEADER} header`,
+    driftSignals: [],
+    hydrationFailures: [],
+    stats: { hitRate: 0 },
+  });
+}
 
 export function createExecuteRouter(service: AdapterIntegrationService): Router {
   const router = Router();
@@ -50,7 +80,7 @@ export function createExecuteRouter(service: AdapterIntegrationService): Router 
     }
   });
 
-  router.post("/:adapterName", async (req: Request, res: Response) => {
+  router.post("/:adapterName", requireRouteKey, async (req: Request, res: Response) => {
     try {
       const { adapterName } = req.params;
       const payload = req.body;
@@ -84,7 +114,7 @@ export function createExecuteRouter(service: AdapterIntegrationService): Router 
     }
   });
 
-  router.post("/batch/:adapterName", async (req: Request, res: Response) => {
+  router.post("/batch/:adapterName", requireRouteKey, async (req: Request, res: Response) => {
     try {
       const { adapterName } = req.params;
       const payloads = Array.isArray(req.body) ? req.body : [req.body];

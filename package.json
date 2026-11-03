@@ -18,7 +18,8 @@
     "start:dev": "node --env-file=.env --import tsx src/server.ts",
     "start:test-server": "ts-node src/__tests__/test-server.ts",
     "fs:login": "tsx scripts/familysearch-login.ts",
-    "fs:read": "tsx scripts/familysearch-read-person.ts"
+    "fs:read": "tsx scripts/familysearch-read-person.ts",
+    "fs:apply": "tsx scripts/familysearch-apply.ts"
   },
   "dependencies": {
     "@google-cloud/vision": "5.3.7",

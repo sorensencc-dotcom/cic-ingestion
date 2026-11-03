@@ -41,6 +41,34 @@ export class FamilySearchApiError extends Error {
   }
 }
 
+export class PersonMergedError extends FamilySearchApiError {
+  constructor(
+    readonly requestedPid: string,
+    readonly survivorPid?: string
+  ) {
+    super(
+      `Person ${requestedPid} was merged${survivorPid ? ` into ${survivorPid}` : ""}; refresh the stored PID`,
+      301
+    );
+    this.name = "PersonMergedError";
+  }
+}
+
+export class PersonDeletedError extends FamilySearchApiError {
+  constructor(readonly requestedPid: string) {
+    super(`Person ${requestedPid} was deleted`, 410);
+    this.name = "PersonDeletedError";
+  }
+}
+
+const PERSON_PATH = /\/platform\/tree\/persons\/([^/?#]+)/;
+
+function survivorOf(location: unknown): string | undefined {
+  return typeof location === "string"
+    ? PERSON_PATH.exec(location)?.[1]
+    : undefined;
+}
+
 export interface WriteResponse {
   status: number;
   location?: string;
@@ -74,6 +102,9 @@ export class FamilySearchAdapter extends BaseAdapter {
       baseURL: FAMILYSEARCH_HOSTS[this.env].api,
       timeout: fsConfig.timeout,
       validateStatus: () => true,
+      // A merged person answers 301; following it turns a POST into a GET
+      // (301/302) or re-posts the body to another person (307/308).
+      maxRedirects: 0,
     });
   }
 
@@ -134,7 +165,24 @@ export class FamilySearchAdapter extends BaseAdapter {
       { relatives: true, sourceDescriptions: true },
       GEDCOMX_JSON
     );
-    return validateGedcomxPersonDocument(response.data);
+    const doc = validateGedcomxPersonDocument(response.data);
+    if (!doc.persons?.some((p) => p.id === pid)) {
+      throw new FamilySearchApiError(
+        `FamilySearch response does not contain requested person ${pid}`
+      );
+    }
+    return doc;
+  }
+
+  async readNotes(pid: string): Promise<Array<{ text?: string }>> {
+    const response = await this.request(
+      `/platform/tree/persons/${encodeURIComponent(pid)}/notes`,
+      {},
+      GEDCOMX_JSON
+    );
+    if (response.status === 204 || !response.data) return [];
+    const notes = response.data?.persons?.find?.((p: { id?: string }) => p.id === pid)?.notes;
+    return Array.isArray(notes) ? notes : [];
   }
 
   async postGedcomx(path: string, body: unknown): Promise<WriteResponse> {
@@ -272,7 +320,18 @@ export class FamilySearchAdapter extends BaseAdapter {
       }
 
       const { status } = response;
-      if (status >= 200 && status < 300) return response;
+      // Writes create resources: only 201/204 count, never a bare 200.
+      if (write ? status === 201 || status === 204 : status >= 200 && status < 300) {
+        return response;
+      }
+      const requestedPid = PERSON_PATH.exec(path)?.[1] ?? path;
+      if (status === 301) {
+        throw new PersonMergedError(
+          requestedPid,
+          survivorOf(response.headers?.["location"])
+        );
+      }
+      if (status === 410) throw new PersonDeletedError(requestedPid);
 
       if (status === 401 && !authRetried) {
         authRetried = true;

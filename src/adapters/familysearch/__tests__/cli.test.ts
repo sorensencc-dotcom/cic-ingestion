@@ -1,3 +1,6 @@
+import { createHash as pkceHash } from "node:crypto";
+import { buildAuthorizationUrl as pkceAuthUrl } from "../tokenProvider";
+import { generatePkce } from "../cli/login";
 import { describe, expect, it } from "@jest/globals";
 import { buildAuthorizationUrl } from "../tokenProvider";
 import { extractEnvFileArg, parseEnvText } from "../cli/envFile";
@@ -133,5 +136,22 @@ describe("person summary", () => {
     expect(
       redactSecrets({ a: { access_token: "t", email: "e", keep: 1 }, b: [{ Authorization: "x" }] })
     ).toEqual({ a: { access_token: "[REDACTED]", email: "[REDACTED]", keep: 1 }, b: [{ Authorization: "[REDACTED]" }] });
+  });
+});
+
+describe("PKCE", () => {
+  it("derives an S256 challenge from the verifier", () => {
+    const { verifier, challenge } = generatePkce();
+    expect(verifier.length).toBeGreaterThanOrEqual(43);
+    expect(challenge).toBe(pkceHash("sha256").update(verifier).digest("base64url"));
+  });
+
+  it("puts the challenge in the authorization URL", () => {
+    const { challenge } = generatePkce();
+    const url = new URL(
+      pkceAuthUrl({ env: "beta", clientId: "k", redirectUri: "http://localhost:3000/callback", state: "s", codeChallenge: challenge })
+    );
+    expect(url.searchParams.get("code_challenge")).toBe(challenge);
+    expect(url.searchParams.get("code_challenge_method")).toBe("S256");
   });
 });

@@ -9,7 +9,12 @@ import { SearchResult } from "../../adapters/familysearch/schema";
 import { FamilySearchSource } from "../../adapters/FamilySearchRouteAdapter";
 import { registerFamilySearchFromEnv } from "../../config/familySearchRegistration";
 
-const CREDS = { FAMILYSEARCH_APP_KEY: "app", FAMILYSEARCH_ACCESS_TOKEN: "tok" };
+const ROUTE_KEY = "test-route-key-0123456789";
+const CREDS = {
+  FAMILYSEARCH_APP_KEY: "app",
+  FAMILYSEARCH_ACCESS_TOKEN: "tok",
+  CIC_CREDENTIALED_ROUTE_KEY: ROUTE_KEY,
+};
 
 const ok = (data: unknown): AdapterOutput => ({ success: true, data, score: 0.9, timestamp: 1 });
 
@@ -41,14 +46,22 @@ describe("POST /execute/:adapter (familysearch)", () => {
     base = `http://127.0.0.1:${(server.address() as AddressInfo).port}`;
   }
 
-  const post = (path: string, body: unknown) =>
+  const post = (path: string, body: unknown, key: string | null = ROUTE_KEY) =>
     fetch(`${base}${path}`, {
       method: "POST",
-      headers: { "content-type": "application/json" },
+      headers: {
+        "content-type": "application/json",
+        ...(key ? { "x-cic-route-key": key } : {}),
+      },
       body: JSON.stringify(body),
     });
 
+  beforeEach(() => {
+    process.env.CIC_CREDENTIALED_ROUTE_KEY = ROUTE_KEY;
+  });
+
   afterEach(async () => {
+    delete process.env.CIC_CREDENTIALED_ROUTE_KEY;
     service?.destroy();
     await new Promise((r) => server?.close(r));
   });
@@ -91,6 +104,53 @@ describe("POST /execute/:adapter (familysearch)", () => {
     await post("/execute/familysearch", { key: "x", payload: { mode: "search", surname: "A" } });
     await post("/execute/familysearch", { key: "x", payload: { mode: "search", surname: "B" } });
     expect(source.search).toHaveBeenCalledTimes(2);
+  });
+
+  it("rejects credentialed adapters without a valid route key", async () => {
+    await start(CREDS);
+    const none = await post("/execute/familysearch", { key: "P", payload: {} }, null);
+    const wrong = await post("/execute/familysearch", { key: "P", payload: {} }, "nope-nope-nope-nope-nope");
+    const batch = await post("/execute/batch/familysearch", [{ key: "P" }], null);
+    expect([none.status, wrong.status, batch.status]).toEqual([401, 401, 401]);
+    expect(source.run).not.toHaveBeenCalled();
+  });
+
+  it("strips the raw GEDCOM X document unless includeRaw is set", async () => {
+    const src = makeSource({
+      run: jest.fn(async (input: AdapterInput) =>
+        ok({ persons: [{ pid: input.key, name: "A" }], relationships: [], raw: { persons: ["living"] } })
+      ),
+    });
+    await start(CREDS, src);
+    const plain = await (await post("/execute/familysearch", { key: "P", payload: {} })).json();
+    const withRaw = await (
+      await post("/execute/familysearch", { key: "P", payload: { includeRaw: true } })
+    ).json();
+    expect(plain.data.raw).toBeUndefined();
+    expect(withRaw.data.raw).toBeDefined();
+  });
+
+  it("returns 400 for malformed search params", async () => {
+    await start(CREDS);
+    for (const payload of [
+      { mode: "search", surname: 0 },
+      { mode: "search", surname: "x", count: "abc" },
+      { mode: "search", surname: "x", count: 101 },
+      { mode: "search", surname: "x", sex: "Other" },
+      { mode: "search", surname: ["a"] },
+    ]) {
+      const res = await post("/execute/familysearch", { payload });
+      expect(res.status).toBe(400);
+    }
+    expect(source.search).not.toHaveBeenCalled();
+  });
+
+  it("does not register without a route key", () => {
+    const registry = new AdapterRegistry();
+    const log = { info: jest.fn(), warn: jest.fn() };
+    const { CIC_CREDENTIALED_ROUTE_KEY: _k, ...noKey } = CREDS;
+    expect(registerFamilySearchFromEnv(registry, noKey, log, () => makeSource())).toBe(false);
+    expect(log.warn).toHaveBeenCalledWith(expect.stringContaining("CIC_CREDENTIALED_ROUTE_KEY"));
   });
 
   it("returns 404 for an unknown adapter", async () => {

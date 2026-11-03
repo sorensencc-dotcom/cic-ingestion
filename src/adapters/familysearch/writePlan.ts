@@ -73,11 +73,40 @@ export interface PlanOptions {
   allowConclusions?: boolean;
   minConfidence?: number;
   now?: () => Date;
+  /**
+   * TRM source id -> id of a source description that already exists but the
+   * person does not reference yet, so the person document cannot reveal it.
+   * The planner then attaches it instead of creating a duplicate. The caller
+   * must have confirmed the description exists and belongs to that source.
+   */
+  existingSources?: Readonly<Record<string, string>>;
 }
+
+const SOURCE_DESCRIPTION_ID = /^[A-Za-z0-9][A-Za-z0-9-]{2,30}$/;
 
 export interface PersonReader {
   readPerson(pid: string): Promise<GedcomxDocument>;
+  /** Read Person does not reliably inline notes; fetch them explicitly. */
+  readNotes?(pid: string): Promise<Array<{ text?: string }>>;
 }
+
+export async function loadPerson(
+  reader: PersonReader,
+  pid: string
+): Promise<GedcomxDocument> {
+  const doc = await reader.readPerson(pid);
+  if (!reader.readNotes) return doc;
+  const person = doc.persons?.find((p) => p.id === pid);
+  if (person) {
+    person.notes = [...(person.notes ?? []), ...(await reader.readNotes(pid))];
+  }
+  return doc;
+}
+
+/** Stable identity of an operation across two plans built at different times. */
+const opKey = (type: OperationType, findingIds: string[]) =>
+  `${type}|${[...findingIds].sort().join(",")}`;
+export const fingerprint = (op: PlannedOperation) => opKey(op.type, op.findingIds);
 
 const GX = "http://gedcomx.org/";
 const FACT_TYPES: Partial<Record<FindingKind, string>> = {
@@ -97,8 +126,94 @@ export const marker = (f: ProposedFinding) => `[TRM:${findingId(f)}]`;
 const sourceMarker = (f: ProposedFinding) => `[TRM-SOURCE:${f.trmSourceId}]`;
 
 const yearOf = (text?: string) => text?.match(/\d{4}/)?.[0];
-const norm = (text?: string) =>
+const MONTHS = [
+  "jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec",
+];
+const pad = (n: number | string) => String(n).padStart(2, "0");
+const QUALIFIED_DATE =
+  /\b(?:abt|about|approx\w*|circa|ca|est\w*|before|bef|after|aft|between|bet|from|calc\w*)\b|\bc\.|[~\/?]|^\s*[ABab]\+/;
+// A real calendar day, so "31 February 1920" never becomes a day to compare.
+function exactDay(y: string, m: number, d: string): string | undefined {
+  const date = new Date(Date.UTC(Number(y), m - 1, Number(d)));
+  const real =
+    date.getUTCFullYear() === Number(y) &&
+    date.getUTCMonth() === m - 1 &&
+    date.getUTCDate() === Number(d);
+  return real ? `${y}-${pad(m)}-${pad(d)}` : undefined;
+}
+// Returns YYYY-MM-DD only when the text carries an exact full day; undefined for year-only,
+// month-only, qualified (about, before, ranges) or impossible dates, which are not compared by day.
+export function dayOf(text?: string): string | undefined {
+  if (!text || QUALIFIED_DATE.test(text)) return undefined;
+  const iso = text.match(/^\+?(\d{4})-(\d{2})-(\d{2})/);
+  if (iso) return exactDay(iso[1], Number(iso[2]), iso[3]);
+  const dmy = text.match(/\b(\d{1,2})\s+([A-Za-z]{3})[A-Za-z]*\.?,?\s+(\d{4})\b/);
+  const mdy = text.match(/\b([A-Za-z]{3})[A-Za-z]*\.?\s+(\d{1,2}),?\s+(\d{4})\b/);
+  const [d, m, y] = dmy ? [dmy[1], dmy[2], dmy[3]] : mdy ? [mdy[2], mdy[1], mdy[3]] : [];
+  const month = m ? MONTHS.indexOf(m.toLowerCase()) : -1;
+  return month >= 0 && d && y ? exactDay(y, month + 1, d) : undefined;
+}
+export const norm = (text?: string) =>
   (text ?? "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+
+const FINDING_KINDS: ReadonlySet<string> = new Set<FindingKind>([
+  "name_variant",
+  "birth",
+  "death",
+  "marriage",
+  "residence",
+  "relationship",
+]);
+
+const nonEmpty = (v: unknown): v is string =>
+  typeof v === "string" && v.trim().length > 0;
+const optionalString = (v: unknown) => v === undefined || typeof v === "string";
+
+/**
+ * Findings arrive as parsed JSON, not checked TypeScript values, so this
+ * fails closed: anything not provably valid is dropped with a reason.
+ * Returns undefined when the finding is acceptable.
+ */
+export function findingProblem(
+  f: unknown,
+  minConfidence: number
+): string | undefined {
+  if (!f || typeof f !== "object") return "finding is not an object";
+  const r = f as Record<string, unknown>;
+  if (!nonEmpty(r.trmSourceId) || !nonEmpty(r.trmFactId)) {
+    return "missing TRM source id or fact id";
+  }
+  if (!nonEmpty(r.sourceTitle) || !nonEmpty(r.value) || !nonEmpty(r.note)) {
+    return "missing source title, value, or note";
+  }
+  if (typeof r.kind !== "string" || !FINDING_KINDS.has(r.kind)) {
+    return `unknown finding kind ${String(r.kind)}`;
+  }
+  if (
+    !optionalString(r.date) ||
+    !optionalString(r.place) ||
+    !optionalString(r.sourceUrl)
+  ) {
+    return "date, place, and sourceUrl must be strings";
+  }
+  if (
+    typeof r.confidence !== "number" ||
+    !Number.isFinite(r.confidence) ||
+    r.confidence < 0 ||
+    r.confidence > 1
+  ) {
+    return `confidence must be a number in [0, 1], got ${String(r.confidence)}`;
+  }
+  if (r.confidence < minConfidence) {
+    return `confidence ${r.confidence} below ${minConfidence}`;
+  }
+  return undefined;
+}
+
+function safeFindingId(f: unknown): string {
+  const r = (f && typeof f === "object" ? f : {}) as Record<string, unknown>;
+  return `${String(r.trmSourceId ?? "?")}/${String(r.trmFactId ?? "?")}`;
+}
 
 export async function planWrite(
   pid: string,
@@ -106,7 +221,7 @@ export async function planWrite(
   reader: PersonReader,
   options: PlanOptions = {}
 ): Promise<WritePlan> {
-  return buildPlan(pid, findings, await reader.readPerson(pid), options);
+  return buildPlan(pid, findings, await loadPerson(reader, pid), options);
 }
 
 export function isPossiblyLiving(person: GxPerson, now: Date): boolean {
@@ -135,7 +250,7 @@ export function buildPlan(
   if (isPossiblyLiving(person, now)) {
     for (const f of findings) {
       plan.dropped.push({
-        findingId: findingId(f),
+        findingId: safeFindingId(f),
         reason: "person is living or possibly living",
       });
     }
@@ -144,19 +259,16 @@ export function buildPlan(
 
   const minConfidence = options.minConfidence ?? 0.6;
   const accepted: ProposedFinding[] = [];
-  for (const f of findings) {
-    const id = findingId(f);
-    if (!f.trmSourceId?.trim() || !f.trmFactId?.trim()) {
-      plan.dropped.push({ findingId: id, reason: "missing TRM source id or fact id" });
-    } else if (!f.sourceTitle?.trim() || !f.value?.trim()) {
-      plan.dropped.push({ findingId: id, reason: "missing source title or value" });
-    } else if (f.confidence < minConfidence) {
-      plan.dropped.push({
-        findingId: id,
-        reason: `confidence ${f.confidence} below ${minConfidence}`,
-      });
+  const seenIds = new Set<string>();
+  for (const raw of findings) {
+    const problem =
+      findingProblem(raw, minConfidence) ??
+      (seenIds.has(safeFindingId(raw)) ? "duplicate finding id in batch" : undefined);
+    seenIds.add(safeFindingId(raw));
+    if (problem) {
+      plan.dropped.push({ findingId: safeFindingId(raw), reason: problem });
     } else {
-      accepted.push(f);
+      accepted.push(raw);
     }
   }
 
@@ -169,8 +281,6 @@ export function buildPlan(
   const attachOps: PlannedOperation[] = [];
   const noteOps: PlannedOperation[] = [];
   const factOps: PlannedOperation[] = [];
-  const seq = { n: 0 };
-  const nextId = () => `op-${++seq.n}`;
 
   const bySource = new Map<string, ProposedFinding[]>();
   for (const f of accepted) {
@@ -182,8 +292,18 @@ export function buildPlan(
     const first = group[0];
     const about = first.sourceUrl;
     const ids = group.map(findingId);
-    const existingId = findDescription(doc, about, sourceMarker(first))?.id;
+    const declaredId = options.existingSources?.[first.trmSourceId];
+    if (declaredId !== undefined && !SOURCE_DESCRIPTION_ID.test(declaredId)) {
+      throw new Error(`invalid existing source description id "${declaredId}" for ${first.trmSourceId}`);
+    }
+    const existingId =
+      declaredId ?? findDescription(doc, about, sourceMarker(first), first.sourceTitle)?.id;
+    // Tag only conclusion types the source actually supports on the tree.
     const tags = group
+      .filter((f) => {
+        const s = factStatus(person, f);
+        return s === "present" || (s === "absent" && !!options.allowConclusions);
+      })
       .map((f) => FACT_TYPES[f.kind])
       .filter((t): t is string => !!t);
     const message = `TRM ${first.trmSourceId}: ${first.sourceTitle}`.slice(0, 400);
@@ -197,7 +317,7 @@ export function buildPlan(
         reason: `source description ${existingId} already present`,
       });
     } else {
-      sdOpId = nextId();
+      sdOpId = opKey("create_source_description", ids);
       sdOps.push({
         id: sdOpId,
         type: "create_source_description",
@@ -230,7 +350,7 @@ export function buildPlan(
       });
     } else {
       attachOps.push({
-        id: nextId(),
+        id: opKey("attach_source", ids),
         type: "attach_source",
         rationale: `Attach TRM source ${first.trmSourceId} to ${pid}`,
         evidenceUrl: about,
@@ -261,6 +381,8 @@ export function buildPlan(
     }
   }
 
+  const seenConclusions = new Set<string>();
+  const plannedUnique = new Set<FindingKind>();
   for (const f of accepted) {
     const id = findingId(f);
     const status = factStatus(person, f);
@@ -275,7 +397,7 @@ export function buildPlan(
     } else {
       const message = changeMessage(f, status);
       noteOps.push({
-        id: nextId(),
+        id: opKey("add_note", [id]),
         type: "add_note",
         rationale: noteRationale(f, status),
         evidenceUrl: f.sourceUrl,
@@ -306,7 +428,31 @@ export function buildPlan(
       });
       continue;
     }
-    const op = conclusionOp(pid, f, nextId());
+    const conclusionKey = `${f.kind}|${norm(f.value)}|${dayOf(f.date) ?? norm(f.date)}|${norm(f.place)}`;
+    if (seenConclusions.has(conclusionKey)) {
+      plan.skipped.push({
+        findingId: id,
+        operation: f.kind === "name_variant" ? "add_name" : "add_fact",
+        reason: "identical conclusion already planned in this batch",
+      });
+      continue;
+    }
+    // A person has one birth and one death: a second, different one stays a note.
+    if (UNIQUE_FACTS.has(f.kind) && plannedUnique.has(f.kind)) {
+      plan.skipped.push({
+        findingId: id,
+        operation: "add_fact",
+        reason: `another ${f.kind} conclusion is already planned in this batch; recorded as note only`,
+      });
+      continue;
+    }
+    seenConclusions.add(conclusionKey);
+    if (UNIQUE_FACTS.has(f.kind)) plannedUnique.add(f.kind);
+    const op = conclusionOp(
+      pid,
+      f,
+      opKey(f.kind === "name_variant" ? "add_name" : "add_fact", [id])
+    );
     if (op) factOps.push(op);
   }
 
@@ -328,19 +474,51 @@ function factStatus(person: GxPerson, f: ProposedFinding): FactStatus {
   if (!factType) return "note_only";
   if (!f.date && !f.place) return "note_only";
   const same = (person.facts ?? []).filter((x) => x.type === factType);
-  const matches = same.some((x) => factMatches(x, f));
+  const matches = same.some((x) => factMatches(x, f, UNIQUE_FACTS.has(f.kind)));
   if (matches) return "present";
   if (same.length > 0 && UNIQUE_FACTS.has(f.kind)) return "conflict";
   return "absent";
 }
 
-function factMatches(existing: GxFact, f: ProposedFinding): boolean {
+// A unique fact (birth, death) counts as already present only when the dates are provably
+// the same: equal exact days, a bare year matching the existing year, or identical text.
+// Anything else (13-Aug-1968, 8/13/1968, month-only, "about", non-English months) is not
+// proven equal, so it is a conflict and gets recorded as a note instead of being skipped.
+function uniqueDateAgrees(existing: GxFact, wanted?: string): boolean {
+  if (!wanted?.trim()) return true;
+  const texts = [existing.date?.formal, existing.date?.original].filter(
+    (t): t is string => !!t
+  );
+  if (/^\s*\d{4}\s*$/.test(wanted)) {
+    return texts.some((t) => yearOf(t) === yearOf(wanted));
+  }
+  const wantedDay = dayOf(wanted);
+  if (wantedDay) return texts.some((t) => dayOf(t) === wantedDay);
+  return texts.some((t) => norm(t) === norm(wanted));
+}
+
+// Whole comma-separated parts must match, so "San Diego" never matches "San Francisco" and
+// "Springfield, Illinois" never matches "Springfield, Missouri". One side may be less
+// specific than the other ("Provo" vs "Provo, Utah, United States").
+function placeAgrees(existing?: string, wanted?: string): boolean {
+  if (!wanted?.trim()) return true;
+  const parts = (t?: string) => (t ?? "").split(",").map(norm).filter(Boolean);
+  const e = parts(existing);
+  const w = parts(wanted);
+  if (e.length === 0 || w.length === 0) return false;
+  return w.every((p) => e.includes(p)) || e.every((p) => w.includes(p));
+}
+
+function factMatches(existing: GxFact, f: ProposedFinding, unique = false): boolean {
   const existingYear = yearOf(existing.date?.formal ?? existing.date?.original);
   const wantedYear = yearOf(f.date);
-  const dateOk = !wantedYear || existingYear === wantedYear;
-  const placeOk =
-    !f.place || norm(existing.place?.original).includes(norm(f.place).split(" ")[0]);
-  return dateOk && placeOk;
+  const existingDay = dayOf(existing.date?.formal) ?? dayOf(existing.date?.original);
+  const wantedDay = dayOf(f.date);
+  const dayClash = !!existingDay && !!wantedDay && existingDay !== wantedDay;
+  const dateOk = unique
+    ? uniqueDateAgrees(existing, f.date)
+    : (!wantedYear || existingYear === wantedYear) && !dayClash;
+  return dateOk && placeAgrees(existing.place?.original, f.place);
 }
 
 function conclusionOp(
@@ -456,11 +634,14 @@ export function descriptionIdOf(ref?: string): string {
 export function findDescription(
   doc: GedcomxDocument,
   about: string | undefined,
-  sourceMarker: string
+  sourceMarker: string,
+  title?: string
 ): GxSourceDescription | undefined {
+  const wantedTitle = norm(title);
   return (doc.sourceDescriptions ?? []).find(
     (sd) =>
       (about !== undefined && sd.about === about) ||
-      (sd.notes ?? []).some((n) => n.text?.includes(sourceMarker))
+      (sd.notes ?? []).some((n) => n.text?.includes(sourceMarker)) ||
+      (!!wantedTitle && (sd.titles ?? []).some((t) => norm(t.value) === wantedTitle))
   );
 }
