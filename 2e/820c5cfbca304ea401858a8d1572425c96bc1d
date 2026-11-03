@@ -1,0 +1,19 @@
+.github/workflows/secret-scan.yml
+  s_034b2ad3184dc7::t_87b05c0f55943c 22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.7.5",
+  "base_commit_sha": "2e820c5cfbca304ea401858a8d1572425c96bc1d",
+  "prompts": {},
+  "sessions": {
+    "s_034b2ad3184dc7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a7a637ef-4d1e-4c8b-9413-aec3c7ae6a9b",
+        "model": "claude-sonnet-5-5"
+      },
+      "human_author": "Soren <sorensencc@gmail.com>"
+    }
+  }
+}
