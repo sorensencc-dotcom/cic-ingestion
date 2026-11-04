@@ -2,9 +2,13 @@ import { timingSafeEqual } from "crypto";
 import { NextFunction, Router, Request, Response } from "express";
 import { AdapterIntegrationService } from "../services/AdapterIntegrationService";
 
-// Adapters that act with a personal third-party credential. The listener has
-// no authentication of its own, so these require a shared secret header.
-export const CREDENTIALED_ADAPTERS: ReadonlySet<string> = new Set(["familysearch"]);
+// Adapters that use third-party credentials. The listener has no
+// authentication of its own, so these require a shared secret header.
+export const CREDENTIALED_ADAPTERS: ReadonlySet<string> = new Set([
+  "familysearch",
+  "grok",
+  "xai-docs-mcp",
+]);
 export const ROUTE_KEY_ENV = "CIC_CREDENTIALED_ROUTE_KEY";
 export const ROUTE_KEY_HEADER = "x-cic-route-key";
 export const MIN_ROUTE_KEY_LENGTH = 16;
