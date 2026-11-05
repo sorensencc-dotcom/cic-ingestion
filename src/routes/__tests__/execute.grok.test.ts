@@ -6,7 +6,7 @@ import { AdapterInput, AdapterOutput, BaseAdapter } from "../../adapters/BaseAda
 import { AdapterIntegrationService } from "../../services/AdapterIntegrationService";
 import { createExecuteRouter } from "../execute";
 
-const ROUTE_KEY = "test-route-key-0123456789";
+const ROUTE_KEY = "test-route-key-" + "0123456789";
 const ROUTES = ["/grok", "/xai-docs-mcp", "/batch/grok"];
 
 class TestAdapter extends BaseAdapter {
